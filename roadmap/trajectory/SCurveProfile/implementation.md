@@ -1,6 +1,6 @@
 # S-Curve (Jerk-Limited) Profile — Implementation Pseudocode
 
-> Roadmap ref: #M9 (Tier 2) · Target: `numerical/trajectory` · Namespace `trajectory` · Type: `float` (templated on `T`, instantiated for `float` only)
+> Roadmap ref: #M9 (Tier 2) · Target: `robotics/trajectory` · Namespace `trajectory` · Type: `float` (templated on `T`, instantiated for `float` only)
 
 ## Data structures
 
@@ -78,15 +78,15 @@ function Sample(t):                              # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `numerical/trajectory/SCurveProfile.hpp` — `#pragma once` →
+- Header: `robotics/trajectory/SCurveProfile.hpp` — `#pragma once` →
   `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class SCurveProfile<float>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
-- Coverage: `numerical/trajectory/SCurveProfile.cpp` →
+- Coverage: `robotics/trajectory/SCurveProfile.cpp` →
   `template class SCurveProfile<float>;`
-- Test: `numerical/trajectory/test/TestSCurveProfile.cpp`
+- Test: `robotics/trajectory/test/TestSCurveProfile.cpp`
 - Doc: `doc/trajectory/SCurveProfile.md` (expand to follow `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestSCurveProfile.cpp` → the `_test` target.
-- New module: create `numerical/trajectory/CMakeLists.txt` via `robotics_add_header_library(...)`,
-  add a `test/` subdir, register it in `numerical/CMakeLists.txt`, and add a `doc/trajectory/` folder.
+- New module: create `robotics/trajectory/CMakeLists.txt` via `robotics_add_header_library(...)`,
+  add a `test/` subdir, register it in `robotics/CMakeLists.txt`, and add a `doc/trajectory/` folder.
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

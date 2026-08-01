@@ -1,11 +1,11 @@
 ---
-description: "Numerical C++ rules (float-only): no heap, bounded containers, generic template<typename T> instantiated for float, embedded pragmas, Allman/brace-init, SOLID, const-correct. Canonical: AGENTS.md."
+description: "Robotics C++ rules (float-only): no heap, bounded containers, generic template<typename T> instantiated for float, embedded pragmas, Allman/brace-init, SOLID, const-correct. Canonical: AGENTS.md."
 applyTo: "**/*.{hpp,cpp,h}"
 ---
 
-# Numerical Toolbox C++ Rules
+# Robotics Toolbox C++ Rules
 
-This project is a numerical algorithms library for DSP, control algorithms, filters, optimizers, and estimators targeting resource-constrained embedded systems. Follow these rules strictly.
+This project is a robot-manipulator algorithms library (kinematics, dynamics, trajectories, and manipulator control) targeting resource-constrained embedded systems. It consumes the shared numerical primitives (`math`, `solvers`, …) from numerical-toolbox-cpp via FetchContent. Follow these rules strictly.
 
 ## Memory — No Heap Allocation
 
@@ -43,9 +43,9 @@ Apply `OPTIMIZE_FOR_SPEED` (from `numerical/math/CompilerOptimizations.hpp`) on 
 
 ## Naming
 
-- Classes/Methods: `PascalCase` (e.g., `FirFilter`, `Compute()`)
+- Classes/Methods: `PascalCase` (e.g., `ForwardKinematics`, `Compute()`)
 - Member variables: `camelCase` (e.g., `sampleRate`, `coefficients`)
-- Namespaces: lowercase (`filters`, `controllers`, `analysis`, `math`)
+- Namespaces: lowercase (`kinematics`, `dynamics`, `trajectory`, `math`)
 - Template parameters: descriptive (`typename T`, `std::size_t Order`)
 
 ## Style

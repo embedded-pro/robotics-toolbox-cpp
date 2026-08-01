@@ -1,6 +1,6 @@
 # Cartesian Path + Orientation (SLERP) Interpolation — Implementation Pseudocode
 
-> Roadmap ref: #M10 (Tier 2) · Target: `numerical/trajectory` · Namespace `trajectory` · Type: `float` (templated on `T`, instantiated for `float` only)
+> Roadmap ref: #M10 (Tier 2) · Target: `robotics/trajectory` · Namespace `trajectory` · Type: `float` (templated on `T`, instantiated for `float` only)
 
 ## Data structures
 
@@ -71,15 +71,15 @@ function Sample(t):                           # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `numerical/trajectory/CartesianSlerpInterpolation.hpp` — `#pragma once` →
+- Header: `robotics/trajectory/CartesianSlerpInterpolation.hpp` — `#pragma once` →
   `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class CartesianSlerpInterpolation<float>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
-- Coverage: `numerical/trajectory/CartesianSlerpInterpolation.cpp` →
+- Coverage: `robotics/trajectory/CartesianSlerpInterpolation.cpp` →
   `template class CartesianSlerpInterpolation<float>;`
-- Test: `numerical/trajectory/test/TestCartesianSlerpInterpolation.cpp`
+- Test: `robotics/trajectory/test/TestCartesianSlerpInterpolation.cpp`
 - Doc: `doc/trajectory/CartesianSlerpInterpolation.md` (expand to follow `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestCartesianSlerpInterpolation.cpp` → the `_test` target.
-- New module: create `numerical/trajectory/CMakeLists.txt` via `robotics_add_header_library(...)`,
-  add a `test/` subdir, register it in `numerical/CMakeLists.txt`, and add a `doc/trajectory/` folder.
+- New module: create `robotics/trajectory/CMakeLists.txt` via `robotics_add_header_library(...)`,
+  add a `test/` subdir, register it in `robotics/CMakeLists.txt`, and add a `doc/trajectory/` folder.
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

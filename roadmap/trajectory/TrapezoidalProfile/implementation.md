@@ -1,6 +1,6 @@
 # Trapezoidal (LSPB) Velocity Profile — Implementation Pseudocode
 
-> Roadmap ref: #M3 (Tier 1) · Target: `numerical/trajectory` · Namespace `trajectory` · Type: `float` (templated on `T`, instantiated for `float` only)
+> Roadmap ref: #M3 (Tier 1) · Target: `robotics/trajectory` · Namespace `trajectory` · Type: `float` (templated on `T`, instantiated for `float` only)
 
 ## Data structures
 
@@ -76,15 +76,15 @@ function Sample(t):                             # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `numerical/trajectory/TrapezoidalProfile.hpp` — `#pragma once` →
+- Header: `robotics/trajectory/TrapezoidalProfile.hpp` — `#pragma once` →
   `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class TrapezoidalProfile<float>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
-- Coverage: `numerical/trajectory/TrapezoidalProfile.cpp` →
+- Coverage: `robotics/trajectory/TrapezoidalProfile.cpp` →
   `template class TrapezoidalProfile<float>;`
-- Test: `numerical/trajectory/test/TestTrapezoidalProfile.cpp`
+- Test: `robotics/trajectory/test/TestTrapezoidalProfile.cpp`
 - Doc: `doc/trajectory/TrapezoidalProfile.md` (expand to follow `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestTrapezoidalProfile.cpp` → the `_test` target.
-- New module: create `numerical/trajectory/CMakeLists.txt` via `robotics_add_header_library(...)`,
-  add a `test/` subdir, register it in `numerical/CMakeLists.txt`, and add a `doc/trajectory/` folder.
+- New module: create `robotics/trajectory/CMakeLists.txt` via `robotics_add_header_library(...)`,
+  add a `test/` subdir, register it in `robotics/CMakeLists.txt`, and add a `doc/trajectory/` folder.
 - Generic pattern: see `roadmap/README.md` → "Deployment shape".

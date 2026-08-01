@@ -1,6 +1,6 @@
 # Time-Optimal Path Parameterization (TOPP) — Implementation Pseudocode
 
-> Roadmap ref: #M27 (Tier 5) · Target: `numerical/trajectory` · Namespace `trajectory` · Type: `float` (templated on `T`, instantiated for `float` only)
+> Roadmap ref: #M27 (Tier 5) · Target: `robotics/trajectory` · Namespace `trajectory` · Type: `float` (templated on `T`, instantiated for `float` only)
 
 ## Data structures
 
@@ -81,15 +81,15 @@ function Sample(t):                         # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `numerical/trajectory/TimeOptimalPathParameterization.hpp` — `#pragma once` →
+- Header: `robotics/trajectory/TimeOptimalPathParameterization.hpp` — `#pragma once` →
   `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class TimeOptimalPathParameterization<float, N, Grid>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
-- Coverage: `numerical/trajectory/TimeOptimalPathParameterization.cpp` →
+- Coverage: `robotics/trajectory/TimeOptimalPathParameterization.cpp` →
   `template class TimeOptimalPathParameterization<float, N, Grid>;`
-- Test: `numerical/trajectory/test/TestTimeOptimalPathParameterization.cpp`
+- Test: `robotics/trajectory/test/TestTimeOptimalPathParameterization.cpp`
 - Doc: `doc/trajectory/TimeOptimalPathParameterization.md` (expand to follow `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestTimeOptimalPathParameterization.cpp` → the `_test` target.
-- New module: create `numerical/trajectory/CMakeLists.txt` via `robotics_add_header_library(...)`,
-  add a `test/` subdir, register it in `numerical/CMakeLists.txt`, and add a `doc/trajectory/` folder.
+- New module: create `robotics/trajectory/CMakeLists.txt` via `robotics_add_header_library(...)`,
+  add a `test/` subdir, register it in `robotics/CMakeLists.txt`, and add a `doc/trajectory/` folder.
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.
