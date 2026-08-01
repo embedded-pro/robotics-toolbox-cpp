@@ -13,6 +13,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: build
     groups:
       patch-minor-action-updates:
         update-types:
@@ -22,9 +24,13 @@ updates:
     directory: .devcontainer
     schedule:
       interval: daily
+    commit-message:
+      prefix: build
   - package-ecosystem: gitsubmodule
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: build
     registries:
       - github-private
