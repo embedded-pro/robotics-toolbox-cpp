@@ -2,7 +2,7 @@
 
 The library's test strategy: every algorithm is validated against the **mathematical invariants of
 its family**, not golden output. This is the reference for the `unit-tester` agent (and humans) when
-writing **unit tests** for `numerical/`. It answers one question per algorithm: *which mathematical
+writing **unit tests** for `robotics/`. It answers one question per algorithm: *which mathematical
 properties must a correct implementation satisfy, and how do we assert them?*
 
 ## Rationale

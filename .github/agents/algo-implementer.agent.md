@@ -1,5 +1,5 @@
 ---
-description: "Deploy ONE roadmap/ algorithm spec into numerical/ as float-only production code + test + doc + CMake. Terse, minimal tests, no comments. Use for roadmap deployment."
+description: "Deploy ONE roadmap/ algorithm spec into robotics/ as float-only production code + test + doc + CMake. Terse, minimal tests, no comments. Use for roadmap deployment."
 tools: [read, edit, search, execute, todo]
 model: "Claude Sonnet 4.6"
 handoffs:

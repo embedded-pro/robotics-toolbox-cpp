@@ -1,13 +1,13 @@
 ---
-description: "Numerical Toolbox testing (float-only): TEST_F on float, StrictMock only, anonymous-namespace fixtures, no plain TEST(), no redundant cases, Arrange-Act-Assert. Canonical: AGENTS.md."
+description: "Robotics Toolbox testing (float-only): TEST_F on float, StrictMock only, anonymous-namespace fixtures, no plain TEST(), no redundant cases, Arrange-Act-Assert. Canonical: AGENTS.md."
 applyTo: "**/test/**"
 ---
 
-# Numerical Toolbox Testing Guidelines
+# Robotics Toolbox Testing Guidelines
 
 ## File Structure
 
-- Test files: `numerical/{domain}/test/Test{ComponentName}.cpp`
+- Test files: `robotics/{domain}/test/Test{ComponentName}.cpp`
 - CMake: tests added via `add_subdirectory(test)` with standard test target patterns
 
 ## Framework
@@ -66,17 +66,17 @@ When `EMIL_ENABLE_COVERAGE` is set, template code needs explicit instantiation i
 
 ```cpp
 #ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD
-extern template class FirFilter<float, 8>;
+extern template class ForwardKinematics<float, 3>;
 #endif
 ```
 
 And in the matching `.cpp` file:
 
 ```cpp
-#include "numerical/filters/passive/FirFilter.hpp"
+#include "robotics/kinematics/ForwardKinematics.hpp"
 
-namespace filters::passive
+namespace kinematics
 {
-    template class FirFilter<float, 8>;
+    template class ForwardKinematics<float, 3>;
 }
 ```

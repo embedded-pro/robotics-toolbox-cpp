@@ -1,5 +1,5 @@
 ---
-description: "Refactor a pre-roadmap numerical/ algorithm to reuse shared math/ utilities, add coverage-build infra, and simplify/dedupe tests — preserving existing Q15/Q31 support. Behavior-preserving."
+description: "Refactor a pre-roadmap robotics/ algorithm to reuse shared math/ utilities, add coverage-build infra, and simplify/dedupe tests — preserving existing Q15/Q31 support. Behavior-preserving."
 tools: [read, edit, search, execute, todo]
 model: "Claude Sonnet 4.6"
 handoffs:

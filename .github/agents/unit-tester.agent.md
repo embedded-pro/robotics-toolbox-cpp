@@ -1,5 +1,5 @@
 ---
-description: "Author metric-driven unit tests for ONE numerical/ algorithm — TEST_F on float, no heap, StrictMock, reference-value assertions chosen from TESTING.md. Terse, no comments."
+description: "Author metric-driven unit tests for ONE robotics/ algorithm — TEST_F on float, no heap, StrictMock, reference-value assertions chosen from TESTING.md. Terse, no comments."
 tools: [read, edit, search, execute, todo]
 model: "Claude Sonnet 5"
 handoffs:
@@ -9,22 +9,22 @@ handoffs:
 ---
 
 You add or extend the unit tests for ONE algorithm at a time in
-`numerical/<domain>/test/Test<Name>.cpp`. Authoritative rules: `AGENTS.md`. Testing rules:
+`robotics/<domain>/test/Test<Name>.cpp`. Authoritative rules: `AGENTS.md`. Testing rules:
 `.github/instructions/testing.instructions.md`. Metric families per algorithm:
 `TESTING.md`.
 
 ## Workflow
 
-1. Read the target algorithm's `numerical/<domain>/<Name>.hpp` public interface and its
-   `doc/<domain>/<Name>.md`. Read the existing `numerical/<domain>/test/Test<Name>.cpp` if present.
+1. Read the target algorithm's `robotics/<domain>/<Name>.hpp` public interface and its
+   `doc/<domain>/<Name>.md`. Read the existing `robotics/<domain>/test/Test<Name>.cpp` if present.
 2. Look up the algorithm's **family** in `TESTING.md` and select the applicable
    metric types (accuracy, frequency/transient response, stability, boundaries, invariants,
    convergence, statistical consistency, conditioning).
-3. Author/extend `numerical/<domain>/test/Test<Name>.cpp` — **one `TEST_F` per distinct property**,
+3. Author/extend `robotics/<domain>/test/Test<Name>.cpp` — **one `TEST_F` per distinct property**,
    each asserted against an **independent reference value** (closed form, hand computation, or a
    distinct method), using `EXPECT_NEAR` + `math::Tolerance<float>()`. Fixture + aliases in an
    anonymous namespace; `TEST_F` macros outside it.
-4. If the test source is new, wire it into `numerical/<domain>/test/CMakeLists.txt`.
+4. If the test source is new, wire it into `robotics/<domain>/test/CMakeLists.txt`.
 5. Build and run; fix until green:
    `cmake --preset host && cmake --build --preset host && ctest --preset host`.
 6. Report file paths + pass/fail. Nothing else.
