@@ -1,0 +1,29 @@
+---
+name: Create Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  release_please:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: token
+        with:
+          app-id: ${{ vars.FOREST_RELEASER_APP_ID }}
+          private-key: ${{ secrets.FOREST_RELEASER_APP_PRIVATE_KEY }}
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        id: release
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}

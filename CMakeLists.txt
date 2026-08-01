@@ -1,0 +1,123 @@
+cmake_minimum_required(VERSION 3.24)
+
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(ROBOTICS_TOOLBOX_STANDALONE On)
+endif()
+
+option(CMAKE_COMPILE_WARNING_AS_ERROR "Enable warnings-as-error" On)
+option(ROBOTICS_TOOLBOX_INCLUDE_DEFAULT_INIT "Include default initialization code; turn off when providing custom initialization" On)
+option(ROBOTICS_TOOLBOX_BUILD_SIMULATOR "Enable build of the Qt simulator applications" Off)
+option(ROBOTICS_TOOLBOX_BUILD_TESTS "Enable build of the tests" Off)
+option(ROBOTICS_TOOLBOX_ENABLE_OPTIMIZATIONS "Enable compiler optimizations for numerical routines" On)
+
+if (ROBOTICS_TOOLBOX_BUILD_TESTS)
+    # CTest cannot be included before the first project() statement, but Embedded Infastructure
+    # Library needs to see that test utilities need to be built.
+    set(BUILD_TESTING On)
+    add_definitions(-DROBOTICS_TOOLBOX_ENABLE_ASSERTIONS=1)
+endif()
+
+if (ROBOTICS_TOOLBOX_ENABLE_OPTIMIZATIONS)
+    add_definitions(-DRoboticsToolbox_ENABLE_OPTIMIZATIONS=1)
+endif()
+
+if (EMIL_ENABLE_COVERAGE)
+    add_definitions(-DROBOTICS_TOOLBOX_COVERAGE_BUILD=1)
+endif()
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(RoboticsHeaderLibrary)
+
+add_definitions(-DEMIL_ENABLE_TRACING=1)
+
+if (ROBOTICS_TOOLBOX_STANDALONE)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        emil
+        GIT_REPOSITORY https://github.com/embedded-pro/embedded-infra-lib.git
+        GIT_TAG        2848dbf163a6ebf159e29f7f4f73b96f7773d20d # Unreleased
+    )
+
+    set(EMIL_INCLUDE_MBEDTLS Off CACHE BOOL "" FORCE)
+    set(EMIL_INCLUDE_ECHO Off CACHE BOOL "" FORCE)
+    set(EMIL_FETCH_ECHO_COMPILERS Off CACHE BOOL "" FORCE)
+    set(EMIL_BUILD_ECHO_COMPILERS Off CACHE BOOL "" FORCE)
+    set(EMIL_ENABLE_DOCKER_TOOLS Off CACHE BOOL "" FORCE)
+
+    FetchContent_MakeAvailable(emil)
+
+    FetchContent_Declare(
+        numerical_toolbox
+        GIT_REPOSITORY https://github.com/embedded-pro/numerical-toolbox-cpp.git
+        GIT_TAG        main
+    )
+
+    FetchContent_MakeAvailable(numerical_toolbox)
+endif()
+
+project(robotics-toolbox LANGUAGES C CXX ASM VERSION 1.0.0) # x-release-please-version
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED On)
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    set(CMAKE_C_FLAGS_DEBUG "-Og -g" CACHE STRING "C Debug flags" FORCE)
+    set(CMAKE_CXX_FLAGS_DEBUG "-Og -g" CACHE STRING "C++ Debug flags" FORCE)
+endif()
+
+if (ROBOTICS_TOOLBOX_STANDALONE)
+    execute_process(
+        COMMAND git config --global url.https://github.com/.insteadOf git@github.com:
+        RESULT_VARIABLE GIT_CONFIG_RESULT
+        OUTPUT_QUIET
+        ERROR_QUIET
+    )
+endif()
+
+set_directory_properties(PROPERTY USE_FOLDERS ON)
+
+# When building robotics-toolbox by itself do not exclude any targets from all
+# Libraries will only be excluded from all when robotics-toolbox is a consumed as a dependency.
+if (ROBOTICS_TOOLBOX_STANDALONE)
+    set(ROBOTICS_TOOLBOX_EXCLUDE_FROM_ALL "")
+else()
+    set(ROBOTICS_TOOLBOX_EXCLUDE_FROM_ALL "EXCLUDE_FROM_ALL")
+endif()
+
+if (ROBOTICS_TOOLBOX_BUILD_TESTS)
+    include(CTest)
+    emil_enable_testing()
+endif()
+
+add_subdirectory(robotics)
+
+if (ROBOTICS_TOOLBOX_BUILD_SIMULATOR)
+    add_subdirectory(simulator)
+endif()
+
+emil_clangformat_directories(robotics DIRECTORIES .)
+
+emil_coverage_targets(DIRECTORIES .)
+
+if (ROBOTICS_TOOLBOX_STANDALONE)
+    emil_folderize_all_targets()
+endif()
+
+if (NOT TARGET package)
+    set(CPACK_GENERATOR "ZIP;TGZ")
+    set(CPACK_SOURCE_IGNORE_FILES ".vs/;.git/;build/")
+    set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+    set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+    set(CPACK_PACKAGE_DESCRIPTION "${PROJECT_DESCRIPTION}")
+    set(CPACK_DEBIAN_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+    set(CPACK_RPM_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+    set(CPACK_PACKAGE_HOMEPAGE_URL "${PROJECT_HOMEPAGE_URL}")
+    set(CPACK_PACKAGE_MAINTAINER "${CPACK_PACKAGE_VENDOR}")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "${CPACK_PACKAGE_VENDOR}")
+    set(CPACK_RPM_PACKAGE_MAINTAINER "${CPACK_PACKAGE_VENDOR}")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+    set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+
+    include(CPack)
+endif()

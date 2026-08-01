@@ -1,0 +1,42 @@
+{
+  "include-component-in-tag": false,
+  "plugins": [
+    "sentence-case"
+  ],
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "robotics-toolbox",
+      "extra-files": [
+        "CMakeLists.txt"
+      ],
+      "changelog-sections": [
+        {
+          "type": "feat",
+          "section": "Features"
+        },
+        {
+          "type": "fix",
+          "section": "Bug Fixes"
+        },
+        {
+          "type": "chore",
+          "section": "Miscellaneous"
+        },
+        {
+          "type": "refactor",
+          "section": "Refactoring"
+        },
+        {
+          "type": "build",
+          "section": "Build System"
+        },
+        {
+          "type": "perf",
+          "section": "Performance Improvements"
+        }
+      ]
+    }
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}

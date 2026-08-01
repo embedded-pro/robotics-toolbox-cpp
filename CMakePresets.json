@@ -1,0 +1,113 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "defaults",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/install",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "On",
+        "CMAKE_COMPILE_WARNING_AS_ERROR": "On"
+      }
+    },
+    {
+      "name": "host",
+      "displayName": "Configuration for Host Tooling and Tests",
+      "inherits": "defaults",
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
+        "ROBOTICS_TOOLBOX_BUILD_TESTS": true,
+        "ROBOTICS_TOOLBOX_BUILD_SIMULATOR": true
+      },
+      "generator": "Ninja Multi-Config"
+    },
+    {
+      "name": "host-single-Debug",
+      "displayName": "Configuration for Host Tooling and Tests, Single Config Generator, Debug",
+      "inherits": "defaults",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "ROBOTICS_TOOLBOX_BUILD_TESTS": true
+      }
+    },
+    {
+      "name": "coverage",
+      "displayName": "Configuration for Code Coverage",
+      "inherits": "host",
+      "cacheVariables": {
+        "EMIL_ENABLE_COVERAGE": "On",
+        "ROBOTICS_TOOLBOX_ENABLE_OPTIMIZATIONS": "Off",
+        "ROBOTICS_TOOLBOX_BUILD_SIMULATOR": true
+      },
+      "generator": "Ninja"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "host-RelWithDebInfo",
+      "configuration": "RelWithDebInfo",
+      "configurePreset": "host"
+    },
+    {
+      "name": "host-Debug",
+      "configuration": "Debug",
+      "configurePreset": "host"
+    },
+    {
+      "name": "host-Debug-WithPackage",
+      "configuration": "Debug",
+      "configurePreset": "host",
+      "targets": [
+        "all",
+        "package"
+      ]
+    },
+    {
+      "name": "host-single-Debug",
+      "configuration": "Debug",
+      "configurePreset": "host-single-Debug"
+    },
+    {
+      "name": "coverage",
+      "configuration": "Debug",
+      "configurePreset": "coverage"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "defaults",
+      "hidden": true,
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "stopOnFailure": true
+      }
+    },
+    {
+      "name": "host",
+      "configurePreset": "host",
+      "configuration": "Debug",
+      "inherits": "defaults"
+    },
+    {
+      "name": "coverage",
+      "configurePreset": "coverage",
+      "configuration": "Debug",
+      "inherits": "defaults"
+    },
+    {
+      "name": "host-single-Debug",
+      "configurePreset": "host-single-Debug",
+      "configuration": "Debug",
+      "inherits": "defaults"
+    }
+  ]
+}
