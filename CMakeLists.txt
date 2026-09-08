@@ -56,7 +56,7 @@ if (ROBOTICS_TOOLBOX_STANDALONE)
     FetchContent_MakeAvailable(numerical_toolbox)
 endif()
 
-project(robotics-toolbox LANGUAGES C CXX ASM VERSION 1.0.0) # x-release-please-version
+project(robotics-toolbox LANGUAGES C CXX ASM VERSION 1.0.1) # x-release-please-version
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED On)
