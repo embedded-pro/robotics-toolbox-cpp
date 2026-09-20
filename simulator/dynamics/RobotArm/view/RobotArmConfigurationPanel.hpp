@@ -1,6 +1,6 @@
 #pragma once
 
-#include "simulator/dynamics/RobotArm/application/RobotArmSimulator.hpp"
+#include "simulator/dynamics/RobotArm/application/RobotArmTypes.hpp"
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
