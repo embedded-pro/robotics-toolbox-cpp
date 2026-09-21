@@ -31,8 +31,6 @@ namespace simulator::dynamics::view
 
         std::uint8_t trailMaximumAlpha{ 180 };
 
-        // The Qt original set a pen and drew a line per trail segment - up to 499 of each per
-        // repaint. AGENTS.md forbids per-sample virtual calls, so the fade is banded instead.
         std::size_t trailBands{ 16 };
         std::size_t trailSeriesIndex{ 3 };
 

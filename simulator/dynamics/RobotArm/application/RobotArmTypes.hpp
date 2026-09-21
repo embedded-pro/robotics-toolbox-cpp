@@ -6,9 +6,6 @@
 
 namespace simulator::dynamics
 {
-    // Split out of RobotArmSimulator.hpp: these are plain float aggregates, but sharing a header
-    // with the templated simulator meant every view that named them also pulled in
-    // robotics/{dynamics,kinematics} and the numerical headers behind those.
     struct RobotArmConfig
     {
         int dof = 2;

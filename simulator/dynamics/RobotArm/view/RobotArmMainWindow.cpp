@@ -39,9 +39,6 @@ namespace simulator::dynamics::view
         statusBar()->showMessage("Configure robot parameters and press Start");
     }
 
-    // QtPaintedWidget clears a callback on the view when it is destroyed, and QObject would
-    // otherwise delete it during ~QMainWindow - after this window's own members, sceneView
-    // among them, have already been destroyed. Deleting it here keeps that order valid.
     RobotArmMainWindow::~RobotArmMainWindow()
     {
         delete view3D;

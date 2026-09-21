@@ -44,9 +44,6 @@ namespace
     };
 }
 
-// The defect this port fixes: the Qt original drew the wide translucent outline after the solid
-// stroke, so it covered the link instead of framing it. Asserted on the command stream so a
-// reintroduction fails CI rather than needing someone to notice it in a screenshot.
 TEST_F(RobotArmSceneViewTest, EachLinkDrawsItsTranslucentOutlineBeforeTheSolidStroke)
 {
     view.Paint(canvas, bounds);
@@ -91,8 +88,6 @@ TEST_F(RobotArmSceneViewTest, TheTrailIsBandedRatherThanOneCallPerSegment)
 {
     view.Paint(canvas, bounds);
 
-    // 16 trail bands plus the single shadow polyline; the Qt original issued 39 DrawLine and 39
-    // SetPen calls for the same 40-point trail.
     EXPECT_EQ(canvas.CountOf(CommandKind::DrawPolyline), 17u);
 }
 
@@ -117,7 +112,6 @@ TEST_F(RobotArmSceneViewTest, AShortTrailDrawsNoBands)
     canvas.Clear();
     view.Paint(canvas, bounds);
 
-    // Only the shadow polyline survives.
     EXPECT_EQ(canvas.CountOf(CommandKind::DrawPolyline), 1u);
 }
 
@@ -157,8 +151,6 @@ TEST_F(RobotArmSceneViewTest, PaintingWithNoRoomDrawsNothing)
     EXPECT_TRUE(canvas.Commands().empty());
 }
 
-// The Qt adapter reports MouseButton::None on every move event and turns mouse tracking on, so a
-// hover must not move the camera.
 TEST_F(RobotArmSceneViewTest, HoveringDoesNotOrbit)
 {
     const auto before = view.Camera().Pose().azimuth;
@@ -211,8 +203,6 @@ TEST_F(RobotArmSceneViewTest, DoubleClickingResetsTheCamera)
     EXPECT_NEAR(view.Camera().Pose().distance, 3.5f, 1e-6f);
 }
 
-// The camera basis is built once per Paint now; the Qt original rebuilt it inside every Project
-// call. Repainting has to be idempotent for that to be safe.
 TEST_F(RobotArmSceneViewTest, RepaintingProducesTheSameCommandStream)
 {
     view.Paint(canvas, bounds);

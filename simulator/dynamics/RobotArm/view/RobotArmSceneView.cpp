@@ -30,7 +30,6 @@ namespace simulator::dynamics::view
         currentState = state;
         currentDof = dof;
 
-        // Reserved here rather than in Paint, which must not allocate.
         jointScreen.reserve(currentState.jointPositions.size());
         shadowScreen.reserve(currentState.jointPositions.size());
         trailScreen.reserve(currentState.endEffectorTrail.size());
@@ -55,8 +54,6 @@ namespace simulator::dynamics::view
             camera.StartOrbit(event.position);
     }
 
-    // No button test here: the Qt adapter reports MouseButton::None on every move. The camera's
-    // own orbiting flag is what distinguishes a drag from a hover.
     void RobotArmSceneView::OnMouseMove(const ui::MouseEvent& event)
     {
         if (!camera.IsOrbiting())
@@ -150,8 +147,6 @@ namespace simulator::dynamics::view
             if (last <= first)
                 continue;
 
-            // Bands share an endpoint so the polyline has no gaps at the seams, and the alpha is
-            // the original's ramp sampled at the band's newest sample.
             const auto span = std::span<const ui::Point>{ trailScreen }.subspan(first, last - first + 1);
             const auto ratio = static_cast<float>(last + 1) / static_cast<float>(total);
             const auto alpha = static_cast<std::uint8_t>(ratio * static_cast<float>(config.trailMaximumAlpha));
@@ -172,9 +167,6 @@ namespace simulator::dynamics::view
         {
             const auto color = theme.Series(i);
 
-            // Wide translucent stroke first, solid over it. The Qt original drew these the other
-            // way round, so the outline it intended was painted on top of the link and never read
-            // as an outline at all.
             canvas.SetPen(ui::Pen{ color.WithAlpha(config.linkOutlineAlpha), config.linkOutlineWidth,
                 ui::LineStyle::Solid, ui::LineCap::Round });
             canvas.DrawLine(jointScreen[i], jointScreen[i + 1]);
