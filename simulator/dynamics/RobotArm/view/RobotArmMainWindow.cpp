@@ -1,42 +1,42 @@
 #include "simulator/dynamics/RobotArm/view/RobotArmMainWindow.hpp"
-#include <QSplitter>
 #include <cmath>
 
 namespace simulator::dynamics::view
 {
+    namespace
+    {
+        const ui::shell::ShellSpec shellSpec{
+            "Robot Arm Dynamics Simulator",
+            ui::Size{ 1400.0f, 900.0f },
+            350.0f,
+            {},
+            "Configure robot parameters and press Start"
+        };
+    }
+
     RobotArmMainWindow::RobotArmMainWindow(QWidget* parent)
         : QMainWindow(parent)
+        , formView(new ui::backend::qt::QtFormView{ this })
+        , shell(*this, shellSpec)
+        , view3D(new ui::backend::qt::QtPaintedWidget{ sceneView, this })
+        , simulationTimer(new QTimer{ this })
     {
-        setWindowTitle("Robot Arm Dynamics Simulator");
-        resize(1400, 900);
+        formView->Build(form.Model());
+        formView->setMinimumWidth(280);
+        shell.SetPanel(formView);
 
-        auto* splitter = new QSplitter(Qt::Horizontal, this);
-
-        configPanel = new RobotArmConfigurationPanel(splitter);
-        configPanel->setMaximumWidth(350);
-        configPanel->setMinimumWidth(280);
-
-        view3D = new ui::backend::qt::QtPaintedWidget(sceneView, splitter);
         view3D->SetBackgroundRole(ui::theme::ColorRole::SceneBackground);
         view3D->SetPanCursorEnabled(true);
+        shell.SetContent(view3D);
 
-        splitter->addWidget(configPanel);
-        splitter->addWidget(view3D);
-        splitter->setStretchFactor(0, 0);
-        splitter->setStretchFactor(1, 1);
-
-        setCentralWidget(splitter);
-
-        simulationTimer = new QTimer(this);
         connect(simulationTimer, &QTimer::timeout, this, &RobotArmMainWindow::OnSimulationStep);
 
-        connect(configPanel, &RobotArmConfigurationPanel::StartRequested, this, &RobotArmMainWindow::OnStartRequested);
-        connect(configPanel, &RobotArmConfigurationPanel::StopRequested, this, &RobotArmMainWindow::OnStopRequested);
-        connect(configPanel, &RobotArmConfigurationPanel::ResetRequested, this, &RobotArmMainWindow::OnResetRequested);
-        connect(configPanel, &RobotArmConfigurationPanel::ConfigurationChanged, this, &RobotArmMainWindow::ApplyConfiguration);
+        form.Model().onActionTriggered = [this](ui::model::ActionId action)
+        {
+            OnActionTriggered(action);
+        };
 
         ApplyConfiguration();
-        statusBar()->showMessage("Configure robot parameters and press Start");
     }
 
     RobotArmMainWindow::~RobotArmMainWindow()
@@ -44,11 +44,21 @@ namespace simulator::dynamics::view
         delete view3D;
     }
 
+    void RobotArmMainWindow::OnActionTriggered(ui::model::ActionId action)
+    {
+        if (action == field::start)
+            OnStartRequested();
+        else if (action == field::stop)
+            OnStopRequested();
+        else if (action == field::reset)
+            OnResetRequested();
+    }
+
     void RobotArmMainWindow::ApplyConfiguration()
     {
-        auto config = configPanel->GetConfiguration();
+        auto config = form.BuildConfiguration();
         simulator.Configure(config);
-        simulator.SetInitialPositions(configPanel->GetInitialPositions());
+        simulator.SetInitialPositions(form.InitialPositions());
         simulationTimer->setInterval(static_cast<int>(std::round(1000.0f * config.dt)));
         sceneView.SetState(simulator.GetState(), config.dof);
     }
@@ -58,10 +68,10 @@ namespace simulator::dynamics::view
         if (!running)
         {
             ApplyConfiguration();
-            simulator.SetInitialPositions(configPanel->GetInitialPositions());
+            simulator.SetInitialPositions(form.InitialPositions());
             running = true;
             simulationTimer->start();
-            statusBar()->showMessage("Simulation running...");
+            shell.SetStatus("Simulation running...");
         }
     }
 
@@ -69,7 +79,7 @@ namespace simulator::dynamics::view
     {
         running = false;
         simulationTimer->stop();
-        statusBar()->showMessage("Simulation stopped");
+        shell.SetStatus("Simulation stopped");
     }
 
     void RobotArmMainWindow::OnResetRequested()
@@ -77,20 +87,21 @@ namespace simulator::dynamics::view
         running = false;
         simulationTimer->stop();
         ApplyConfiguration();
-        statusBar()->showMessage("Simulation reset");
+        shell.SetStatus("Simulation reset");
     }
 
     void RobotArmMainWindow::OnSimulationStep()
     {
-        simulator.SetTorques(configPanel->GetTorques());
+        simulator.SetTorques(form.Torques());
         simulator.Step();
 
         auto config = simulator.GetConfig();
         sceneView.SetState(simulator.GetState(), config.dof);
 
         auto& state = simulator.GetState();
-        statusBar()->showMessage(
-            QString("t=%1s | Running")
-                .arg(static_cast<double>(state.time), 0, 'f', 2));
+
+        shell.SetStatus(QString("t=%1s | Running")
+                .arg(static_cast<double>(state.time), 0, 'f', 2)
+                .toStdString());
     }
 }

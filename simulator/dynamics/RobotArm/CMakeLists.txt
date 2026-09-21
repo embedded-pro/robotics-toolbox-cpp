@@ -9,6 +9,7 @@ emil_build_for(robotics.simulator.dynamics.robot_arm HOST All PREREQUISITE_BOOL 
 target_link_libraries(robotics.simulator.dynamics.robot_arm PRIVATE
     robotics.simulator.dynamics.robotarm.application
     robotics.simulator.dynamics.robotarm.view
+    robotics.simulator.shell
 )
 
 target_sources(robotics.simulator.dynamics.robot_arm PRIVATE

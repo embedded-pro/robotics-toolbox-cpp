@@ -21,8 +21,6 @@ set_target_properties(robotics.simulator.dynamics.robotarm.view PROPERTIES
 target_sources(robotics.simulator.dynamics.robotarm.view PRIVATE
     RobotArmSceneView.cpp
     RobotArmSceneView.hpp
-    RobotArmConfigurationPanel.cpp
-    RobotArmConfigurationPanel.hpp
     RobotArmMainWindow.cpp
     RobotArmMainWindow.hpp
 )

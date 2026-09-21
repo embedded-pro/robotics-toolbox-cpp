@@ -8,11 +8,14 @@ target_include_directories(robotics.simulator.dynamics.robotarm.application PUBL
 target_link_libraries(robotics.simulator.dynamics.robotarm.application PUBLIC
     robotics.dynamics
     robotics.kinematics
+    ui.model
 )
 
 target_sources(robotics.simulator.dynamics.robotarm.application PRIVATE
     RobotArmSimulator.cpp
     RobotArmSimulator.hpp
+    RobotArmForm.cpp
+    RobotArmForm.hpp
 )
 
 if(MSVC)
@@ -21,4 +24,8 @@ else()
     target_compile_options(robotics.simulator.dynamics.robotarm.application PRIVATE
         -Wno-error
     )
+endif()
+
+if (ROBOTICS_TOOLBOX_BUILD_TESTS)
+    add_subdirectory(test)
 endif()
