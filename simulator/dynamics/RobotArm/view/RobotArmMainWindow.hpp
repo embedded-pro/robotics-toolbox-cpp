@@ -1,8 +1,9 @@
 #pragma once
 
 #include "simulator/dynamics/RobotArm/application/RobotArmSimulator.hpp"
-#include "simulator/dynamics/RobotArm/view/RobotArm3DWidget.hpp"
 #include "simulator/dynamics/RobotArm/view/RobotArmConfigurationPanel.hpp"
+#include "simulator/dynamics/RobotArm/view/RobotArmSceneView.hpp"
+#include "ui/backend/qt/QtPaintedWidget.hpp"
 #include <QMainWindow>
 #include <QStatusBar>
 #include <QTimer>
@@ -16,6 +17,7 @@ namespace simulator::dynamics::view
 
     public:
         explicit RobotArmMainWindow(QWidget* parent = nullptr);
+        ~RobotArmMainWindow() override;
 
     private:
         void OnStartRequested();
@@ -25,8 +27,9 @@ namespace simulator::dynamics::view
         void ApplyConfiguration();
 
         RobotArmSimulator simulator;
+        RobotArmSceneView sceneView;
         RobotArmConfigurationPanel* configPanel;
-        RobotArm3DWidget* view3D;
+        ui::backend::qt::QtPaintedWidget* view3D;
         QTimer* simulationTimer;
         bool running = false;
     };

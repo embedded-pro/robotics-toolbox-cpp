@@ -7,6 +7,10 @@ target_include_directories(robotics.simulator.dynamics.robotarm.view PUBLIC
 
 target_link_libraries(robotics.simulator.dynamics.robotarm.view PUBLIC
     robotics.simulator.dynamics.robotarm.application
+    ui.core
+    ui.theme
+    ui.scene
+    ui.backend.qt
     Qt6::Widgets
 )
 
@@ -15,8 +19,8 @@ set_target_properties(robotics.simulator.dynamics.robotarm.view PROPERTIES
 )
 
 target_sources(robotics.simulator.dynamics.robotarm.view PRIVATE
-    RobotArm3DWidget.cpp
-    RobotArm3DWidget.hpp
+    RobotArmSceneView.cpp
+    RobotArmSceneView.hpp
     RobotArmConfigurationPanel.cpp
     RobotArmConfigurationPanel.hpp
     RobotArmMainWindow.cpp
@@ -29,4 +33,8 @@ else()
     target_compile_options(robotics.simulator.dynamics.robotarm.view PRIVATE
         -Wno-error
     )
+endif()
+
+if (ROBOTICS_TOOLBOX_BUILD_TESTS)
+    add_subdirectory(test)
 endif()

@@ -16,7 +16,9 @@ namespace simulator::dynamics::view
         configPanel->setMaximumWidth(350);
         configPanel->setMinimumWidth(280);
 
-        view3D = new RobotArm3DWidget(splitter);
+        view3D = new ui::backend::qt::QtPaintedWidget(sceneView, splitter);
+        view3D->SetBackgroundRole(ui::theme::ColorRole::SceneBackground);
+        view3D->SetPanCursorEnabled(true);
 
         splitter->addWidget(configPanel);
         splitter->addWidget(view3D);
@@ -37,13 +39,18 @@ namespace simulator::dynamics::view
         statusBar()->showMessage("Configure robot parameters and press Start");
     }
 
+    RobotArmMainWindow::~RobotArmMainWindow()
+    {
+        delete view3D;
+    }
+
     void RobotArmMainWindow::ApplyConfiguration()
     {
         auto config = configPanel->GetConfiguration();
         simulator.Configure(config);
         simulator.SetInitialPositions(configPanel->GetInitialPositions());
         simulationTimer->setInterval(static_cast<int>(std::round(1000.0f * config.dt)));
-        view3D->SetState(simulator.GetState(), config.dof);
+        sceneView.SetState(simulator.GetState(), config.dof);
     }
 
     void RobotArmMainWindow::OnStartRequested()
@@ -79,7 +86,7 @@ namespace simulator::dynamics::view
         simulator.Step();
 
         auto config = simulator.GetConfig();
-        view3D->SetState(simulator.GetState(), config.dof);
+        sceneView.SetState(simulator.GetState(), config.dof);
 
         auto& state = simulator.GetState();
         statusBar()->showMessage(
