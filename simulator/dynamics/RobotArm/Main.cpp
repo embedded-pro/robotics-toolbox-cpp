@@ -1,15 +1,7 @@
 #include "simulator/dynamics/RobotArm/view/RobotArmMainWindow.hpp"
-#include "ui/theme/Theme.hpp"
-#include <QApplication>
+#include "simulator/shell/AppRunner.hpp"
 
 int main(int argc, char* argv[])
 {
-    QApplication app(argc, argv);
-
-    ui::theme::SetCurrent(ui::theme::Instrument());
-
-    simulator::dynamics::view::RobotArmMainWindow window;
-    window.show();
-
-    return app.exec();
+    return simulator::shell::Run<simulator::dynamics::view::RobotArmMainWindow>(argc, argv, ui::theme::Instrument());
 }

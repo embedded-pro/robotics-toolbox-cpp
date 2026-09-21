@@ -47,9 +47,6 @@ if (ROBOTICS_TOOLBOX_STANDALONE)
 
     FetchContent_MakeAvailable(emil)
 
-    # Declared before numerical_toolbox is made available: numerical-toolbox-cpp declares ui in
-    # its own standalone block, and FetchContent honours the first declaration it sees, so this
-    # keeps the pin here authoritative.
     if (ROBOTICS_TOOLBOX_BUILD_SIMULATOR)
         FetchContent_Declare(
             ui
@@ -57,8 +54,6 @@ if (ROBOTICS_TOOLBOX_STANDALONE)
             GIT_TAG        main
         )
 
-        # Explicit rather than inferred from this repository's simulator flag: e-foc configures
-        # its Qt tools on every host build, so no consumer flag means the same thing everywhere.
         set(UI_BUILD_QT_BACKEND On CACHE BOOL "" FORCE)
     endif()
 
