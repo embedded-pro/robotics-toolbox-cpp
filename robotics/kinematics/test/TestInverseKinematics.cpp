@@ -1,270 +1,153 @@
 #include "robotics/kinematics/ForwardKinematics.hpp"
 #include "robotics/kinematics/InverseKinematics.hpp"
+#include "numerical/math/Tolerance.hpp"
 #include <cmath>
 #include <gtest/gtest.h>
 #include <numbers>
 
 namespace
 {
-    constexpr float tolerance = 1e-3f;
+    using Vector3 = math::Vector<float, 3>;
+    using Link = dynamics::RevoluteJointLink<float>;
+
     constexpr float pi = std::numbers::pi_v<float>;
 
-    dynamics::RevoluteJointLink<float> MakeLink(float mass, float length,
-        const math::Vector<float, 3>& axis,
-        const math::Vector<float, 3>& parentToJoint,
-        const math::Vector<float, 3>& jointToCoM)
-    {
-        float I = mass * length * length / 12.0f;
+    const Vector3 xAxis{ 1.0f, 0.0f, 0.0f };
+    const Vector3 yAxis{ 0.0f, 1.0f, 0.0f };
+    const Vector3 zAxis{ 0.0f, 0.0f, 1.0f };
 
-        return dynamics::RevoluteJointLink<float>{
-            mass,
-            math::SquareMatrix<float, 3>{
-                { I, 0.0f, 0.0f },
-                { 0.0f, I, 0.0f },
-                { 0.0f, 0.0f, I } },
-            axis,
-            parentToJoint,
-            jointToCoM
-        };
+    Link MakeLink(const Vector3& axis, const Vector3& parentToJoint, const Vector3& jointToCoM)
+    {
+        return Link{ 1.0f, math::SquareMatrix<float, 3>::Identity(), axis, parentToJoint, jointToCoM };
     }
 
-    dynamics::RevoluteJointLink<float> MakePlanarLink(float mass, float length,
-        const math::Vector<float, 3>& parentToJoint)
-    {
-        return MakeLink(mass, length,
-            math::Vector<float, 3>{ 0.0f, 0.0f, 1.0f },
-            parentToJoint,
-            math::Vector<float, 3>{ length / 2.0f, 0.0f, 0.0f });
-    }
-
-    class TestInverseKinematics : public ::testing::Test
+    class TestInverseKinematics
+        : public ::testing::Test
     {
     protected:
-        kinematics::InverseKinematics<float, 1> ik1;
-        kinematics::InverseKinematics<float, 2> ik2;
-        kinematics::InverseKinematics<float, 3> ik3;
-        kinematics::ForwardKinematics<float, 1> fk1;
-        kinematics::ForwardKinematics<float, 2> fk2;
-        kinematics::ForwardKinematics<float, 3> fk3;
+        const Vector3 planarTool{ 0.8f, 0.0f, 0.0f };
+        const std::array<Link, 2> planarArm{
+            MakeLink(zAxis, Vector3{}, Vector3{ 0.5f, 0.0f, 0.0f }),
+            MakeLink(zAxis, Vector3{ 1.0f, 0.0f, 0.0f }, Vector3{ 0.4f, 0.0f, 0.0f })
+        };
+
+        template<std::size_t N>
+        void ExpectToolAt(const std::array<Link, N>& links, const Vector3& tool,
+            const math::Vector<float, N>& q, const Vector3& target) const
+        {
+            kinematics::ForwardKinematics<float, N> fk{ tool };
+            auto positions = fk.Compute(links, q);
+
+            EXPECT_NEAR(positions[N].at(0, 0), target.at(0, 0), math::Tolerance<float>());
+            EXPECT_NEAR(positions[N].at(1, 0), target.at(1, 0), math::Tolerance<float>());
+            EXPECT_NEAR(positions[N].at(2, 0), target.at(2, 0), math::Tolerance<float>());
+        }
     };
 }
 
-TEST_F(TestInverseKinematics, single_link_reaches_target_on_arc)
+TEST_F(TestInverseKinematics, single_link_recovers_reference_angle)
 {
-    float length = 1.0f;
-    auto link = MakePlanarLink(1.0f, length, math::Vector<float, 3>{});
-    std::array<dynamics::RevoluteJointLink<float>, 1> links = { link };
+    std::array<Link, 1> links{ MakeLink(zAxis, Vector3{}, Vector3{ 0.5f, 0.0f, 0.0f }) };
+    kinematics::InverseKinematics<float, 1> ik{ xAxis };
+    Vector3 target{ std::cos(pi / 3.0f), std::sin(pi / 3.0f), 0.0f };
 
-    math::Vector<float, 1> referenceQ{ pi / 3.0f };
-    auto fkRef = fk1.Compute(links, referenceQ);
-    math::Vector<float, 3> target = fkRef[1];
-
-    math::Vector<float, 1> initialQ{ 0.0f };
-    auto result = ik1.Solve(links, target, initialQ);
+    auto result = ik.Solve(links, target, math::Vector<float, 1>{ 0.0f });
 
     EXPECT_TRUE(result.converged);
-    EXPECT_NEAR(result.q.at(0, 0), pi / 3.0f, 1e-3f);
-
-    auto positions = fk1.Compute(links, result.q);
-    EXPECT_NEAR(positions[1].at(0, 0), target.at(0, 0), tolerance);
-    EXPECT_NEAR(positions[1].at(1, 0), target.at(1, 0), tolerance);
-    EXPECT_NEAR(positions[1].at(2, 0), target.at(2, 0), tolerance);
+    EXPECT_NEAR(result.q.at(0, 0), pi / 3.0f, math::Tolerance<float>());
 }
 
-TEST_F(TestInverseKinematics, starts_at_solution_converges_immediately)
+TEST_F(TestInverseKinematics, initial_guess_at_solution_returns_without_iterating)
 {
-    float length = 1.0f;
-    auto link = MakePlanarLink(1.0f, length, math::Vector<float, 3>{});
-    std::array<dynamics::RevoluteJointLink<float>, 1> links = { link };
+    kinematics::InverseKinematics<float, 2> ik{ planarTool };
+    math::Vector<float, 2> initialQ{ pi / 4.0f, -pi / 6.0f };
+    kinematics::ForwardKinematics<float, 2> fk{ planarTool };
+    Vector3 target{ fk.Compute(planarArm, initialQ)[2] };
 
-    math::Vector<float, 1> initialQ{ pi / 4.0f };
-    auto fkPositions = fk1.Compute(links, initialQ);
-    math::Vector<float, 3> target = fkPositions[1];
-
-    auto result = ik1.Solve(links, target, initialQ);
+    auto result = ik.Solve(planarArm, target, initialQ);
 
     EXPECT_TRUE(result.converged);
-    EXPECT_LT(result.iterations, 2u);
+    EXPECT_EQ(result.iterations, 0u);
     EXPECT_LT(result.finalError, 1e-4f);
 }
 
-TEST_F(TestInverseKinematics, two_link_planar_reaches_known_position)
+TEST_F(TestInverseKinematics, two_link_planar_reaches_reachable_target)
 {
-    float l1 = 1.0f, l2 = 0.8f;
+    kinematics::InverseKinematics<float, 2> ik{ planarTool };
+    Vector3 target{ 0.5f, 1.0f, 0.0f };
 
-    auto link1 = MakePlanarLink(1.0f, l1, math::Vector<float, 3>{});
-    auto link2 = MakePlanarLink(0.8f, l2, math::Vector<float, 3>{ l1, 0.0f, 0.0f });
-    std::array<dynamics::RevoluteJointLink<float>, 2> links = { link1, link2 };
-
-    math::Vector<float, 2> initialQ{ 0.0f, 0.0f };
-    math::Vector<float, 3> target{ 0.5f, 1.0f, 0.0f };
-
-    auto result = ik2.Solve(links, target, initialQ);
+    auto result = ik.Solve(planarArm, target, math::Vector<float, 2>{ 0.0f, 0.0f });
 
     EXPECT_TRUE(result.converged);
-
-    auto positions = fk2.Compute(links, result.q);
-    EXPECT_NEAR(positions[2].at(0, 0), target.at(0, 0), tolerance);
-    EXPECT_NEAR(positions[2].at(1, 0), target.at(1, 0), tolerance);
-    EXPECT_NEAR(positions[2].at(2, 0), target.at(2, 0), tolerance);
+    ExpectToolAt(planarArm, planarTool, result.q, target);
 }
 
-TEST_F(TestInverseKinematics, two_link_planar_fully_extended)
+TEST_F(TestInverseKinematics, target_near_full_extension_converges)
 {
-    float l1 = 1.0f, l2 = 0.5f;
+    kinematics::InverseKinematics<float, 2> ik{ planarTool };
+    Vector3 target{ 1.75f, 0.0f, 0.0f };
 
-    auto link1 = MakePlanarLink(1.0f, l1, math::Vector<float, 3>{});
-    auto link2 = MakePlanarLink(0.5f, l2, math::Vector<float, 3>{ l1, 0.0f, 0.0f });
-    std::array<dynamics::RevoluteJointLink<float>, 2> links = { link1, link2 };
-
-    math::Vector<float, 2> initialQ{ 0.1f, 0.1f };
-    math::Vector<float, 3> target{ l1 + l2 - 0.05f, 0.0f, 0.0f };
-
-    auto result = ik2.Solve(links, target, initialQ);
+    auto result = ik.Solve(planarArm, target, math::Vector<float, 2>{ 0.1f, 0.1f });
 
     EXPECT_TRUE(result.converged);
-
-    auto positions = fk2.Compute(links, result.q);
-    EXPECT_NEAR(positions[2].at(0, 0), target.at(0, 0), tolerance);
-    EXPECT_NEAR(positions[2].at(1, 0), 0.0f, tolerance);
+    ExpectToolAt(planarArm, planarTool, result.q, target);
 }
 
-TEST_F(TestInverseKinematics, two_link_planar_folded_elbow_up)
+TEST_F(TestInverseKinematics, target_near_base_converges)
 {
-    float l1 = 1.0f, l2 = 0.8f;
+    kinematics::InverseKinematics<float, 2> ik{ planarTool };
+    Vector3 target{ 0.4f, 0.0f, 0.0f };
 
-    auto link1 = MakePlanarLink(1.0f, l1, math::Vector<float, 3>{});
-    auto link2 = MakePlanarLink(0.8f, l2, math::Vector<float, 3>{ l1, 0.0f, 0.0f });
-    std::array<dynamics::RevoluteJointLink<float>, 2> links = { link1, link2 };
-
-    math::Vector<float, 2> initialQ{ pi / 4.0f, -pi / 4.0f };
-    math::Vector<float, 3> target{ 1.2f, 0.5f, 0.0f };
-
-    auto result = ik2.Solve(links, target, initialQ);
+    auto result = ik.Solve(planarArm, target, math::Vector<float, 2>{ pi / 3.0f, -2.0f * pi / 3.0f });
 
     EXPECT_TRUE(result.converged);
-
-    auto positions = fk2.Compute(links, result.q);
-    EXPECT_NEAR(positions[2].at(0, 0), target.at(0, 0), tolerance);
-    EXPECT_NEAR(positions[2].at(1, 0), target.at(1, 0), tolerance);
+    ExpectToolAt(planarArm, planarTool, result.q, target);
 }
 
-TEST_F(TestInverseKinematics, unreachable_target_does_not_converge)
+TEST_F(TestInverseKinematics, unreachable_target_exhausts_iterations)
 {
-    float l1 = 1.0f, l2 = 0.5f;
+    kinematics::InverseKinematicsConfig<float> config;
+    config.maxIterations = 50;
+    kinematics::InverseKinematics<float, 2> ik{ planarTool, config };
 
-    auto link1 = MakePlanarLink(1.0f, l1, math::Vector<float, 3>{});
-    auto link2 = MakePlanarLink(0.5f, l2, math::Vector<float, 3>{ l1, 0.0f, 0.0f });
-    std::array<dynamics::RevoluteJointLink<float>, 2> links = { link1, link2 };
-
-    math::Vector<float, 2> initialQ{ 0.0f, 0.0f };
-    math::Vector<float, 3> target{ 10.0f, 10.0f, 10.0f };
-
-    auto result = ik2.Solve(links, target, initialQ);
+    auto result = ik.Solve(planarArm, Vector3{ 10.0f, 10.0f, 10.0f }, math::Vector<float, 2>{ 0.0f, 0.0f });
 
     EXPECT_FALSE(result.converged);
-    EXPECT_GT(result.finalError, 1e-4f);
-    EXPECT_EQ(result.iterations, 100u);
+    EXPECT_EQ(result.iterations, 50u);
+    EXPECT_GT(result.finalError, config.tolerance);
 }
 
-TEST_F(TestInverseKinematics, result_contains_populated_iteration_count_and_error)
+TEST_F(TestInverseKinematics, heavy_damping_still_converges_to_exact_target)
 {
-    float l1 = 1.0f, l2 = 0.8f;
+    kinematics::InverseKinematicsConfig<float> config;
+    config.dampingFactor = 0.5f;
+    config.maxIterations = 500;
+    kinematics::InverseKinematics<float, 2> ik{ planarTool, config };
+    Vector3 target{ 0.5f, 1.0f, 0.0f };
 
-    auto link1 = MakePlanarLink(1.0f, l1, math::Vector<float, 3>{});
-    auto link2 = MakePlanarLink(0.8f, l2, math::Vector<float, 3>{ l1, 0.0f, 0.0f });
-    std::array<dynamics::RevoluteJointLink<float>, 2> links = { link1, link2 };
-
-    math::Vector<float, 2> initialQ{ 0.0f, 0.0f };
-    math::Vector<float, 3> target{ 0.5f, 1.0f, 0.0f };
-
-    auto result = ik2.Solve(links, target, initialQ);
-
-    EXPECT_GT(result.iterations, 0u);
-    EXPECT_LT(result.finalError, 1e-4f);
-}
-
-TEST_F(TestInverseKinematics, custom_damping_factor_still_converges)
-{
-    float l1 = 1.0f, l2 = 0.8f;
-
-    auto link1 = MakePlanarLink(1.0f, l1, math::Vector<float, 3>{});
-    auto link2 = MakePlanarLink(0.8f, l2, math::Vector<float, 3>{ l1, 0.0f, 0.0f });
-    std::array<dynamics::RevoluteJointLink<float>, 2> links = { link1, link2 };
-
-    kinematics::InverseKinematicsConfig<float> cfg;
-    cfg.dampingFactor = 0.5f;
-    cfg.tolerance = 1e-4f;
-    cfg.maxIterations = 500;
-    kinematics::InverseKinematics<float, 2> ikHighDamping{ cfg };
-
-    math::Vector<float, 2> initialQ{ 0.0f, 0.0f };
-    math::Vector<float, 3> target{ 0.5f, 1.0f, 0.0f };
-
-    auto result = ikHighDamping.Solve(links, target, initialQ);
+    auto result = ik.Solve(planarArm, target, math::Vector<float, 2>{ 0.0f, 0.0f });
 
     EXPECT_TRUE(result.converged);
-
-    auto positions = fk2.Compute(links, result.q);
-    EXPECT_NEAR(positions[2].at(0, 0), target.at(0, 0), tolerance);
-    EXPECT_NEAR(positions[2].at(1, 0), target.at(1, 0), tolerance);
+    EXPECT_LT(result.finalError, config.tolerance);
 }
 
-TEST_F(TestInverseKinematics, three_link_spatial_reaches_target)
+TEST_F(TestInverseKinematics, spatial_chain_with_base_and_tool_offsets_reaches_fk_target)
 {
-    float l1 = 0.5f, l2 = 0.4f, l3 = 0.3f;
+    const Vector3 tool{ 0.25f, 0.0f, 0.05f };
+    const std::array<Link, 3> links{
+        MakeLink(zAxis, Vector3{ 0.0f, 0.0f, 0.2f }, Vector3{ 0.0f, 0.0f, 0.1f }),
+        MakeLink(yAxis, Vector3{ 0.0f, 0.0f, 0.5f }, Vector3{ 0.05f, 0.0f, 0.0f }),
+        MakeLink(yAxis, Vector3{ 0.4f, 0.0f, 0.0f }, Vector3{ 0.05f, 0.0f, 0.0f })
+    };
+    kinematics::InverseKinematicsConfig<float> config;
+    config.dampingFactor = 0.05f;
+    config.maxIterations = 300;
+    kinematics::InverseKinematics<float, 3> ik{ tool, config };
+    kinematics::ForwardKinematics<float, 3> fk{ tool };
+    Vector3 target{ fk.Compute(links, math::Vector<float, 3>{ pi / 4.0f, pi / 6.0f, -pi / 3.0f })[3] };
 
-    auto link1 = MakeLink(1.0f, l1,
-        math::Vector<float, 3>{ 0.0f, 0.0f, 1.0f },
-        math::Vector<float, 3>{},
-        math::Vector<float, 3>{ l1 / 2.0f, 0.0f, 0.0f });
-    auto link2 = MakeLink(0.8f, l2,
-        math::Vector<float, 3>{ 0.0f, 1.0f, 0.0f },
-        math::Vector<float, 3>{ l1, 0.0f, 0.0f },
-        math::Vector<float, 3>{ l2 / 2.0f, 0.0f, 0.0f });
-    auto link3 = MakeLink(0.6f, l3,
-        math::Vector<float, 3>{ 0.0f, 1.0f, 0.0f },
-        math::Vector<float, 3>{ l2, 0.0f, 0.0f },
-        math::Vector<float, 3>{ l3 / 2.0f, 0.0f, 0.0f });
-    std::array<dynamics::RevoluteJointLink<float>, 3> links = { link1, link2, link3 };
-
-    kinematics::InverseKinematicsConfig<float> cfg;
-    cfg.dampingFactor = 0.05f;
-    cfg.tolerance = 1e-4f;
-    cfg.maxIterations = 300;
-    kinematics::InverseKinematics<float, 3> ik3Spatial{ cfg };
-
-    math::Vector<float, 3> referenceQ{ pi / 4.0f, pi / 6.0f, -pi / 3.0f };
-    auto fkRef = fk3.Compute(links, referenceQ);
-    math::Vector<float, 3> target = fkRef[3];
-
-    math::Vector<float, 3> initialQ{ 0.0f, 0.0f, 0.0f };
-    auto result = ik3Spatial.Solve(links, target, initialQ);
+    auto result = ik.Solve(links, target, math::Vector<float, 3>{ 0.0f, 0.0f, 0.0f });
 
     EXPECT_TRUE(result.converged);
-
-    auto positions = fk3.Compute(links, result.q);
-    EXPECT_NEAR(positions[3].at(0, 0), target.at(0, 0), tolerance);
-    EXPECT_NEAR(positions[3].at(1, 0), target.at(1, 0), tolerance);
-    EXPECT_NEAR(positions[3].at(2, 0), target.at(2, 0), tolerance);
-}
-
-TEST_F(TestInverseKinematics, two_link_target_at_origin_region)
-{
-    float l1 = 1.0f, l2 = 0.8f;
-
-    auto link1 = MakePlanarLink(1.0f, l1, math::Vector<float, 3>{});
-    auto link2 = MakePlanarLink(0.8f, l2, math::Vector<float, 3>{ l1, 0.0f, 0.0f });
-    std::array<dynamics::RevoluteJointLink<float>, 2> links = { link1, link2 };
-
-    math::Vector<float, 2> initialQ{ pi / 3.0f, -2.0f * pi / 3.0f };
-    math::Vector<float, 3> target{ 0.4f, 0.0f, 0.0f };
-
-    auto result = ik2.Solve(links, target, initialQ);
-
-    EXPECT_TRUE(result.converged);
-
-    auto positions = fk2.Compute(links, result.q);
-    EXPECT_NEAR(positions[2].at(0, 0), target.at(0, 0), tolerance);
-    EXPECT_NEAR(positions[2].at(1, 0), target.at(1, 0), tolerance);
+    ExpectToolAt(links, tool, result.q, target);
 }

@@ -18,14 +18,17 @@ include(FetchContent)
 FetchContent_Declare(
     robotics_toolbox
     GIT_REPOSITORY https://github.com/embedded-pro/robotics-toolbox-cpp.git
-    GIT_TAG        main
+    GIT_TAG        <commit-sha>
 )
 FetchContent_MakeAvailable(robotics_toolbox)
 
 target_link_libraries(my_app PRIVATE robotics.kinematics robotics.dynamics)
 ```
 
-The numerical-toolbox dependency is fetched automatically. Includes are namespaced by domain, e.g.
+Pin `GIT_TAG` to a commit SHA for reproducible builds. The dependencies
+[embedded-infra-lib](https://github.com/embedded-pro/embedded-infra-lib) (`infra.util`) and
+numerical-toolbox (`numerical.math`, `numerical.solver`) are fetched automatically unless the parent
+project already defines those targets. Includes are namespaced by domain, e.g.
 `#include "robotics/kinematics/ForwardKinematics.hpp"` and — for shared primitives —
 `#include "numerical/math/Matrix.hpp"`.
 
@@ -89,6 +92,14 @@ Build & test locally:
 ```bash
 cmake --preset host && cmake --build --preset host
 ctest --preset host
+```
+
+The `host` preset also builds the simulator and therefore needs Qt6. Without Qt6, use the
+library-only preset:
+
+```bash
+cmake --preset host-single-Debug && cmake --build --preset host-single-Debug
+ctest --preset host-single-Debug
 ```
 
 ## Contributing

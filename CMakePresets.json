@@ -50,6 +50,11 @@
   ],
   "buildPresets": [
     {
+      "name": "host",
+      "configuration": "Debug",
+      "configurePreset": "host"
+    },
+    {
       "name": "host-RelWithDebInfo",
       "configuration": "RelWithDebInfo",
       "configurePreset": "host"

@@ -190,7 +190,8 @@ namespace simulator::dynamics
         {
             auto links = BuildLinks2();
             math::Vector<float, 2> q{ { state.q[0] }, { state.q[1] } };
-            auto positions = fk2.Compute(links, q);
+            ::kinematics::ForwardKinematics<float, 2> fk{ math::Vector<float, 3>{ config.linkLengths[1], 0.0f, 0.0f } };
+            auto positions = fk.Compute(links, q);
 
             for (int i = 0; i <= n; ++i)
                 state.jointPositions[i] = { positions[i].at(0, 0), positions[i].at(1, 0), positions[i].at(2, 0) };
@@ -199,7 +200,8 @@ namespace simulator::dynamics
         {
             auto links = BuildLinks3();
             math::Vector<float, 3> q{ { state.q[0] }, { state.q[1] }, { state.q[2] } };
-            auto positions = fk3.Compute(links, q);
+            ::kinematics::ForwardKinematics<float, 3> fk{ math::Vector<float, 3>{ config.linkLengths[2], 0.0f, 0.0f } };
+            auto positions = fk.Compute(links, q);
 
             for (int i = 0; i <= n; ++i)
                 state.jointPositions[i] = { positions[i].at(0, 0), positions[i].at(1, 0), positions[i].at(2, 0) };
