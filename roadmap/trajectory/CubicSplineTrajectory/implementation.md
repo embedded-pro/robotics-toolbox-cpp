@@ -81,7 +81,8 @@ function Sample(t):                                                 # OPTIMIZE_F
     return { position, velocity, acceleration }
 ```
 
-Verified with python3: knots reproduced to `1e-15`, velocity/acceleration continuous at interior knots,
+Verified with python3: knots reproduced exactly, one-sided velocity/acceleration limits at interior knots
+agree to `2e-15`,
 clamped end velocities exact, natural end accelerations zero, collinear knots ⇒ `M ≡ 0`, two clamped
 knots ⇒ exactly the `PolynomialTrajectory` cubic.
 
@@ -120,5 +121,4 @@ knots ⇒ exactly the `PolynomialTrajectory` cubic.
 - New module (first trajectory item only): `robotics/trajectory/CMakeLists.txt` with
   `robotics_add_header_library(robotics.trajectory)`, `TrajectoryTypes.hpp` in `target_sources`, a
   `test/` subdir, `add_subdirectory(trajectory)` in `robotics/CMakeLists.txt`, and a `doc/trajectory/` folder.
-- Roadmap bookkeeping: add the M33 row to `ROADMAP.md` and the `roadmap/README.md` trajectory index.
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.
