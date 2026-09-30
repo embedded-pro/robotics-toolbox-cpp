@@ -18,6 +18,8 @@ handoffs:
     prompt: "Refactor the pre-roadmap algorithm described above to reuse shared utilities and simplify tests, following robotics-toolbox conventions."
 ---
 
+# Orchestrator
+
 Triage requests and route to the right specialist. Do NOT implement or plan yourself.
 
 ## Workflow

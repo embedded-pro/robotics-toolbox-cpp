@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestRedundancyResolution : public ::testing::Test:
     # 7R arm (iiwa-like), standard DH (a, α, d): (0,−π/2,0.34) (0,π/2,0) (0,π/2,0.4) (0,−π/2,0)
     #                                           (0,−π/2,0.4) (0,π/2,0) (0,0,0.126)
@@ -19,7 +19,7 @@ class TestRedundancyResolution : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 undamped_primary_task_is_exact:
     Arrange: RedundancyResolution<float, 6, 7>{ pose, λ = 0 }
     Assert:  pose.Jacobian(q)·Resolve(q, xDot, qDot0) ≈ xDot  (tol 1e-5)

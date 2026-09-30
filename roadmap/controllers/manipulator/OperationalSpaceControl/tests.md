@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestOperationalSpaceControl : public ::testing::Test:          # Dof = 2, TaskDim = 2
     StrictMock<dynamics::MockEulerLagrangeDynamics<float,2>>  model
     StrictMock<kinematics::MockJacobianProvider<float,2,2>>   jacobian
@@ -22,7 +22,7 @@ class TestOperationalSpaceControlRedundant : public ::testing::Test: # Dof = 3, 
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 unit_inertia_gives_task_pd:
     Arrange: M = I, J = I, J̇q̇ = 0, C q̇ = 0, g = 0; eX, eXDot, xdDdot given
     Act:     τ = ComputeTorque(q, qDot, desiredPose, xdDot, xdDdot, 0)

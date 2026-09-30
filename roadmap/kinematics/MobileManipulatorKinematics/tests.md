@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestMobileManipulatorKinematics : public ::testing::Test:
     # 3-link arm (M30 link model): z-axis joint at (0,0,0.1); y-axis joint +(0,0,0.2); y-axis joint +(0.3,0,0)
     std::array<RevoluteJointLink<float>, 3>  links{ ... }
@@ -17,7 +17,7 @@ class TestMobileManipulatorKinematics : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 tool_pose_composes_base_mount_and_arm:
     Assert: ToolPose(base, q) = T_wb·mount·arm.ToolPose(q); p ≈ (0.698536, 2.343297, 0.695513)
 twist_matches_finite_difference:

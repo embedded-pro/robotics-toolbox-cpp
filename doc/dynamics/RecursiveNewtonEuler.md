@@ -4,7 +4,8 @@
 
 The Recursive Newton-Euler Algorithm (RNEA) is the most efficient method for computing **inverse dynamics** of serial kinematic chains (robot arms, manipulators). Given joint positions, velocities, and desired accelerations, it computes the required joint torques in $O(n)$ time — linear in the number of links.
 
-This contrasts with evaluating the Euler-Lagrange equations directly: a straightforward Lagrangian evaluation grows as $O(n^4)$, and even with a precomputed mass matrix the product $M(q)\ddot{q}$ alone is $O(n^2)$. Hollerbach's comparative study (1980) puts the recursive Newton-Euler formulation at $150n - 48$ multiplications and $131n - 48$ additions — 852 and 738 for a 6-DOF arm — against tens of thousands of multiplications for the direct Lagrangian form.
+This contrasts with evaluating the Euler-Lagrange equations directly: a straightforward Lagrangian evaluation grows as $O(n^4)$, and even with a precomputed mass matrix the product $M(q)\ddot{q}$ alone is $O(n^2)$.
+Hollerbach's comparative study (1980) puts the recursive Newton-Euler formulation at $150n - 48$ multiplications and $131n - 48$ additions — 852 and 738 for a 6-DOF arm — against tens of thousands of multiplications for the direct Lagrangian form.
 
 The algorithm has two passes over the kinematic chain:
 

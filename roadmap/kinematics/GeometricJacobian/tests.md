@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestGeometricJacobian : public ::testing::Test:
     # 2-link unit planar arm, z-axis joints, joint 2 at (1,0,0), tool at (1,0,0) of link 2
     std::array<RevoluteJointLink<float>, 2> planar{ ... }
@@ -14,7 +14,7 @@ class TestGeometricJacobian : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 stretched_planar_arm_columns:
     Act:    J = GeometricJacobian::Compute(kinematics.Compute(planar, (0, 0)))
     Assert: linear rows [[0,0],[2,1],[0,0]], angular rows [[0,0],[0,0],[1,1]]

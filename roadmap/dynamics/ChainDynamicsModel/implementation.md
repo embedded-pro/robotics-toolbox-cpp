@@ -9,7 +9,7 @@ library turns a link description into those interfaces. This adapter does: it im
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t Dof>                 # static_assert(std::is_floating_point_v<T>); instantiated for float
 class InverseDynamicsModel:                           # new interface, virtual ~InverseDynamicsModel() = default
     virtual StateVector ComputeInverseDynamics(const StateVector& q, const StateVector& qDot,
@@ -27,7 +27,7 @@ class ChainDynamicsModel
 
 ## Interface
 
-```
+```text
 ChainDynamicsModel(const LinkArray& links, const Vector3& gravity)
 void        SetLinks(const LinkArray& links)                             # e.g. payload change
 MassMatrix  ComputeMassMatrix(const StateVector& q) const override
@@ -39,7 +39,7 @@ StateVector ComputeInverseDynamics(const StateVector& q, const StateVector& qDot
 
 ## Algorithm (pseudocode)
 
-```
+```text
 ComputeMassMatrix(q)          = crba.Compute(links, q)
 ComputeCoriolisTerms(q, q̇)    = rnea.InverseDynamics(links, q, q̇, 0, 0)        # no gravity, no q̈
 ComputeGravityTerms(q)        = rnea.InverseDynamics(links, q, 0, 0, gravity)

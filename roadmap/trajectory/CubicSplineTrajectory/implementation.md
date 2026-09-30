@@ -7,7 +7,7 @@
 `JointTrajectoryState<T, Dof>` comes from `robotics/trajectory/TrajectoryTypes.hpp` (canonical
 definition: PolynomialTrajectory spec → Data structures).
 
-```
+```cpp
 enum class EndCondition : uint8_t { Clamped, Natural }
 
 template<typename T, std::size_t Dof>        # static_assert(std::is_floating_point_v<T>); instantiated for float
@@ -27,7 +27,7 @@ class CubicSplineTrajectory:                                   # static_assert(M
 
 ## Interface
 
-```
+```cpp
 bool Plan(const array<T, MaxPoints>& times, const array<JointVector, MaxPoints>& positions,
           std::size_t count, const SplineBoundary<T, Dof>& boundary = {})
                                     # false if count ∉ [2, MaxPoints] or times not strictly increasing
@@ -37,7 +37,7 @@ T StartTime() const;  T Duration() const         # t_0, t_{K−1} − t_0
 
 ## Algorithm (pseudocode)
 
-```
+```text
 # Per joint, unknowns M_k = q̈(t_k). On interval k (τ = t − t_k ∈ [0, h_k]):
 #   q(τ) = q_k + β_k·τ + (M_k/2)·τ² + d_k·τ³
 #   β_k  = (q_{k+1} − q_k)/h_k − h_k·(2M_k + M_{k+1})/6        # velocity at t_k

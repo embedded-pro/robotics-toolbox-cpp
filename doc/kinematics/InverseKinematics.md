@@ -57,7 +57,9 @@ $$\|\Delta q\| \leq \frac{\|e\|}{2\lambda}$$
 
 because each singular value $\sigma$ of $J$ is mapped to $\sigma / (\sigma^2 + \lambda^2) \le 1/(2\lambda)$.
 
-Damping does **not** bias the converged solution of the iteration. A fixed point requires $J^\top (J J^\top + \lambda^2 I)^{-1} e = 0$, which for a full-rank $J$ implies $e = 0$: a reachable, non-singular target is reached exactly, and larger $\lambda$ only shortens the steps and slows convergence. The damping trade-off is therefore speed and step size versus robustness near singularities; only at a singular configuration, or for an unreachable target, does the iteration stop at a least-squares stationary point with $e \neq 0$. Choosing $\lambda \in [0.01, 0.2]$ (scaled to the robot's link lengths) is a common starting point.
+Damping does **not** bias the converged solution of the iteration. A fixed point requires $J^\top (J J^\top + \lambda^2 I)^{-1} e = 0$, which for a full-rank $J$ implies $e = 0$: a reachable, non-singular target is reached exactly, and larger $\lambda$ only shortens the steps and slows convergence.
+The damping trade-off is therefore speed and step size versus robustness near singularities; only at a singular configuration, or for an unreachable target, does the iteration stop at a least-squares stationary point with $e \neq 0$.
+Choosing $\lambda \in [0.01, 0.2]$ (scaled to the robot's link lengths) is a common starting point.
 
 ## Complexity Analysis
 

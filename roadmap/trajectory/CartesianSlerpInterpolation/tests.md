@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestCartesianSlerp : public ::testing::Test:
     using Law = PolynomialTrajectory<float>
     Law linearLaw{ { .q0 = 0, .qf = 1, .v0 = 1, .vf = 1 }, 1.0f, Degree::Cubic }   # s(t) = t, ṡ = 1
@@ -16,7 +16,7 @@ class TestCartesianSlerp : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 endpoints_match_start_and_goal:
     Assert: Sample(0).pose ≈ start  and  Sample(tf).pose ≈ goal   (R and p element-wise)
 

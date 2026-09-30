@@ -7,7 +7,7 @@ chain (`ChainTaskJacobian`, M30/M8), DH (`DhTaskJacobian`, M7) and PoE (M15).
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t Dof>          # static_assert(std::is_floating_point_v<T>); instantiated for float
 struct PoseIkConfig:
     T           damping                  # λ₀
@@ -33,14 +33,14 @@ class PoseInverseKinematics:
 
 ## Interface
 
-```
+```text
 PoseInverseKinematics(const JacobianProvider<T, 6, Dof>& arm, const PoseIkConfig<T, Dof>& config)
 PoseIkResult<T, Dof>  Solve(const SE3Transform<T>& target, const JointVector& q0) const   # hot path
 ```
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function WeightedError(target, q):
     e = SE3Transform::PoseError(target, arm.ToolPose(q))   # (Δp; true log-map rotation vector), M6
     return (e.linear; ρ·e.angular)

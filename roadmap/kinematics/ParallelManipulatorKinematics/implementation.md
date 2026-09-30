@@ -8,7 +8,7 @@ actuated variables differ (leg lengths vs arm angles), so they share no data mod
 
 ## Data structures
 
-```
+```cpp
 template<typename T>                            # static_assert(std::is_floating_point_v<T>); instantiated for float
 struct StewartGoughGeometry:
     std::array<Vector3<T>, 6> baseAnchors       # bᵢ, base frame
@@ -43,7 +43,7 @@ class DeltaKinematics:
 
 ## Interface
 
-```
+```cpp
 StewartGoughKinematics(const StewartGoughGeometry<T>& geometry, const StewartForwardConfig<T>& config)
 std::array<T, 6>         Inverse(const SE3Transform<T>& pose) const          # leg lengths; hot path
 Matrix6<T>               LegJacobian(const SE3Transform<T>& pose) const      # l̇ = J·(v; ω)
@@ -56,7 +56,7 @@ std::optional<Vector3<T>>        Forward(const Vector3<T>& angles) const     # e
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 # ---- Stewart–Gough ----
 function Inverse(pose):                          # OPTIMIZE_FOR_SPEED, closed form
     for i: lengths[i] = ‖pose.R·pᵢ + pose.p − bᵢ‖

@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestForwardDynamicsIntegrator : public ::testing::Test:
     # single uniform rod about ŷ (pendulum) and a 2-link rod chain, gravity (0, 0, −9.81)
     ForwardDynamicsIntegrator<float, 1, IntegrationMethod::RungeKutta4> pendulum{ rod, gravity }
@@ -14,7 +14,7 @@ class TestForwardDynamicsIntegrator : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 small_oscillation_period_matches_physical_pendulum:
     Arrange: rod length L hanging at q = π/2, released from π/2 + 0.05 rad, dt = 1 ms
     Assert:  measured period ≈ 2π·sqrt(2L/(3g)) within 0.5 %

@@ -8,6 +8,8 @@ handoffs:
     prompt: "Review the implementation changes made above against robotics-toolbox project standards."
 ---
 
+# Executor
+
 Canonical rules: `AGENTS.md`. Implement exactly what's asked — nothing more.
 
 ## Workflow

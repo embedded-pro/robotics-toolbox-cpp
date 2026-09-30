@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestChainDynamicsModel : public ::testing::Test:
     # 2-link uniform rods about ŷ, gravity (0, 0, −9.81), q measured from horizontal
     ChainDynamicsModel<float, 2> model{ MakeRodChain(1.2, 0.6, 0.7, 0.45), (0, 0, −9.81) }
@@ -13,7 +13,7 @@ class TestChainDynamicsModel : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 gravity_terms_match_closed_form:
     Assert: g(q) = −g·[m1l1/2·c1 + m2(l1c1 + l2/2·c12), m2l2/2·c12]
 coriolis_terms_match_closed_form:

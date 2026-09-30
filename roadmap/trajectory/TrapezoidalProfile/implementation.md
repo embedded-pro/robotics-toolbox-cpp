@@ -8,7 +8,7 @@
 (canonical definition: PolynomialTrajectory spec → Data structures); not redefined here. This profile
 reads `vMax`, `aMax` and ignores `jMax`.
 
-```
+```cpp
 template<typename T>               # static_assert(std::is_floating_point_v<T>); instantiated for float
 class TrapezoidalProfile:
     T q0, direction, distance      # start, sign(qf - q0), |qf - q0|
@@ -18,7 +18,7 @@ class TrapezoidalProfile:
 
 ## Interface
 
-```
+```cpp
 TrapezoidalProfile(T q0, T qf, MotionLimits<T> limits)                  # minimum-time plan
 static std::optional<TrapezoidalProfile> PlanWithDuration(T q0, T qf, T aMax, T duration)
                                                                         # fixed-time plan (synchronization)
@@ -29,7 +29,7 @@ bool IsTriangular()                 # true when no cruise phase exists
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 function plan(q0, qf, limits):
     distance = |qf - q0|;  direction = sign(qf - q0);  aMax = limits.aMax
     dBlend = limits.vMax^2 / limits.aMax        # distance used by accel + decel

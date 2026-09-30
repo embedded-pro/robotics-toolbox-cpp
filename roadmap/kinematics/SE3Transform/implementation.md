@@ -8,7 +8,7 @@ other spec**: 6-vectors are ordered **linear part first** — twists `(v; ω)`, 
 
 ## Data structures
 
-```
+```cpp
 template<typename T> using Vector3 = math::Vector<T, 3>
 template<typename T> using Matrix3 = math::SquareMatrix<T, 3>
 template<typename T> using Vector6 = math::Vector<T, 6>      # twist (v; ω) or wrench (f; n)
@@ -22,7 +22,7 @@ struct SE3Transform:
 
 ## Interface
 
-```
+```text
 static SE3Transform Identity()
 SE3Transform operator*(const SE3Transform& rhs) const        # composition
 SE3Transform Inverse() const
@@ -39,7 +39,7 @@ static Vector6<T>   PoseError(const SE3Transform& target, const SE3Transform& cu
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function operator*(rhs):   return { R·rhs.R, R·rhs.p + p }
 function Inverse():        return { Rᵀ, −Rᵀ·p }
 

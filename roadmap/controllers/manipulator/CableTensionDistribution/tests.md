@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestCableTensionDistribution : public ::testing::Test:     # planar point mass, 3 cables, WrenchDim = 2
     std::array<Vector3<float>,3> base     = { (0, 2, 0), (−√3, −1, 0), (√3, −1, 0) }   # 120° apart, radius 2
     std::array<Vector3<float>,3> platform = { 0, 0, 0 }
@@ -25,7 +25,7 @@ class TestCableTensionDistributionSpatial : public ::testing::Test:  # 8 cables,
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 structure_matrix_from_geometry:
     Act:     A = ComputeStructureMatrix(pose)
     Assert:  columns == (0, 1), (−0.866025, −0.5), (0.866025, −0.5)

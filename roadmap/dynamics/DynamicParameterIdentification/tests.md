@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestDynamicParameterIdentification : public ::testing::Test:
     # planar 2R uniform rods; "true" links generate noiseless torques with RNEA
     ChainInertialRegressor<float, 2> regressor{ links, gravity }
@@ -15,7 +15,7 @@ class TestDynamicParameterIdentification : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 base_parameter_count_with_gravity_is_six:
     Arrange: joint axes horizontal (gravity acts)
     Assert:  Solve().rank == 6

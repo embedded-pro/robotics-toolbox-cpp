@@ -8,6 +8,8 @@ handoffs:
     prompt: "Review the refactoring changes made above against robotics-toolbox project standards."
 ---
 
+# Modernizer
+
 Canonical rules: `AGENTS.md`. You modernize ONE pre-roadmap algorithm at a time so it matches
 current roadmap conventions. Refactor is **behavior-preserving** — no new features, no public-API
 change unless required to remove duplication.

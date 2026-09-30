@@ -4,7 +4,7 @@
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t TaskDim, std::size_t Dof>   # static_assert(std::is_floating_point_v<T>); static_assert(Dof > TaskDim)
 class RedundancyResolution:                                    # instantiated for float
     const JacobianProvider<T, TaskDim, Dof>& jacobian         # M8 seam; TaskDim 3 (position) or 6 (pose)
@@ -15,7 +15,7 @@ class RedundancyResolution:                                    # instantiated fo
 
 ## Interface
 
-```
+```text
 RedundancyResolution(const JacobianProvider<T, TaskDim, Dof>& jacobian, T damping, T rankTolerance = 1e-4)
 JointVector              Resolve(const JointVector& q, const TaskVector& xDot,
                                  const JointVector& qDot0)                 # hot path
@@ -25,7 +25,7 @@ Matrix<T, Dof, Dof>      NullSpaceProjector(const JointVector& q)          # P =
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 function Factor(q):
     J = jacobian.Jacobian(q)                    # TaskDim × Dof
     svd.Decompose(Jᵀ)                           # Jᵀ = U·Σ·Vᵀ ⇒ J = V·Σ·Uᵀ

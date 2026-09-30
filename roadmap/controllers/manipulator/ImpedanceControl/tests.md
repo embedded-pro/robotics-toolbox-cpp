@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestImpedanceControl : public ::testing::Test:
     # both injected dependencies mocked; Dof = 2, TaskDim = 2 (planar xy point):
     StrictMock<dynamics::MockEulerLagrangeDynamics<float,2>>   model
@@ -24,7 +24,7 @@ class TestImpedanceControlPose : public ::testing::Test:     # TaskDim = 6 branc
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 # ---- (a) ComputeTorque: stiffness/damping, no force sensing ----
 compliant_law_with_identity_jacobian:
     Arrange: J = I; e = xd − x != 0; qDot, xdDot != 0; g != 0

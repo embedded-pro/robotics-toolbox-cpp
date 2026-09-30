@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestHybridPositionForceControl : public ::testing::Test:
     # both dependencies mocked; planar TaskDim = 2, Dof = 2:
     StrictMock<dynamics::MockEulerLagrangeDynamics<float,2>>  model
@@ -21,7 +21,7 @@ class TestHybridPositionForceControl : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 motion_axis_does_position_pd:
     Arrange: J = I, model 0; only axis-0 position/velocity error, fd = fMeasured = 0
     Assert:  τ[0] == Kp[0]·eX[0] + Kd[0]·eXDot[0];  τ[1] == 0

@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestCoriolisMatrix : public ::testing::Test:
     # 3-link chain: skewed unit axes, full SPD inertia tensors, off-axis CoM, arbitrary offsets
     std::array<RevoluteJointLink<float>, 3> chain{ ... }
@@ -17,7 +17,7 @@ class TestCoriolisMatrix : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 reduces_to_rnea_when_reference_equals_actual:
     Assert: modified.InverseDynamics(q, q̇, q̇, q̈, g) ≈ rnea.InverseDynamics(q, q̇, q̈, g)
 coriolis_times_velocity_equals_rnea_bias:

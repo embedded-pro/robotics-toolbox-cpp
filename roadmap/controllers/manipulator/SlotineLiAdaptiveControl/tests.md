@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestSlotineLiAdaptiveControl : public ::testing::Test:
     # regressor injected & mocked; Dof = 2, NumParams = 3:
     StrictMock<dynamics::MockInertialRegressor<float,2,3>> regressor
@@ -19,7 +19,7 @@ class TestSlotineLiAdaptiveControl : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 zero_error_uses_feedforward_only:
     Arrange: q=qd, qDot=qdDot ⇒ s=0; regressor Y given
     Act:     τ = ComputeTorque(...)

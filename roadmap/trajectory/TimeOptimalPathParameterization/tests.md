@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class PathGeometryMock : public PathGeometry<float, 2>          # MOCK_METHOD Position / FirstDerivative / SecondDerivative
 class JointLimitsMock  : public JointLimits<float, 2>           # MOCK_METHOD Coefficients / Bounds
 class InverseDynamicsModelMock : public dynamics::InverseDynamicsModel<float, 2>   # MOCK_METHOD ComputeInverseDynamics
@@ -27,7 +27,7 @@ class TestTopp : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 bang_bang_total_time_matches_closed_form:
     Arrange: GivenStraightSingleJointPath(L = 1, unitTorque)
     Act:     Parameterize()

@@ -11,7 +11,7 @@ from PoE (M15).
 
 ## Data structures
 
-```
+```cpp
 enum class JointType : uint8_t { Revolute, Prismatic }      # shared with M1 / M7
 
 template<typename T, std::size_t N>                          # static_assert(std::is_floating_point_v<T>); instantiated for float
@@ -28,7 +28,7 @@ class ChainPoseKinematics:
 
 ## Interface
 
-```
+```text
 explicit ChainPoseKinematics(const SE3Transform<T>& toolInLastLink)
 FrameChain<T, N>  Compute(const LinkArray& links, const JointVector& q) const   # hot path
 SE3Transform<T>   ToolPose(const LinkArray& links, const JointVector& q) const
@@ -36,7 +36,7 @@ SE3Transform<T>   ToolPose(const LinkArray& links, const JointVector& q) const
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function Compute(links, q):                     # OPTIMIZE_FOR_SPEED
     R = I;  o = links[0].parentToJoint
     for i in 0..N-1:

@@ -7,7 +7,7 @@ frame, `(f; n)` about the tool point) — i.e. `−fExternal` of `ImpedanceContr
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t Dof, std::size_t TaskDim>   # static_assert(std::is_floating_point_v<T>); instantiated for float
 class HybridPositionForceControl:                             # TaskDim = 6 (pose) or ≤ 3 (position; 2 = planar xy)
     const dynamics::EulerLagrangeDynamics<T, Dof>&       model      # C q̇, g — typically ChainDynamicsModel (M29)
@@ -21,7 +21,7 @@ class HybridPositionForceControl:                             # TaskDim = 6 (pos
 
 ## Interface
 
-```
+```cpp
 struct Gains { SquareMatrix Kp, Kd, Kf, Ki, Kdf; TaskVector integralLimit; }   # integralLimit ≥ 0
 
 HybridPositionForceControl(const dynamics::EulerLagrangeDynamics<T,Dof>& model,
@@ -36,7 +36,7 @@ void Reset()                                                                    
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function ComputeTorque(q, qDot, desiredPose, xdDot, fMeasured, fd):   # OPTIMIZE_FOR_SPEED; gains.* unqualified
     J    = jacobian.Jacobian(q)
     xDot = J·qDot

@@ -4,7 +4,7 @@
 
 ## Data structures
 
-```
+```cpp
 enum class JointType : uint8_t { Revolute, Prismatic }          # shared with M7 / M30
 
 template<typename T>                                            # static_assert(std::is_floating_point_v<T>); instantiated for float
@@ -31,7 +31,7 @@ template<typename T> using RevoluteJointLink = JointLink<T>    # migration alias
 
 ## Interface
 
-```
+```text
 (Matrix3 R, Vector3 offset) JointTransform(T q) const          # link frame relative to parent; hot path
 Vector3 AngularAxis() const    # axis if Revolute else 0        # motion subspace S = (AngularAxis; LinearAxis)
 Vector3 LinearAxis()  const    # axis if Prismatic else 0       # in the dynamics' (ω; v) ordering
@@ -39,7 +39,7 @@ Vector3 LinearAxis()  const    # axis if Prismatic else 0       # in the dynamic
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 function JointTransform(q):                                    # OPTIMIZE_FOR_SPEED
     if type == Revolute:  return (RotationAboutAxis(jointAxis, q), parentToJoint)
     else:                 return (Identity, parentToJoint + jointAxis·q)

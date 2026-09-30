@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestCompositeRigidBodyAlgorithm : public ::testing::Test:
     CompositeRigidBodyAlgorithm<float, 2> crba2
     CompositeRigidBodyAlgorithm<float, 3> crba3
@@ -14,7 +14,7 @@ class TestCompositeRigidBodyAlgorithm : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 single_rod_about_end_is_ml2_over_3:
     Assert: M = m·l²/3 for a z-axis rod
 two_link_planar_matches_closed_form:

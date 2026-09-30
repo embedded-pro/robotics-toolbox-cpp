@@ -8,7 +8,7 @@ per-joint offsets and signs describe the arm; no DH table and no frame conventio
 
 ## Data structures
 
-```
+```cpp
 template<typename T>                            # static_assert(std::is_floating_point_v<T>); instantiated for float
 struct OpwParameters:                           # model zero pose: upper arm and forearm point along +z
     T a1                  # axis 1 → axis 2, radial (x)
@@ -41,7 +41,7 @@ Forward model (defines the parameters; `Forward` implements it):
 
 ## Interface
 
-```
+```text
 explicit AnalyticalIkOpw(const OpwParameters<T>& parameters)
 OpwSolutions<T>  Solve(const SE3Transform<T>& flange) const        # all real branches; hot path
 SE3Transform<T>  Forward(const JointVector& q) const                # closed-form FK (round trips, tests)
@@ -49,7 +49,7 @@ SE3Transform<T>  Forward(const JointVector& q) const                # closed-for
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 function Forward(q):
     θ = signs ⊙ q − offsets;  k = √(a2² + c3²);  ψ3 = atan2(a2, c3)
     x = c2·sin θ2 + k·sin(θ2 + θ3 + ψ3) + a1;  z = c2·cos θ2 + k·cos(θ2 + θ3 + ψ3)

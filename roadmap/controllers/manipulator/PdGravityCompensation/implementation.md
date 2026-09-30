@@ -4,7 +4,7 @@
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t Dof>    # static_assert(std::is_floating_point_v<T>); instantiated for float
 class PdGravityCompensation:
     const dynamics::EulerLagrangeDynamics<T, Dof>& model   # only g(q) is queried
@@ -14,7 +14,7 @@ class PdGravityCompensation:
 
 ## Interface
 
-```
+```cpp
 # Dynamics model injected (DIP); the set-point regulator needs only its gravity term:
 PdGravityCompensation(const EulerLagrangeDynamics<T,Dof>& model,
                       const SquareMatrix& Kp, const SquareMatrix& Kd)
@@ -26,7 +26,7 @@ Vector<T,Dof> ComputeTorque(const StateVector& q,
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function ComputeTorque(q, qDot, qd):              # OPTIMIZE_FOR_SPEED
     # set-point regulation: qd is constant, so the desired velocity is zero
     e = qd - q

@@ -4,7 +4,7 @@
 
 ## Data structures
 
-```
+```cpp
 template<typename T>                            # static_assert(std::is_floating_point_v<T>); instantiated for float
 struct ArcParameters:                           # configuration of one section
     T kappa      # curvature κ (1/m); sign folds into φ: (−κ, φ) ≡ (κ, φ + π)
@@ -18,7 +18,7 @@ class ContinuumKinematics:
 
 ## Interface
 
-```
+```cpp
 explicit ContinuumKinematics(const std::array<ArcParameters<T>, NumSections>& sections)
 static SE3Transform<T>  SectionTransform(const ArcParameters<T>& arc)     # one arc; hot path
 SE3Transform<T>         Forward() const                                   # tip pose; hot path
@@ -27,7 +27,7 @@ static ArcParameters<T> InverseSection(const Vector3<T>& tip)             # sing
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function SectionTransform(arc):                 # OPTIMIZE_FOR_SPEED, robot-independent map
     θ = arc.kappa · arc.length                  # total bend angle
     if |θ| < θ_series:                          # straight-ish: no 1/κ, no 0/0

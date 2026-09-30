@@ -11,6 +11,8 @@ handoffs:
     prompt: "Revise the implementation plan based on the review feedback above."
 ---
 
+# Reviewer
+
 Canonical rules: `AGENTS.md`. Review only — no file modifications.
 
 ## Workflow

@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestTrapezoidalProfile : public ::testing::Test:
     MotionLimits<float> limits{ .vMax = 1.0f, .aMax = 2.0f }
     TrapezoidalProfile<float> profile{ 0.0f, 5.0f, limits }   # long move ⇒ trapezoid
@@ -13,7 +13,7 @@ class TestTrapezoidalProfile : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 endpoints_reached_exactly:
     Assert: Sample(0).position ≈ 0  and  Sample(tf).position ≈ 5
 

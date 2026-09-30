@@ -8,6 +8,8 @@ handoffs:
     prompt: "Implement the plan outlined above, following all project conventions strictly."
 ---
 
+# Planner
+
 Canonical rules: `AGENTS.md`. Produce plans only — no code edits.
 
 ## Workflow

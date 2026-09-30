@@ -8,7 +8,7 @@ Shared trajectory types — **canonical definition**, created once in
 `robotics/trajectory/TrajectoryTypes.hpp` by the first trajectory item deployed; every other trajectory
 spec includes it and never redefines these names:
 
-```
+```cpp
 template<typename T>               # static_assert(std::is_floating_point_v<T>); instantiated for float
 struct TrajectoryState:            # one scalar axis
     T position{}, velocity{}, acceleration{}, jerk{}   # jerk = 0 where a profile leaves it undefined
@@ -25,7 +25,7 @@ struct JointTrajectoryState:
 
 This item:
 
-```
+```cpp
 enum class Degree : uint8_t { Cubic = 3, Quintic = 5 }
 
 template<typename T>               # static_assert(std::is_floating_point_v<T>); instantiated for float
@@ -43,7 +43,7 @@ class PolynomialTrajectory:
 
 ## Interface
 
-```
+```text
 PolynomialTrajectory(BoundaryConditions<T> bc, T tf, Degree degree)
 TrajectoryState<T> Sample(T t)      # hot path
 T    Duration()
@@ -52,7 +52,7 @@ void Reset(BoundaryConditions<T> bc, T tf)   # keeps the degree
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function solveCubic(bc, tf):            # closed form, no linear solve
     a0 = bc.q0
     a1 = bc.v0

@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestChainPoseKinematics : public ::testing::Test:
     # 3-link arm: z-axis base joint raised 0.2, then two y-axis joints (0.5 up, 0.4 along x)
     std::array<RevoluteJointLink<float>, 3> arm{ ... }
@@ -14,7 +14,7 @@ class TestChainPoseKinematics : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 origins_and_tool_match_shipped_forward_kinematics:
     Assert: jointOrigins[i] and tool.p equal ForwardKinematics{ (0.3,0,0) }.Compute positions
 axes_are_expressed_in_the_base_frame:

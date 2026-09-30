@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestJointLink : public ::testing::Test:
     Vector3 x = {1, 0, 0}, z = {0, 0, 1}
     JointLink<float> MakeRevolute(axis, parentToJoint), MakePrismatic(axis, parentToJoint)
@@ -13,7 +13,7 @@ class TestJointLink : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 existing_aggregate_initializers_default_to_revolute:
     Arrange: RevoluteJointLink<float>{ m, I, axis, offset, com }
     Assert:  type == Revolute, armature == 0, limits unbounded

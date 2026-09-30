@@ -4,7 +4,7 @@
 
 ## Data structures
 
-```
+```cpp
 template<typename T>                            # static_assert(std::is_floating_point_v<T>); instantiated for float
 struct BaseState:                               # planar pose of the axle midpoint in the world frame
     T x, y, phi
@@ -18,7 +18,7 @@ class MobileManipulatorKinematics:
 
 ## Interface
 
-```
+```cpp
 MobileManipulatorKinematics(const JacobianProvider<T, 6, ArmDof>& arm, const SE3Transform<T>& mount, T wheelBase)
 Matrix<T, 6, 2 + ArmDof>  Compute(const BaseState<T>& base, const JointVector& q) const   # hot path
 SE3Transform<T>           ToolPose(const BaseState<T>& base, const JointVector& q) const
@@ -31,7 +31,7 @@ Rows are the tool-point twist `(v; ω)` in the world frame (M6/M8 ordering).
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 function ToolPose(base, q):
     T_wb = { Rz(base.phi), (base.x, base.y, 0) }
     return T_wb * mount * arm.ToolPose(q)

@@ -8,7 +8,7 @@ and to cross-check the momentum observer (M16).
 
 ## Data structures
 
-```
+```cpp
 template<typename T>                                   # static_assert(std::is_floating_point_v<T>); instantiated for float
 struct ToolWrench:
     Vector3<T> force                                   # f, exerted BY the environment ON the tool, base frame
@@ -18,7 +18,7 @@ struct ToolWrench:
 
 ## Interface
 
-```
+```text
 # new overload next to the shipped InverseDynamics(links, q, q̇, q̈, gravity):
 JointVector InverseDynamics(const LinkArray& links, const JointVector& q, const JointVector& qDot,
                             const JointVector& qDDot, const Vector3& gravity,
@@ -27,7 +27,7 @@ JointVector InverseDynamics(const LinkArray& links, const JointVector& q, const 
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function InverseDynamics(links, q, q̇, q̈, g, w):       # OPTIMIZE_FOR_SPEED
     states = ComputeForwardPass(links, q, q̇, q̈, g)      # unchanged
     Rlast = R_0 · R_1 ··· R_{N−1}                        # base ← last link (product of states[i].R)

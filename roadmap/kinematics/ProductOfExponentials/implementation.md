@@ -6,7 +6,7 @@ Screws follow the library convention (M6): `S = (v; ω)`, linear part first.
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t N>             # static_assert(std::is_floating_point_v<T>); instantiated for float
 class ProductOfExponentials:
     std::array<Vector6<T>, N>  screws           # space-frame screw axes Sᵢ = (vᵢ; ωᵢ) at q = 0
@@ -19,7 +19,7 @@ Screw construction (asserted at construction):
 
 ## Interface
 
-```
+```cpp
 ProductOfExponentials(const std::array<Vector6<T>, N>& screws, const SE3Transform<T>& home)
 SE3Transform<T>   Compute(const JointVector& q) const          # tool pose; hot path
 Matrix<T, 6, N>   SpaceJacobian(const JointVector& q) const    # Lynch–Park space Jacobian, (v; ω) rows
@@ -29,7 +29,7 @@ static Matrix<T, 6, N> SpaceToGeometric(const Matrix<T, 6, N>& Js, const Vector3
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function Compute(q):                            # OPTIMIZE_FOR_SPEED
     A = Identity
     for i in 0..N-1: A = A * SE3Transform::Exp(screws[i], q[i])      # M6

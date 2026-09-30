@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestFrictionCompensation : public ::testing::Test:
     # single-joint params: Fc=0.5, Fs=0.8, Fv=0.1, vs=0.05, delta=2, eps=1e-3, maxCompensation=10
     JointFrictionParameters<float> p = MakeParams()
@@ -14,7 +14,7 @@ class TestFrictionCompensation : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 positive_velocity_positive_torque:
     Arrange: qDot = +1.0
     Act:     tau = Compute(qDot)

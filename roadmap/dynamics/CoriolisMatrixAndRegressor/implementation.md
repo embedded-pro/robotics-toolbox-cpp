@@ -10,7 +10,7 @@ parameters, `Y·π`. One modified RNEA pass provides all three, with the **Chris
 
 ## Data structures
 
-```
+```cpp
 # internal spatial algebra uses Featherstone ordering, motion (ω; v), force (n; f), link frames,
 # exactly like the shipped ArticulatedBodyAlgorithm; nothing here is exposed as a public 6-vector.
 
@@ -37,7 +37,7 @@ class ChainInertialRegressor : public InertialRegressor<T, NumLinks, 10 * NumLin
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 # helpers (6-vectors in (ω; v) / (n; f) ordering, 6×6 in 3×3 blocks):
 #   crm(v) = [[ω×, 0], [v×, ω×]]        crf(v) = −crm(v)ᵀ = [[ω×, v×], [0, ω×]]
 #   barcrf(h) for force h = (n; f):   barcrf(h)·w = crf(w)·h  ⇒ barcrf(h) = [[−n×, −f×], [−f×, 0]]

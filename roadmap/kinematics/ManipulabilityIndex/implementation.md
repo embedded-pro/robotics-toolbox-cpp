@@ -4,7 +4,7 @@
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t TaskDim, std::size_t Dof>   # static_assert(std::is_floating_point_v<T>); instantiated for float
 class ManipulabilityIndex:
     const JacobianProvider<T, TaskDim, Dof>& jacobian        # M8 seam, injected
@@ -15,7 +15,7 @@ class ManipulabilityIndex:
 
 ## Interface
 
-```
+```cpp
 explicit ManipulabilityIndex(const JacobianProvider<T, TaskDim, Dof>& jacobian)
 T                    Compute(const JointVector& q) const            # w of rows 0..Rows−1 (translational for TaskDim 3/6); hot path
 T                    ComputeRotational(const JointVector& q) const requires (TaskDim == 6)   # rows 3–5
@@ -26,7 +26,7 @@ bool                 NearSingular(const JointVector& q, T eps) const   # Compute
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function GramRoot(B):                           # B: Rows × Dof, one unit
     if Rows ≤ Dof:  G = B·Bᵀ                    # Rows × Rows: task-space ellipsoid volume
     else:           G = Bᵀ·B                    # Dof × Dof: B·Bᵀ would be rank ≤ Dof ⇒ det ≡ 0

@@ -10,7 +10,7 @@ identifiable, so the solver must handle a rank-deficient regressor.
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t Dof>                   # static_assert(std::is_floating_point_v<T>); instantiated for float
 class DynamicParameterIdentification:
     static constexpr std::size_t P = 10 * Dof           # full parameter count (M31 ordering)
@@ -29,7 +29,7 @@ struct IdentificationResult:
 
 ## Interface
 
-```
+```cpp
 void AddSample(const JointVector& q, const JointVector& qDot, const JointVector& qDDot,
                const JointVector& tauMeasured)          # streaming, O(Dof·P²)
 std::optional<IdentificationResult> Solve(T relativeTolerance) const   # nullopt if no samples
@@ -39,7 +39,7 @@ void Reset()
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function AddSample(q, q̇, q̈, τ):                        # streaming Givens QR, no sample storage
     Y = regressor.Compute(q, q̇, q̇, q̈)                  # Dof × P
     for each row k of Y (with right-hand side τ[k]):

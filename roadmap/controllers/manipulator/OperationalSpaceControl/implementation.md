@@ -4,7 +4,7 @@
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t Dof, std::size_t TaskDim>   # static_assert(std::is_floating_point_v<T>); instantiated for float
 class OperationalSpaceControl:                                # TaskDim = 6 (pose) or ≤ 3 (position; 2 = planar xy)
     const dynamics::EulerLagrangeDynamics<T, Dof>&       model      # M, C q̇, g — typically ChainDynamicsModel (M29)
@@ -16,7 +16,7 @@ class OperationalSpaceControl:                                # TaskDim = 6 (pos
 
 ## Interface
 
-```
+```text
 OperationalSpaceControl(const dynamics::EulerLagrangeDynamics<T,Dof>& model,
                         const kinematics::JacobianProvider<T,TaskDim,Dof>& jacobian,
                         const SquareMatrix& Kp, const SquareMatrix& Kd, T sigma)
@@ -29,7 +29,7 @@ JointVector ComputeTorque(const JointVector& q, const JointVector& qDot,
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function ComputeTorque(q, qDot, desiredPose, xdDot, xdDdot, tauSecondary):   # OPTIMIZE_FOR_SPEED
     J  = jacobian.Jacobian(q)                                   # TaskDim×Dof
     M  = model.ComputeMassMatrix(q)                             # Dof×Dof (SPD)

@@ -10,7 +10,7 @@ is streamed with `Sample`.
 `JointTrajectoryState<T, Dof>` comes from `robotics/trajectory/TrajectoryTypes.hpp` (canonical
 definition: PolynomialTrajectory spec → Data structures).
 
-```
+```cpp
 template<typename T, std::size_t Dof> using JointVector = math::Vector<T, Dof>
 
 template<typename T, std::size_t Dof>        # static_assert(std::is_floating_point_v<T>); instantiated for float
@@ -58,7 +58,7 @@ class TimeOptimalPathParameterization:
 
 ## Interface
 
-```
+```cpp
 TimeOptimalPathParameterization(const PathGeometry<T, Dof>& path, const JointLimits<T, Dof>& limits)
 bool  Parameterize()                                         # false if infeasible
 std::optional<JointTrajectoryState<T, Dof>> Sample(T t) const  # nullopt until Parameterize() succeeds
@@ -70,7 +70,7 @@ InverseDynamicsJointLimits(const PathGeometry<T, Dof>&, const dynamics::InverseD
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 # Along the path q̇ = q'·ṡ, q̈ = q'·u + q''·x, so every joint torque is affine in (x, u):
 #   τ(s) = a(s)·u + b(s)·x + c(s),   a = M q',  b = M q'' + C(q,q') q',  c = g(q)
 # Grid s_i = i/N, Δ_i = s_{i+1} − s_i (uniform 1/N). Stage i holds u_i constant on [s_i, s_{i+1}]:

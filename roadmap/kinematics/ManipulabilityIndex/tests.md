@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestManipulabilityIndex : public ::testing::Test:
     # 2-link unit planar arm (z-axis joints, link lengths 1), link model M30
     std::array<RevoluteJointLink<float>, 2>  planar{ ... }
@@ -18,7 +18,7 @@ class TestManipulabilityIndex : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 position_manipulability_is_abs_sin_elbow:
     Assert: w.Compute({0, q₂}) ≈ |sin q₂| for q₂ ∈ {0.3, 1.2, 2.5}  (Dof < Rows ⇒ Jᵀ·J branch)
 right_angle_elbow_is_most_dexterous:

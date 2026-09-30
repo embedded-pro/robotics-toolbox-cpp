@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestRecursiveNewtonEuler : public ::testing::Test:     # extends the shipped fixture
     RecursiveNewtonEuler<float, 3> rnea3
     std::array<RevoluteJointLink<float>, 3> chain{ ... }     # skewed axes, tool offset (0.3, 0.05, 0)
@@ -13,7 +13,7 @@ class TestRecursiveNewtonEuler : public ::testing::Test:     # extends the shipp
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 zero_wrench_matches_shipped_overload:
     Assert: InverseDynamics(..., ToolWrench{0, 0, tool}) == InverseDynamics(...)
 wrench_enters_as_minus_jacobian_transpose:

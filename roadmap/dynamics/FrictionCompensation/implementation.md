@@ -4,7 +4,7 @@
 
 ## Data structures
 
-```
+```cpp
 template<typename T>                        # static_assert(std::is_floating_point_v<T>); instantiated for float
 struct JointFrictionParameters:             # one per joint
     T coulomb          # F_c  — kinetic friction magnitude
@@ -22,7 +22,7 @@ class FrictionCompensation:
 
 ## Interface
 
-```
+```cpp
 FrictionCompensation(const std::array<JointFrictionParameters<T>, NumJoints>& params)
 
 # Feedforward friction torque to add to the control law:
@@ -34,7 +34,7 @@ static T JointTorque(const JointFrictionParameters<T>& p, T qDot)
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function JointTorque(p, v):                         # OPTIMIZE_FOR_SPEED
     # Stribeck curve: stiction blends down to Coulomb as |v| grows
     fall  = exp( -(|v| / p.stribeckVelocity) ^ p.stribeckShape )

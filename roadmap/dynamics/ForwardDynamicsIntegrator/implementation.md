@@ -8,7 +8,7 @@ controllers (M5, M12, M16–M20) reproducible.
 
 ## Data structures
 
-```
+```cpp
 enum class IntegrationMethod : uint8_t { SemiImplicitEuler, RungeKutta4 }
 
 template<typename T, std::size_t NumLinks>        # static_assert(std::is_floating_point_v<T>); instantiated for float
@@ -24,14 +24,14 @@ class ForwardDynamicsIntegrator:
 
 ## Interface
 
-```
+```text
 ForwardDynamicsIntegrator(const LinkArray& links, const Vector3& gravity)
 ChainState Step(const ChainState& state, const JointVector& tau, T dt) const     # hot path, τ held over dt
 ```
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 function Step(x, τ, dt):                         # OPTIMIZE_FOR_SPEED
     if Method == SemiImplicitEuler:              # symplectic: bounded energy error
         a = aba.ForwardDynamics(links, x.q, x.q̇, τ, gravity)

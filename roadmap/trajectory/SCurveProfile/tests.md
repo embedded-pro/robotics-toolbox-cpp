@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestSCurveProfile : public ::testing::Test:
     MotionLimits<float> limits{ .vMax = 1.0f, .aMax = 2.0f, .jMax = 10.0f }
     SCurveProfile<float> profile{ 0.0f, 5.0f, limits }   # full 7-segment move (step 1, aMax reached)
@@ -13,7 +13,7 @@ class TestSCurveProfile : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 endpoints_reached_exactly:
     Assert: Sample(0).position ≈ 0  and  Sample(tf).position ≈ 5
 

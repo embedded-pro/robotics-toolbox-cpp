@@ -8,7 +8,7 @@ model (M29) and any forward-dynamics path that solves `M q̈ = τ − h`.
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t NumLinks>      # static_assert(std::is_floating_point_v<T>); instantiated for float
 class CompositeRigidBodyAlgorithm:              # stateless
     using MassMatrix = math::SquareMatrix<T, NumLinks>
@@ -18,13 +18,13 @@ class CompositeRigidBodyAlgorithm:              # stateless
 
 ## Interface
 
-```
+```text
 MassMatrix Compute(const LinkArray& links, const JointVector& q) const          # hot path
 ```
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function Compute(links, q):                     # OPTIMIZE_FOR_SPEED
     for i: R[i] = RotationAboutAxis(links[i].jointAxis, q[i])
     for i: Ic[i] = RigidBodyInertia(links[i])   # rot = I_c + m·Skew(c)ᵀSkew(c), cross = m·Skew(c), lin = m·I

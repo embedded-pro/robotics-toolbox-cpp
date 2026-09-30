@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestProductOfExponentials : public ::testing::Test:
     # 2-link unit planar arm: revolute about ẑ through (0,0,0) and through (1,0,0); screws (v; ω)
     std::array<Vector6<float>, 2> screws{ ((0,0,0); ẑ), ((0,−1,0); ẑ) }
@@ -18,7 +18,7 @@ class TestProductOfExponentials : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 zero_config_returns_home:
     Assert: poe.Compute({0, 0}) ≈ home (tip (2, 0, 0)); ur5.Compute(0).p ≈ (0.817, 0.191, −0.006)
 single_joint_rotation:

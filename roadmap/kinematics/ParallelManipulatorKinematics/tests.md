@@ -4,7 +4,7 @@
 
 ## Fixture — Stewart–Gough
 
-```
+```cpp
 class TestStewartGoughKinematics : public ::testing::Test:
     # leg k = 0..5, j = k/2, s = (k even ? −1 : +1)
     # bₖ = 1.0·(cos β, sin β, 0), β = 120°·j + s·15°;  pₖ = 0.6·(cos γ, sin γ, 0), γ = 120°·j + s·45°
@@ -16,7 +16,7 @@ class TestStewartGoughKinematics : public ::testing::Test:
 
 ## Test cases — Stewart–Gough
 
-```
+```text
 home_legs_are_equal:
     Assert: Inverse(home) ≈ 0.980189 for all six legs
 raising_the_platform_lengthens_every_leg:
@@ -39,7 +39,7 @@ singular_pose_step_stays_finite:
 
 ## Fixture — Delta
 
-```
+```cpp
 class TestDeltaKinematics : public ::testing::Test:
     DeltaKinematics<float> delta{ { R = 0.1, r = 0.03, rf = 0.2, re = 0.45 } }
 # each case below is a TEST_F(TestDeltaKinematics, <name>)
@@ -47,7 +47,7 @@ class TestDeltaKinematics : public ::testing::Test:
 
 ## Test cases — Delta
 
-```
+```text
 zero_angles_put_the_effector_on_the_axis:
     Assert: Forward((0,0,0)) ≈ (0, 0, −0.36)   (√(re² − (R − r + rf)²) = √(0.2025 − 0.0729))
 inverse_of_known_points:

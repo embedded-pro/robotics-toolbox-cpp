@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestPolynomialTrajectory : public ::testing::Test:
     BoundaryConditions<float> restToRest{ .q0 = 0, .qf = 1 }   # v0=vf=0
     PolynomialTrajectory<float> cubic{ restToRest, 2.0f, Degree::Cubic }
@@ -13,7 +13,7 @@ class TestPolynomialTrajectory : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 endpoints_match_boundary_positions:
     Assert: Sample(0).position ≈ 0  and  Sample(tf).position ≈ 1
 

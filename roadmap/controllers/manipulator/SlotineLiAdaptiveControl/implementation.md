@@ -4,7 +4,7 @@
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t Dof, std::size_t NumParams>   # static_assert(std::is_floating_point_v<T>); instantiated for float
 class SlotineLiAdaptiveControl:
     const dynamics::InertialRegressor<T, Dof, NumParams>& regressor  # Y(q,q̇,q̇r,q̈r) — M31
@@ -17,7 +17,7 @@ class SlotineLiAdaptiveControl:
 
 ## Interface
 
-```
+```text
 # Regressor injected (DIP): supplies Y such that  M(q)q̈r + C(q,q̇)q̇r + g(q) = Y·a,
 # C the Christoffel-consistent Coriolis matrix (M31, dynamics::InertialRegressor)
 SlotineLiAdaptiveControl(const dynamics::InertialRegressor<T,Dof,NumParams>& regressor, const SquareMatrix& Lambda,
@@ -33,7 +33,7 @@ void Reset(const Vector& aHat0)
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function ComputeTorque(q, qDot, qd, qdDot, qdDdot):    # OPTIMIZE_FOR_SPEED
     qTilde    = q    - qd
     qTildeDot = qDot - qdDot

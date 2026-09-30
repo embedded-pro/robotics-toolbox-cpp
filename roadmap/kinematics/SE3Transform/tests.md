@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestSE3Transform : public ::testing::Test:
     SE3Transform<float> a{ RotationAboutAxis(ẑ, π/2), (1, 0, 0) }
     SE3Transform<float> b{ RotationAboutAxis(ŷ, π/3), (0, 2, 0) }
@@ -13,7 +13,7 @@ class TestSE3Transform : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 composition_applies_right_operand_first:
     Assert: (a * b).Apply(x) ≈ a.Apply(b.Apply(x)) for x = (0.3, −0.2, 0.5)
 inverse_composes_to_identity:

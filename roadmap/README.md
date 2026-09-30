@@ -8,7 +8,7 @@ the algorithm works, so an implementer can produce the real templated C++ afterw
 
 The tree mirrors the `robotics/` layout. Each algorithm gets its own folder with **three files**:
 
-```
+```text
 roadmap/<domain>/<AlgorithmName>/
 ├── implementation.md   # data structures, interface, algorithm pseudocode, complexity, float notes, deployment
 ├── tests.md            # GoogleTest test plan in pseudocode (TEST_F on float, StrictMock, no heap)

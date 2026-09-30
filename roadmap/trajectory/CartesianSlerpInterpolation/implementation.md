@@ -10,7 +10,7 @@ Poses are `kinematics::SE3Transform<T>` (M6); twists are `kinematics::Vector6<T>
 `FromRotationMatrix`, `Slerp`, `ToRotationMatrix`, `Conjugate`). `TrajectoryState<T>` comes from
 `robotics/trajectory/TrajectoryTypes.hpp`.
 
-```
+```cpp
 template<typename T>               # static_assert(std::is_floating_point_v<T>); instantiated for float
 struct CartesianState:
     kinematics::SE3Transform<T> pose
@@ -31,7 +31,7 @@ class CartesianSlerpInterpolation:
 
 ## Interface
 
-```
+```text
 CartesianSlerpInterpolation(const kinematics::SE3Transform<T>& start,
                             const kinematics::SE3Transform<T>& goal, const TimeLaw& timeLaw)
 CartesianState<T> Sample(T t)       # hot path
@@ -40,7 +40,7 @@ T                 Duration()        # = timeLaw.Duration()
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 function plan(start, goal):                   # orientation geometry once
     p0 = start.p;  deltaP = goal.p - start.p
     q0 = Quaternion::FromRotationMatrix(start.R)

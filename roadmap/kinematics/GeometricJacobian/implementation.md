@@ -11,7 +11,7 @@ single Jacobian implementation — replacing the private 3×N Jacobian inside th
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t N>             # static_assert(std::is_floating_point_v<T>); instantiated for float
 class GeometricJacobian:                        # stateless
     using Jacobian = math::Matrix<T, 6, N>
@@ -31,7 +31,7 @@ class ChainTaskJacobian : public JacobianProvider<T, TaskDim, Dof>:
 
 ## Interface
 
-```
+```text
 static Jacobian     Compute(const FrameChain<T, N>& frames)                                # hot path
 static Vector6<T>   BiasAcceleration(const FrameChain<T, N>& frames, const JointVector& qDot)   # J̇·q̇
 static JointVector  JointTorques(const Jacobian& J, const Vector6<T>& wrench)             # Jᵀ·w
@@ -41,7 +41,7 @@ static JointVector  JointTorques(const Jacobian& J, const Vector6<T>& wrench)   
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 function Compute(frames):                       # OPTIMIZE_FOR_SPEED
     p = frames.tool.p
     for i in 0..N-1:

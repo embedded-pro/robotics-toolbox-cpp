@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestDenavitHartenberg : public ::testing::Test:
     # 2-link unit planar arm, both revolute (a, α, d, θ, type)
     DenavitHartenberg<float, 2> standard{ { {1,0,0,0,Revolute}, {1,0,0,0,Revolute} }, Standard }
@@ -15,7 +15,7 @@ class TestDenavitHartenberg : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 zero_config_is_stretched_along_x:
     Assert: standard.Forward({0, 0}).p ≈ (2, 0, 0), R ≈ I
 planar_elbow_ninety_deg:

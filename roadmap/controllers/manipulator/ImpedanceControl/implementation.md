@@ -8,7 +8,7 @@ Task error `e = xd ⊖ x` (`TaskError`, below); `x̃ = x − xd = −e`.
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t Dof, std::size_t TaskDim>   # static_assert(std::is_floating_point_v<T>); instantiated for float
 class ImpedanceControl:                                       # TaskDim = 6 (pose) or ≤ 3 (position; 2 = planar xy)
     const dynamics::EulerLagrangeDynamics<T, Dof>&       model      # M, C q̇, g — typically ChainDynamicsModel (M29)
@@ -25,7 +25,7 @@ math::Vector<T, TaskDim> TaskError(const kinematics::SE3Transform<T>& desired,
 
 ## Interface
 
-```
+```text
 ImpedanceControl(const dynamics::EulerLagrangeDynamics<T,Dof>& model,
                  const kinematics::JacobianProvider<T,TaskDim,Dof>& jacobian,
                  const SquareMatrix& K, const SquareMatrix& D, const SquareMatrix& Md)
@@ -44,7 +44,7 @@ JointVector ComputeTorqueWithInertiaShaping(const JointVector& q, const JointVec
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function TaskError(desired, current):                    # never subtracts orientations
     if TaskDim == 6: return kinematics::SE3Transform<T>::PoseError(desired, current)   # (Δp; rotation vector)
     return first TaskDim entries of (desired.p − current.p)

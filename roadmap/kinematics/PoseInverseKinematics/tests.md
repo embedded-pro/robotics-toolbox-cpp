@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestPoseInverseKinematics : public ::testing::Test:
     DenavitHartenberg<float, 6>              puma{ pumaTable, Standard }     # PUMA-560, see M7 tests
     DhTaskJacobian<float, 6, 6>              arm{ puma }
@@ -16,7 +16,7 @@ class TestPoseInverseKinematics : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 round_trip_reachable_pose:
     Arrange: target = puma.Forward(qTrue); q0 = qTrue + 0.1
     Act:     r = PoseInverseKinematics{ arm, config }.Solve(target, q0)

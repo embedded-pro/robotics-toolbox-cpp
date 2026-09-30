@@ -7,7 +7,7 @@ sensors and no acceleration measurement — so contacts and collisions can be de
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t Dof>              # static_assert(std::is_floating_point_v<T>); instantiated for float
 class MomentumObserver:
     const EulerLagrangeDynamics<T, Dof>& model     # M(q), g(q) — typically ChainDynamicsModel (M29)
@@ -19,7 +19,7 @@ class MomentumObserver:
 
 ## Interface
 
-```
+```text
 MomentumObserver(model, coriolis, links, gain)
 void                 Reset(const JointVector& q, const JointVector& qDot)                       # p(0)
 const JointVector&   Update(const JointVector& q, const JointVector& qDot,
@@ -29,7 +29,7 @@ bool                 Collision(const JointVector& threshold) const              
 
 ## Algorithm (pseudocode)
 
-```
+```text
 # dynamics: ṗ = τ + Cᵀ(q,q̇) q̇ − g(q) + τ_ext,  p = M(q) q̇   (uses Ṁ = C + Cᵀ)
 function Reset(q, q̇):
     initialMomentum = M(q)·q̇;  integral = 0;  residual = 0

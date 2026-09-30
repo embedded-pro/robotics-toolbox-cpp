@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestCubicSplineTrajectory : public ::testing::Test:
     using Spline = CubicSplineTrajectory<float, 3, 8>
     std::array<float, 8>              times{ 0, 1, 2.5, 3, 4.5 }        # K = 5 used
@@ -17,7 +17,7 @@ class TestCubicSplineTrajectory : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 passes_through_every_knot:
     Assert: Sample(t_k).position ≈ q_k for k = 0..4, every joint
 

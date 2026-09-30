@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestComputedTorqueControl : public ::testing::Test:
     StrictMock<dynamics::MockInverseDynamicsModel<float,2>> model
     SquareMatrix<float,2> Kp = diag(100, 100)
@@ -16,7 +16,7 @@ class TestComputedTorqueControl : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 pure_feedforward_passes_desired_acceleration:
     Arrange: q = qd, qDot = qdDot, qdDdot = a; model returns r
     Act:     τ = ComputeTorque(q, qDot, qd, qdDot, qdDdot)

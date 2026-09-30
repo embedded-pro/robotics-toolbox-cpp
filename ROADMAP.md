@@ -42,10 +42,10 @@ existing `dynamics/` convention.
 | M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —          | ★☆☆☆☆      |
 | M6  | SE(3) transform, twists, wrenches, adjoint, exp/log             | `kinematics`              | —          | ★★☆☆☆      |
 | M28 | Composite Rigid Body Algorithm (mass matrix)                    | `dynamics`                | —          | ★★☆☆☆      |
-| M29 | Chain dynamics model (link chain → M, Cq̇, g, inverse dynamics) | `dynamics`                | M28        | ★★☆☆☆      |
+| M29 | Chain dynamics model (link chain → M, C, g, inverse dynamics)   | `dynamics`                | M28        | ★★☆☆☆      |
 | M30 | Chain pose kinematics (full-pose FK, frame chain)               | `kinematics`              | M6         | ★★☆☆☆      |
 | M7  | Denavit-Hartenberg parameters (standard + modified)             | `kinematics`              | M6, M30    | ★★☆☆☆      |
-| M8  | Geometric Jacobian (6×N), J̇q̇, Jacobian provider               | `kinematics`              | M6, M30    | ★★☆☆☆      |
+| M8  | Geometric Jacobian (6×N), bias term, Jacobian provider          | `kinematics`              | M6, M30    | ★★☆☆☆      |
 | M9  | S-curve (jerk-limited) trajectory                               | `trajectory` (new)        | M3         | ★★☆☆☆      |
 | M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | M6         | ★★☆☆☆      |
 | M11 | Manipulability ellipsoid / Yoshikawa index                      | `kinematics`              | M8         | ★★☆☆☆      |

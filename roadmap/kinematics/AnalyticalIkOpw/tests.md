@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestAnalyticalIkOpw : public ::testing::Test:
     # KUKA KR6 R700 sixx
     OpwParameters<float> kr6{ a1 = 0.025, a2 = −0.035, b = 0, c1 = 0.400, c2 = 0.315, c3 = 0.365, c4 = 0.080,
@@ -16,7 +16,7 @@ class TestAnalyticalIkOpw : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 forward_matches_elementary_chain:
     Assert: ik.Forward(q) ≈ Rz(θ1)·Trans(a1,b,c1)·Ry(θ2)·Trans(0,0,c2)·Ry(θ3)·Trans(a2,0,c3)
                           ·Rz(θ4)·Ry(θ5)·Rz(θ6)·Trans(0,0,c4)  (θ = signs⊙q − offsets), for qTrue and q = 0

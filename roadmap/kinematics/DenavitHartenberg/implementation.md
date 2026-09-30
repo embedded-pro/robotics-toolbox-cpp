@@ -7,7 +7,7 @@ everything built on `JacobianProvider` work on DH-described arms unchanged.
 
 ## Data structures
 
-```
+```cpp
 enum class JointType : uint8_t { Revolute, Prismatic }      # shared with M30 / M1
 enum class DhConvention : uint8_t { Standard, Modified }     # distal (classic) vs proximal (Craig)
 
@@ -33,7 +33,7 @@ class DhTaskJacobian : public JacobianProvider<T, TaskDim, N>:   # M8 seam, mirr
 
 ## Interface
 
-```
+```cpp
 DenavitHartenberg(const std::array<DhLink<T>, N>& links, DhConvention convention,
                   const SE3Transform<T>& tool = SE3Transform<T>::Identity())
 SE3Transform<T>   LinkTransform(std::size_t i, T q) const     # one Aᵢ; hot path
@@ -47,7 +47,7 @@ FrameChain<T, N>  Frames(const JointVector& q) const          # M30 frame chain 
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function LinkTransform(i, q):                   # OPTIMIZE_FOR_SPEED
     link = links[i]
     θ = link.theta + (link.type == Revolute  ? q : 0)

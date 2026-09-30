@@ -8,7 +8,7 @@
 (canonical definition: PolynomialTrajectory spec → Data structures); not redefined here. This profile
 requires `vMax`, `aMax`, `jMax > 0`.
 
-```
+```cpp
 template<typename T>               # static_assert(std::is_floating_point_v<T>); instantiated for float
 class SCurveProfile:
     T q0, direction, jMax
@@ -22,7 +22,7 @@ class SCurveProfile:
 
 ## Interface
 
-```
+```text
 SCurveProfile(T q0, T qf, MotionLimits<T> limits)
 TrajectoryState<T> Sample(T t)      # hot path
 T    Duration()
@@ -33,7 +33,7 @@ bool ReachesMaxAccel() / ReachesMaxVel()
 
 Rest-to-rest closed form (Biagiotti & Melchiorri §3.4, `v0 = v1 = 0`), `h = |qf − q0|`:
 
-```
+```cpp
 # Seven phases: [+j][a=const][-j][v=const][-j][a=const][+j]
 function plan(q0, qf, lim):
     h = |qf - q0|;  direction = sign(qf - q0);  jMax = lim.jMax

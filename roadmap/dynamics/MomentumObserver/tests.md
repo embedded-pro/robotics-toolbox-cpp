@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestMomentumObserver : public ::testing::Test:
     # 2-link uniform rods about ŷ, gravity on; plant simulated with ABA at dt = 1 ms
     ChainDynamicsModel<float, 2> model{ ... }
@@ -15,7 +15,7 @@ class TestMomentumObserver : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```text
 free_motion_keeps_residual_near_zero:
     Arrange: gravity-compensated motion with commanded torque, no external torque, 1 s
     Assert:  max |r| stays below 1e-2 N·m

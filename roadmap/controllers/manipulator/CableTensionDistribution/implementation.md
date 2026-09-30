@@ -8,7 +8,7 @@ serial-arm Jacobian — and no QP solver is needed.
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t NumCables, std::size_t WrenchDim>   # static_assert(std::is_floating_point_v<T>); instantiated for float
 class CableTensionDistribution:            # static_assert(WrenchDim == 6 || WrenchDim <= 3); NumCables ≥ WrenchDim
     # WrenchDim = 6: spatial platform, wrench (f; n) about the platform origin, world frame (M6 order)
@@ -25,7 +25,7 @@ using WrenchVector    = math::Vector<T, WrenchDim>              # wrench the cab
 
 ## Interface
 
-```
+```cpp
 CableTensionDistribution(const AnchorArray& baseAnchors, const AnchorArray& platformAnchors, T tMin, T tMax)
 
 std::optional<StructureMatrix> ComputeStructureMatrix(const kinematics::SE3Transform<T>& platformPose) const
@@ -37,7 +37,7 @@ std::optional<TensionVector> Distribute(const WrenchVector& wrench,
 
 ## Algorithm (pseudocode)
 
-```
+```cpp
 function ComputeStructureMatrix(pose):                  # wrench balance  A·t = w
     for i in 0..NumCables-1:
         r = pose.R·bᵢ                                   # platform anchor offset, world frame

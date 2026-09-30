@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestContinuumKinematics : public ::testing::Test:
     ArcParameters<float> quarter{ π/2, 0, 1 }         # θ = π/2, radius 2/π
     ArcParameters<float> general{ 2.0, 0.7, 1.2 }     # θ = 2.4
@@ -14,7 +14,7 @@ class TestContinuumKinematics : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 straight_section_is_pure_translation:
     Assert: SectionTransform({0, 0, 1}) ≈ { I, (0, 0, 1) }
 quarter_circle_bend:

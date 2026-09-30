@@ -4,7 +4,7 @@
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t Dof>    # static_assert(std::is_floating_point_v<T>); instantiated for float
 class ComputedTorqueControl:
     const dynamics::InverseDynamicsModel<T, Dof>& model   # τ = M(q)q̈ + C(q,q̇)q̇ + g(q) in one call (M29)
@@ -14,7 +14,7 @@ class ComputedTorqueControl:
 
 ## Interface
 
-```
+```cpp
 # Inverse-dynamics model injected (DIP); gains chosen for the resulting double integrator:
 ComputedTorqueControl(const dynamics::InverseDynamicsModel<T,Dof>& model,
                       const SquareMatrix& Kp, const SquareMatrix& Kd)
@@ -26,7 +26,7 @@ Vector<T,Dof> ComputeTorque(const StateVector& q,      const StateVector& qDot,
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function ComputeTorque(q, qDot, qd, qdDot, qdDdot):     # OPTIMIZE_FOR_SPEED
     e    = qd    - q
     eDot = qdDot - qDot
