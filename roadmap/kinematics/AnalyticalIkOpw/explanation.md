@@ -1,34 +1,41 @@
-# Analytical IK (Pieper) — Overview
+# Analytical IK for ortho-parallel 6R arms with a spherical wrist (OPW) — Overview
 
 ## What it is
-A **closed-form** inverse-kinematics solver for the classic six-revolute arm whose last three axes
-meet at a point (a spherical wrist). Instead of iterating, it computes every joint angle directly with
-trigonometry and returns *all* the arm postures — up to eight — that reach a given pose.
+A **closed-form** inverse-kinematics solver for the six-revolute layout used by most industrial arms:
+the second and third axes are parallel to each other and perpendicular to the first, and the last
+three axes meet at one point (a spherical wrist). Seven lengths — shoulder offset, lateral offset,
+elbow offset, and the base, upper-arm, forearm and wrist lengths — plus a zero offset and a direction
+sign per joint describe the arm. It returns every posture — up to eight — that reaches a flange pose.
 
 ## Why it matters (embedded)
-Closed-form IK is exact, has no convergence loop, and runs in constant time — ideal for a hard
-real-time controller that cannot afford an iterative solver's worst-case iteration count. Getting *all*
-solutions also lets a planner choose the posture that best avoids joint limits or obstacles, something
-a single-answer numerical solver cannot offer.
+Closed-form IK is exact, has no convergence loop and runs in constant time — ideal for a hard real-time
+controller that cannot afford an iterative solver's worst case. Getting *all* solutions lets a planner
+pick the posture that respects joint limits or stays close to the current one. The seven-parameter
+description is read straight off a datasheet drawing, avoiding DH frame-placement mistakes.
 
 ## How it works (intuition)
-Pieper's insight is that a spherical wrist **decouples** the problem. The wrist centre — the point
-where the last three axes cross — depends only on the first three joints, so you first back it out of
-the target pose and solve a 3-DOF *position* problem for joints 1-3 using plain planar geometry (an
-`atan2` for the base and the law of cosines for the elbow, giving shoulder and elbow-up/down branches).
-With the arm placed, the leftover rotation from frame 3 to the tool is handled by wrist joints 4-6,
-extracted as a set of Euler angles (two branches for the middle wrist joint). Multiplying the branch
-counts gives up to eight complete solutions.
+Pieper's result is the theoretical basis: when the last three axes intersect, position and
+orientation decouple. The wrist centre sits a fixed distance behind the flange along the approach axis,
+and it depends only on the first three joints. The base joint turns the arm plane toward the wrist
+centre — facing it or facing away, correcting for the lateral offset — giving two shoulder branches.
+Inside that plane the shoulder offset shifts the triangle's corner, and the forearm offset turns the
+forearm into a slightly longer virtual link at a fixed angle; the law of cosines on that triangle gives
+elbow-up and elbow-down. With the arm placed, the remaining rotation is exactly a Z-Y-Z rotation of the
+wrist, read off with `atan2` in two mirror-image flavours. When the wrist's middle joint is straight,
+the first and last wrist axes line up and only their sum is determined, so one is fixed by convention.
 
 ## Key parameters
-- **DH table of the 6R arm** — with the spherical-wrist assumption baked in.
-- **target pose** — the tool position and orientation to invert.
-- **branch selection** — shoulder, elbow, and wrist flips the caller chooses among.
+- **a1, a2, b, c1, c2, c3, c4** — shoulder, elbow and lateral offsets; base, upper-arm, forearm and wrist lengths.
+- **joint offsets and signs** — map the manufacturer's joint zero and direction onto the model.
+- **branch selection** — shoulder front/back, elbow up/down, wrist flip.
 
 ## Reference
-D. L. Pieper, "The Kinematics of Manipulators Under Computer Control," PhD thesis, Stanford
-University, 1968.
+M. Brandstötter, A. Angerer, M. Hofbaur, "An Analytical Solution of the Inverse Kinematics Problem of
+Industrial Serial Manipulators with an Ortho-parallel Basis and a Spherical Wrist," *Proc. Austrian
+Robotics Workshop*, 2014; D. L. Pieper, "The Kinematics of Manipulators Under Computer Control," PhD
+thesis, Stanford University, 1968.
 
 ## See also
-`DenavitHartenberg` (M7) / `SE3Transform` (M6) for the frames, `Cordic` (item 23) for the trig,
-`PoseInverseKinematics` (M13, the iterative fallback for non-spherical wrists).
+`SE3Transform` (M6, the flange pose), `PoseInverseKinematics` (M13, the iterative fallback for other
+layouts), `DenavitHartenberg` (M7), `Cordic` ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp),
+fixed-cost trig).
