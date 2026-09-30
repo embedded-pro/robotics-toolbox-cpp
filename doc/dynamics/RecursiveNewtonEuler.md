@@ -4,7 +4,7 @@
 
 The Recursive Newton-Euler Algorithm (RNEA) is the most efficient method for computing **inverse dynamics** of serial kinematic chains (robot arms, manipulators). Given joint positions, velocities, and desired accelerations, it computes the required joint torques in $O(n)$ time — linear in the number of links.
 
-This contrasts with the Euler-Lagrange approach, which requires explicitly forming and multiplying $n \times n$ matrices ($O(n^3)$). For a 6-DOF robot arm, RNEA is roughly 10× faster than the matrix-based approach.
+This contrasts with evaluating the Euler-Lagrange equations directly: a straightforward Lagrangian evaluation grows as $O(n^4)$, and even with a precomputed mass matrix the product $M(q)\ddot{q}$ alone is $O(n^2)$. Hollerbach's comparative study (1980) puts the recursive Newton-Euler formulation at $150n - 48$ multiplications and $131n - 48$ additions — 852 and 738 for a 6-DOF arm — against tens of thousands of multiplications for the direct Lagrangian form.
 
 The algorithm has two passes over the kinematic chain:
 
@@ -75,7 +75,7 @@ where $[\hat{u}]_\times$ is the skew-symmetric matrix of $\hat{u}$.
 | Per-link backward pass | $O(1)$ | $O(1)$ | Cross products and additions                    |
 | Rotation matrix        | $O(1)$ | $O(1)$ | Rodrigues' formula: trig functions + 3×3 matrix |
 
-Compared to Euler-Lagrange $O(n^3)$ inverse dynamics, RNEA is dramatically faster for large $n$. For $n = 6$ (typical robot arm), RNEA performs roughly 780 floating-point operations vs. ~14,000 for the matrix approach.
+Compared to evaluating inverse dynamics through an explicit mass matrix ($O(n^2)$ to form and apply) or a direct Lagrangian evaluation ($O(n^4)$), RNEA's linear cost dominates for every practical $n$; for $n = 6$ it needs 852 multiplications and 738 additions (Hollerbach, 1980).
 
 ## Step-by-Step Walkthrough
 
@@ -130,8 +130,9 @@ This matches $I_{\text{end}} \cdot \ddot{q} = \frac{ml^2}{3} \cdot 1 = 0.667$.
 ## Connections to Other Algorithms
 
 - **Newton-Euler** ([NewtonEuler.md](NewtonEuler.md)): RNEA applies the single-body Newton-Euler equations recursively across the chain. The per-link force/torque computation is identical.
-- **Euler-Lagrange** ([EulerLagrange.md](EulerLagrange.md)): Both compute the same dynamics ($M\ddot{q} + C\dot{q} + g = \tau$) but RNEA is $O(n)$ vs. $O(n^3)$. RNEA is preferred for computation; Euler-Lagrange for analytical derivation.
-- **Gaussian Elimination** ([GaussianElimination.md](../solvers/GaussianElimination.md)): When using RNEA for forward dynamics, the mass matrix built via RNEA is solved with Gaussian elimination.
+- **Euler-Lagrange** ([EulerLagrange.md](EulerLagrange.md)): Both compute the same dynamics ($M\ddot{q} + C\dot{q} + g = \tau$) but RNEA is $O(n)$, whereas working through $M(q)$ costs at least $O(n^2)$. RNEA is preferred for computation; Euler-Lagrange for analytical derivation.
+- **Linear solvers** ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)): When RNEA is used for forward dynamics, the mass matrix built column by column is factorized (Cholesky, since it is symmetric positive definite) and solved.
+- **Articulated Body Algorithm** ([ArticulatedBodyAlgorithm.md](ArticulatedBodyAlgorithm.md)): the $O(n)$ forward-dynamics dual; composing the two is the identity, which makes it a strong cross-check.
 
 ## References & Further Reading
 
@@ -139,3 +140,4 @@ This matches $I_{\text{end}} \cdot \ddot{q} = \frac{ml^2}{3} \cdot 1 = 0.667$.
 - Siciliano, B., Sciavicco, L., Villani, L., & Oriolo, G. (2009). *Robotics: Modelling, Planning and Control*. Springer. Chapter 7.
 - Luh, J. Y. S., Walker, M. W., & Paul, R. P. C. (1980). On-line computational scheme for mechanical manipulators. *Journal of Dynamic Systems, Measurement, and Control*, 102(2), 69–76.
 - Craig, J. J. (2005). *Introduction to Robotics: Mechanics and Control* (3rd ed.). Pearson. Chapter 6.
+- Hollerbach, J. M. (1980). A recursive Lagrangian formulation of manipulator dynamics and a comparative study of dynamics formulation complexity. *IEEE Transactions on Systems, Man, and Cybernetics*, 10(11), 730–736.

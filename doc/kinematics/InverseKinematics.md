@@ -21,7 +21,7 @@ $$J_i = a_i^w \times (p_{\text{ee}} - p_i)$$
 where:
 - $a_i^w = R_{0 \to i} \, a_i^{\text{link}}$ is the joint axis in world frame (accumulated rotation applied to the link-frame axis)
 - $p_i$ is the world-frame position of joint $i$ (from Forward Kinematics)
-- $p_{\text{ee}}$ is the current end-effector position
+- $p_{\text{ee}}$ is the current tool (end-effector) point, i.e. the last joint position plus the rotated tool offset
 
 ### DLS Update Rule
 
@@ -37,7 +37,7 @@ This is equivalent to solving the $3 \times 3$ linear system:
 
 $$\underbrace{\bigl(J J^\top + \lambda^2 I\bigr)}_{A} \, y = e, \quad \Delta q = J^\top y$$
 
-where $A \in \mathbb{R}^{3 \times 3}$ is always symmetric positive definite (the damping $\lambda^2 I$ guarantees this), so `GaussianElimination<T, 3>` solves it reliably.
+where $A \in \mathbb{R}^{3 \times 3}$ is always symmetric positive definite (the damping $\lambda^2 I$ guarantees this), so a small Gaussian elimination (or Cholesky factorization) solves it reliably.
 
 The updated joint angles are:
 
@@ -53,9 +53,11 @@ The loop terminates when:
 
 At a kinematic singularity (e.g., fully extended arm), $J J^\top$ becomes rank-deficient. The pseudoinverse $J^+ = J^\top (J J^\top)^{-1}$ would produce infinite joint velocities. The damping term $\lambda^2 I$ bounds the solution:
 
-$$\|\Delta q\| \leq \frac{\|e\|}{\lambda}$$
+$$\|\Delta q\| \leq \frac{\|e\|}{2\lambda}$$
 
-The cost is a small positional bias proportional to $\lambda$: the algorithm converges to within approximately $\lambda^2 \|e\|$ rather than exact zero. Choosing $\lambda \in [0.01, 0.2]$ balances stability and accuracy for typical robot geometries.
+because each singular value $\sigma$ of $J$ is mapped to $\sigma / (\sigma^2 + \lambda^2) \le 1/(2\lambda)$.
+
+Damping does **not** bias the converged solution of the iteration. A fixed point requires $J^\top (J J^\top + \lambda^2 I)^{-1} e = 0$, which for a full-rank $J$ implies $e = 0$: a reachable, non-singular target is reached exactly, and larger $\lambda$ only shortens the steps and slows convergence. The damping trade-off is therefore speed and step size versus robustness near singularities; only at a singular configuration, or for an unreachable target, does the iteration stop at a least-squares stationary point with $e \neq 0$. Choosing $\lambda \in [0.01, 0.2]$ (scaled to the robot's link lengths) is a common starting point.
 
 ## Complexity Analysis
 
@@ -82,16 +84,17 @@ Consider a 2-link planar arm with $l_1 = 1.0$, $l_2 = 0.8$, both joints rotating
 5. Solve $Ay = e$, compute $\Delta q = J^\top y$
 6. Update both joint angles toward a bent configuration
 
-After ~40 iterations $q$ converges to joints that produce $p_{\text{ee}} \approx (0.5, 1.0, 0)$.
+After 7 iterations the error drops below $10^{-4}$ and $p_{\text{ee}} \approx (0.5, 1.0, 0)$; with $\lambda = 0.5$ the same target still converges exactly, in 13 iterations.
 
 ## Pitfalls & Edge Cases
 
-- **Unreachable targets**: If $\|p_{\text{target}}\|$ exceeds the total arm length, the algorithm reaches maximum iterations without converging. The returned result has `converged = false`; the end-effector will be as close as geometrically possible.
-- **Singularity handling**: Near singularities (e.g., fully extended arm), the damping $\lambda$ prevents numerical blow-up but introduces a small steady-state error. Reduce $\lambda$ for higher accuracy away from singularities.
+- **Unreachable targets**: If the target lies outside the workspace, the algorithm reaches the iteration limit and reports non-convergence; the iterate approaches a least-squares stationary point (typically the closest reachable point), but this is not guaranteed for non-convex workspaces.
+- **Singularity handling**: Near singularities (e.g., fully extended arm), the damping $\lambda$ bounds the step size and prevents numerical blow-up at the cost of slower convergence. Adaptive or selectively damped schemes raise $\lambda$ only near singularities.
 - **Local minima in redundant chains**: For $n > 3$ (redundant), DLS finds *a* solution (minimum-norm joint motion) but not necessarily the one with the best posture. Null-space techniques (projecting secondary objectives into $\ker(J)$) can improve this.
 - **Initial guess sensitivity**: Starting closer to the expected solution reduces iterations and avoids winding through joint-limit regions. For repeated calls (e.g., tracking), use the previous solution as the initial guess.
-- **Float-only**: Uses `std::cos`, `std::sin`, and `std::sqrt`; Q15/Q31 fixed-point types are not supported.
-- **Configuration preconditions**: `dampingFactor` and `tolerance` must both be strictly positive. The damping term $\lambda^2 I$ ensures $A$ is symmetric positive definite only when $\lambda > 0$; both values are asserted in debug builds via `really_assert`.
+- **Float-only**: The trigonometric and square-root evaluations make fixed-point types unsuitable.
+- **Configuration preconditions**: The damping factor, the tolerance and the iteration budget must all be strictly positive. The damping term $\lambda^2 I$ makes $A$ symmetric positive definite only when $\lambda > 0$; these preconditions are checked when the solver is constructed, in every build type.
+- **Tool and base geometry**: The target is compared against the tool point, so the tool offset and the base mounting offset must match the physical robot; a wrong tool offset makes the solver converge exactly to the wrong joint angles.
 
 ## Variants & Generalizations
 
@@ -111,8 +114,8 @@ After ~40 iterations $q$ converges to joints that produce $p_{\text{ee}} \approx
 ## Connections to Other Algorithms
 
 - [Forward Kinematics](ForwardKinematics.md): Called internally every iteration to compute current end-effector position and joint positions for the Jacobian.
-- [GaussianElimination](../solvers/GaussianElimination.md): Solves the $3 \times 3$ DLS system $Ay = e$ at the core of each iteration.
-- `numerical/math/Geometry3D.hpp`: Provides `CrossProduct` for Jacobian column computation, `RotationAboutAxis` for accumulated rotation, and `VectorNorm` for convergence check.
+- Gaussian elimination ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)): Solves the $3 \times 3$ DLS system $Ay = e$ at the core of each iteration.
+- 3D geometry primitives (cross product, axis–angle rotation, vector norm) from numerical-toolbox-cpp build the Jacobian columns, the accumulated rotations and the convergence test.
 
 ## References & Further Reading
 

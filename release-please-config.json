@@ -8,7 +8,8 @@
       "release-type": "simple",
       "package-name": "robotics-toolbox",
       "extra-files": [
-        "CMakeLists.txt"
+        "CMakeLists.txt",
+        "sonar-project.properties"
       ],
       "changelog-sections": [
         {

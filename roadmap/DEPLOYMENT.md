@@ -22,7 +22,7 @@ Read the spec's three files first (`implementation.md`, `tests.md`, `explanation
 4. **CMake**
    - Add `.hpp` to `target_sources(...)`, `.cpp` to `robotics_add_coverage_sources(...)`,
      `Test<Name>.cpp` to the `_test` target's `target_sources`.
-   - New module (`trajectory`, `robust_control`, `nonlinear_control`, `controllers/manipulator`):
+   - New module (`trajectory`, `controllers/manipulator`):
      create `robotics/<module>/CMakeLists.txt` via `robotics_add_header_library(...)`, add a
      `test/` subdir, register it in the parent `CMakeLists.txt`, and add a `doc/<module>/` folder.
 
@@ -33,9 +33,12 @@ Read the spec's three files first (`implementation.md`, `tests.md`, `explanation
 
 6. **Build & test**, fix until green:
    `cmake --preset host && cmake --build --preset host && ctest --preset host`
-   (scope to the target/test where possible).
+   (needs Qt6 for the simulator; without it use the `host-single-Debug` configure/build/test presets).
+   Scope to the target/test where possible.
 
-7. **Remove roadmap spec** — delete the entire `roadmap/<domain>/<Name>/` directory once all tests are green.
+7. **Remove roadmap spec** — delete the entire `roadmap/<domain>/<Name>/` directory once all tests are
+   green, and in the same change remove its row from `ROADMAP.md` (or mark it done) and its entry from the
+   `roadmap/README.md` index.
 
 **Report**: the file paths created/edited/deleted + the test result. Nothing else.
 

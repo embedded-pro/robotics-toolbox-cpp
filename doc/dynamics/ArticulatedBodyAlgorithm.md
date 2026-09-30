@@ -6,7 +6,7 @@ The Articulated Body Algorithm (ABA) is the most efficient method for computing 
 
 This is the forward-dynamics counterpart of the [Recursive Newton-Euler Algorithm](RecursiveNewtonEuler.md) (which solves inverse dynamics). Together, they form the two fundamental $O(n)$ algorithms in rigid-body dynamics.
 
-Alternatives like Euler-Lagrange require explicitly forming and inverting the $n \times n$ mass matrix ($O(n^3)$), making ABA significantly faster for chains with more than 3-4 links.
+The mass-matrix alternative forms $M(q)$ (for example with the Composite Rigid Body Algorithm, $O(n^2)$) and factorizes it ($O(n^3)$). For short chains the two approaches cost about the same; in Featherstone's operation counts ABA becomes the cheaper option somewhere around $n \approx 6$–$9$ bodies, and its advantage grows linearly beyond that.
 
 ## Mathematical Theory
 
@@ -44,7 +44,13 @@ with $U_i = I^A_i s_i$, $D_i = s_i^T U_i$, and $s_i$ the joint motion subspace (
 
 $$\ddot{q}_i = \frac{u_i - U_i^T \hat{a}_i}{D_i}$$
 
-where $u_i = \tau_i - s_i^T p^A_i$ and $\hat{a}_i$ is the spatial acceleration contribution from the parent.
+where $u_i = \tau_i - s_i^T p^A_i$ and $\hat{a}_i = {}^{i}X_{\lambda(i)}\, a_{\lambda(i)} + c_i$ is the parent's acceleration expressed in link $i$ plus the velocity-product acceleration $c_i = v_i \times s_i \dot{q}_i$. The link's own acceleration is then $a_i = \hat{a}_i + s_i \ddot{q}_i$.
+
+**Bias-force propagation**: the articulated bias force passed to the parent is
+
+$$p^a_i = p^A_i + \hat{I}^A_i c_i + U_i \frac{u_i}{D_i}, \qquad p^A_{\lambda(i)} \leftarrow p^A_{\lambda(i)} + {}^{\lambda(i)}X^*_i\, p^a_i$$
+
+where $p^A_i$ starts as the rigid-body bias force $v_i \times^* I_i v_i$ (gyroscopic and centripetal terms).
 
 ## Complexity Analysis
 
@@ -56,7 +62,7 @@ Each pass visits every link exactly once, performing constant-time spatial algeb
 
 ## Step-by-Step Walkthrough
 
-Consider a 2-link planar arm with unit masses, unit lengths, Y-axis joints, zero velocities, and zero applied torques under gravity $g = [0, 0, -9.81]^T$.
+Consider a 2-link arm of uniform rods with unit masses and unit lengths, both lying along $\hat{x}$ at $q = 0$, rotating about $\hat{y}$, with zero velocities and zero applied torques under gravity $g = [0, 0, -9.81]^T$.
 
 **Pass 1** — Forward kinematics: both links at $q = [0, 0]^T$ with $\dot{q} = [0, 0]^T$, so all velocities and velocity-product terms are zero.
 
@@ -64,11 +70,11 @@ Consider a 2-link planar arm with unit masses, unit lengths, Y-axis joints, zero
 
 **Pass 3** — Forward pass: at the base, the gravitational acceleration is transformed into the base frame and used to compute $\ddot{q}_1$. The resulting acceleration is propagated to link 2 to compute $\ddot{q}_2$.
 
-The result: both joints accelerate downward due to gravity, with the base joint carrying the larger moment from the full chain.
+The result, for uniform rods ($I_{\text{CoM}} = ml^2/12$): $\ddot{q} = g\,[\,9/7,\ -12/7\,]^T \approx [12.61, -16.82]^T$. The shoulder accelerates downward, but the elbow accelerates the *other* way: the outer link initially rotates upward relative to the inner one (its absolute angular acceleration is $\ddot{q}_1 + \ddot{q}_2 = -3g/7$), the classic whip-like start of a double pendulum released from rest.
 
 ## Pitfalls & Edge Cases
 
-- **Singular configurations**: When $D_i \to 0$, the joint becomes locked. This should not happen for well-formed revolute joint models with positive inertia.
+- **Vanishing articulated inertia**: $D_i$ is the effective inertia about joint $i$ of everything outboard of it. $D_i \to 0$ means a torque on that joint meets no resistance, so $\ddot{q}_i$ becomes unbounded (it does not "lock"). This happens only for degenerate models, e.g. a massless outboard chain or a point mass lying on the joint axis; valid links with positive inertia about the joint axis keep $D_i > 0$.
 - **Numerical precision**: The division by $D_i$ amplifies errors if $D_i$ is small. Use `float` (not fixed-point) for dynamics computations.
 - **Floating-point only**: The algorithm involves trigonometric functions, divisions, and large dynamic ranges that are unsuitable for Q15/Q31 fixed-point.
 
@@ -88,7 +94,7 @@ The result: both joints accelerate downward due to gravity, with the base joint 
 
 - [Recursive Newton-Euler](RecursiveNewtonEuler.md): solves the inverse problem ($q, \dot{q}, \ddot{q} \to \tau$). ABA and RNEA are duals: `RNEA(q, qDot, ABA(q, qDot, tau)) ≈ tau`.
 - [Euler-Lagrange](EulerLagrange.md): equivalent $O(n^3)$ formulation using the mass matrix.
-- [Gaussian Elimination](../solvers/GaussianElimination.md): used if the mass matrix approach is taken instead.
+- Gaussian elimination or Cholesky factorization ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)): used if the mass-matrix approach is taken instead.
 
 ## References & Further Reading
 

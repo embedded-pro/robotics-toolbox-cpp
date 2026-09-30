@@ -104,8 +104,9 @@ ctest --preset host-single-Debug
 
 ## Contributing
 
-Contributions, issues, and feature requests are welcome. Please check the contributing guidelines
-before submitting pull requests.
+Contributions, issues, and feature requests are welcome. Before opening a pull request, read
+[AGENTS.md](AGENTS.md) (coding, numeric and testing rules) and
+[roadmap/DEPLOYMENT.md](roadmap/DEPLOYMENT.md) (how a roadmap specification becomes shipped code).
 
 ## License
 

@@ -39,15 +39,12 @@ The `test/Test*.cpp` is a first-class deliverable of every modernization. Audit 
 - [ ] `EXPECT_NEAR` + `math::Tolerance<float>()` for float comparisons.
 - [ ] Anonymous-namespace fixture; macros outside; no heap; no comments.
 
-Keep `TYPED_TEST` where the algorithm is multi-type; behavior and assertions stay identical.
+Behavior and assertions stay identical when restructuring a test.
 
 ## Preserve types — hard rule
 
-Keep existing `Q15`/`Q31` support and its `TYPED_TEST` where the algorithm already has it — do
-**NOT** strip multi-type. The multi-type guard
-(`static_assert(math::is_qnumber<T>::value || std::is_floating_point_v<T>, ...)`) stays for those.
-Float-only migration applies ONLY to algorithms that are already float-only; those follow
-`static_assert(std::is_floating_point_v<T>)` + `TEST_F` on `float`.
+Every algorithm in this repository is float-only: `static_assert(std::is_floating_point_v<T>)` +
+`TEST_F` on `float`. Do not introduce `Q15`/`Q31` or `TYPED_TEST` while modernizing.
 
 ## Memory — quick reference
 

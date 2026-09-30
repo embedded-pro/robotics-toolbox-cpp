@@ -106,10 +106,10 @@ For a 2-DOF arm with equal links ($m_1 = m_2 = 1\,\text{kg}$, $l_1 = l_2 = 1\,\t
 
 ## Pitfalls & Edge Cases
 
-- **Singular mass matrix**: Should not happen for physically valid systems, but numerical conditioning degrades near kinematic singularities (e.g., fully extended arm). The Gaussian elimination solver uses partial pivoting to help.
+- **Mass-matrix conditioning**: The joint-space mass matrix of a physically valid model is always symmetric positive definite, including at kinematic singularities (those make the *task-space* inertia singular, not $M$). Its conditioning is governed by the inertia ratio between proximal and distal links — a heavy shoulder with a light wrist gives a large condition number. A Cholesky factorization exploits the symmetry; Gaussian elimination with partial pivoting also works.
 - **Fixed-point arithmetic**: Dynamics values (torques, accelerations) typically exceed the $[-1, 1)$ range of Q15/Q31 formats. Use `float` unless inputs are carefully scaled.
-- **Coriolis computation**: The choice of Coriolis parameterization (Christoffel vs. factored form) affects the skew-symmetry property of $\dot{M} - 2C$. The interface returns the product $C(q,\dot{q})\dot{q}$ directly, leaving the parameterization choice to the user.
-- **Energy consistency**: For simulation, ensure the model matrices satisfy the skew-symmetry property; otherwise, energy may not be conserved in numerical integration.
+- **Coriolis computation**: Many matrices $C(q,\dot{q})$ produce the same vector $C(q,\dot{q})\dot{q}$, but only the Christoffel-symbol choice makes $\dot{M} - 2C$ skew-symmetric. Working with the vector $C(q,\dot{q})\dot{q}$ (as forward and inverse dynamics do) is independent of that choice; controllers that need the matrix itself (passivity-based and adaptive control, momentum observers) must use the Christoffel form.
+- **Energy consistency**: The exact equations conserve energy for free motion whatever factorization of $C$ is used, because $\dot{q}^T(\dot{M} - 2C)\dot{q} = 0$ holds for every valid one. Energy drift observed in simulation comes from the integrator (step size and method), not from the model.
 - **Units**: Be explicit about whether angles are in radians (standard) and torques in N·m.
 
 ## Variants & Generalizations
@@ -132,10 +132,11 @@ For a 2-DOF arm with equal links ($m_1 = m_2 = 1\,\text{kg}$, $l_1 = l_2 = 1\,\t
 
 ## Connections to Other Algorithms
 
-- **Gaussian Elimination** ([GaussianElimination.md](../solvers/GaussianElimination.md)): Used internally to solve $M\ddot{q} = f$ in forward dynamics
-- **LQR Controller** ([Lqr.md](../controllers/Lqr.md)): Euler-Lagrange dynamics can be linearized to produce the $(A, B)$ state-space matrices needed for LQR design
-- **Kalman Filter** (../filters/active/): State estimation for partially observed dynamical systems derived from Euler-Lagrange models
-- **DARE** ([DiscreteAlgebraicRiccatiEquation.md](../solvers/DiscreteAlgebraicRiccatiEquation.md)): Discretized Euler-Lagrange systems feed into DARE for optimal control gain computation
+- **Recursive Newton-Euler** ([RecursiveNewtonEuler.md](RecursiveNewtonEuler.md)) and **Articulated Body Algorithm** ([ArticulatedBodyAlgorithm.md](ArticulatedBodyAlgorithm.md)): compute the same $\tau$ and $\ddot{q}$ in $O(n)$ from a link description; RNEA also supplies $g(q)$ (zero velocity and acceleration) and $C(q,\dot{q})\dot{q}$ (zero acceleration, zero gravity), which is how a link-based model can implement this formulation.
+- The following live in [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp):
+  - **Linear solvers** (Gaussian elimination, Cholesky): solve $M\ddot{q} = f$ in forward dynamics.
+  - **LQR / DARE**: linearizing the manipulator equation around an operating point gives the $(A, B)$ matrices for optimal state feedback.
+  - **Kalman filters**: state estimation for partially observed systems modelled with these equations.
 
 ## References & Further Reading
 

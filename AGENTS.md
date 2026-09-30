@@ -81,4 +81,5 @@ no code, no class names, no usage examples. Update `doc/<domain>/README.md` when
 - Minimal prose. No preamble/postamble, no restating the plan, no summaries unless asked.
 - Report results as file paths + pass/fail. Don't narrate routine tool calls.
 - Don't re-read files already read; batch reads; prefer targeted edits.
-- Build: `cmake --preset host && cmake --build --preset host` · Test: `ctest --preset host`.
+- Build: `cmake --preset host && cmake --build --preset host` · Test: `ctest --preset host`
+  (the `host` preset builds the Qt simulator; without Qt6 use the `host-single-Debug` presets).
