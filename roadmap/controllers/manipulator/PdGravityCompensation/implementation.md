@@ -4,7 +4,7 @@
 
 ## Data structures
 
-```
+```cpp
 template<typename T, std::size_t Dof>    # static_assert(std::is_floating_point_v<T>); instantiated for float
 class PdGravityCompensation:
     const dynamics::EulerLagrangeDynamics<T, Dof>& model   # only g(q) is queried
@@ -14,7 +14,7 @@ class PdGravityCompensation:
 
 ## Interface
 
-```
+```cpp
 # Dynamics model injected (DIP); the set-point regulator needs only its gravity term:
 PdGravityCompensation(const EulerLagrangeDynamics<T,Dof>& model,
                       const SquareMatrix& Kp, const SquareMatrix& Kd)
@@ -26,7 +26,7 @@ Vector<T,Dof> ComputeTorque(const StateVector& q,
 
 ## Algorithm (pseudocode)
 
-```
+```text
 function ComputeTorque(q, qDot, qd):              # OPTIMIZE_FOR_SPEED
     # set-point regulation: qd is constant, so the desired velocity is zero
     e = qd - q
@@ -49,8 +49,11 @@ function ComputeTorque(q, qDot, qd):              # OPTIMIZE_FOR_SPEED
   steady offset `e_ss = Kp⁻¹·g`.
 - **Set-point regulator only** — `qd` is constant. For trajectory tracking use `ComputedTorqueControl`.
 - Diagonal `Kp`, `Kd` decouple the joints and keep the hot path to `Dof` multiplies.
-- Only `g(q)` is drawn from the injected model — the same interface used by the full computed-torque
-  law, so a single dynamics object serves both controllers (ISP / DIP).
+- Only `g(q)` is drawn from the injected `EulerLagrangeDynamics`, typically a `dynamics::ChainDynamicsModel`
+  (M29), which also implements the `InverseDynamicsModel` used by `ComputedTorqueControl` — one model
+  object serves both controllers (ISP / DIP).
+- The interface is a virtual seam for StrictMock tests; hard real-time builds may template the controller
+  on the concrete `ChainDynamicsModel` to avoid the virtual call (AGENTS.md: no virtual calls in real-time paths).
 - Float-only: `static_assert(std::is_floating_point_v<T>)`; the generic `T` signature keeps a
   `Q15`/`Q31` specialisation cheap to add later.
 
@@ -58,14 +61,16 @@ function ComputeTorque(q, qDot, qd):              # OPTIMIZE_FOR_SPEED
 
 - Header: `robotics/controllers/manipulator/PdGravityCompensation.hpp` — `#pragma once` →
   `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `ComputeTorque`, and
-  `extern template class PdGravityCompensation<float, Dof>;` under `#ifdef NUMERICAL_TOOLBOX_COVERAGE_BUILD`.
+  `extern template class PdGravityCompensation<float, 2>;` / `<float, 3>` under
+  `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/controllers/manipulator/PdGravityCompensation.cpp` →
-  `template class PdGravityCompensation<float, Dof>;`
+  `template class PdGravityCompensation<float, 2>;` / `<float, 3>`
 - Test: `robotics/controllers/manipulator/test/TestPdGravityCompensation.cpp`
 - Doc: `doc/controllers/manipulator/PdGravityCompensation.md` (expand to follow `doc/TEMPLATE.md`)
-- CMake: `.hpp` → `target_sources`; `.cpp` → `numerical_add_coverage_sources`;
+- CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestPdGravityCompensation.cpp` → the `_test` target.
-- New module: create `robotics/controllers/manipulator/CMakeLists.txt` via `numerical_add_header_library(...)`,
-  add a `test/` subdir, register it in `numerical/controllers/CMakeLists.txt`, and add a
+- New module: create `robotics/controllers/manipulator/CMakeLists.txt` via `robotics_add_header_library(...)`,
+  add a `test/` subdir, register it in `robotics/CMakeLists.txt`, and add a
   `doc/controllers/manipulator/` folder.
-- Generic pattern: see `roadmap/README.md` → "Deployment shape".
+- Depends on: shipped `dynamics::EulerLagrangeDynamics`; model typically M29 (`ChainDynamicsModel`).
+- Generic pattern: see `roadmap/DEPLOYMENT.md`.

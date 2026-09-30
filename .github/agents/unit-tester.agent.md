@@ -8,6 +8,8 @@ handoffs:
     prompt: "Review the authored unit tests against AGENTS.md, testing.instructions.md, and TESTING.md: TEST_F on float, StrictMock only, no heap, one behaviour per test, independent reference values, no redundant cases, CMake wiring, tests green."
 ---
 
+# Unit Tester
+
 You add or extend the unit tests for ONE algorithm at a time in
 `robotics/<domain>/test/Test<Name>.cpp`. Authoritative rules: `AGENTS.md`. Testing rules:
 `.github/instructions/testing.instructions.md`. Metric families per algorithm:

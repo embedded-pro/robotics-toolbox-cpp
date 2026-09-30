@@ -55,6 +55,18 @@ and included as `numerical/<domain>/…`.
 `dynamics`, `kinematics`, and new: `trajectory`, `controllers` (manipulator control). Shared
 primitives keep their upstream namespaces (`math`, `solvers`, …) from numerical-toolbox.
 
+## Kinematics & dynamics conventions
+
+- 6-vectors are ordered **linear part first**: twists `(v; ω)`, wrenches `(f; n)`; the geometric
+  Jacobian has linear rows first (roadmap M6/M8). Featherstone `(ω; v)` ordering stays internal to the
+  recursive dynamics algorithms.
+- Orientation errors use the SE(3) logarithm (`PoseError`), never angle subtraction.
+- The tool frame and the base mounting offset are explicit kinematic parameters — never derived from a
+  center of mass.
+- Controllers receive dynamics and Jacobians through small interfaces (`EulerLagrangeDynamics`,
+  `InverseDynamicsModel`, `JacobianProvider`); hard real-time code may bind the concrete types instead.
+- Spatial fixtures in tests must exercise non-parallel axes and gravity across the joint axes.
+
 ## Testing
 
 - GoogleTest. **`TEST_F` on `float`** — no `TYPED_TEST`, no multi-type. **Never plain `TEST()`**.
@@ -81,4 +93,5 @@ no code, no class names, no usage examples. Update `doc/<domain>/README.md` when
 - Minimal prose. No preamble/postamble, no restating the plan, no summaries unless asked.
 - Report results as file paths + pass/fail. Don't narrate routine tool calls.
 - Don't re-read files already read; batch reads; prefer targeted edits.
-- Build: `cmake --preset host && cmake --build --preset host` · Test: `ctest --preset host`.
+- Build: `cmake --preset host && cmake --build --preset host` · Test: `ctest --preset host`
+  (the `host` preset builds the Qt simulator; without Qt6 use the `host-single-Debug` presets).

@@ -18,22 +18,25 @@ include(FetchContent)
 FetchContent_Declare(
     robotics_toolbox
     GIT_REPOSITORY https://github.com/embedded-pro/robotics-toolbox-cpp.git
-    GIT_TAG        main
+    GIT_TAG        <commit-sha>
 )
 FetchContent_MakeAvailable(robotics_toolbox)
 
 target_link_libraries(my_app PRIVATE robotics.kinematics robotics.dynamics)
 ```
 
-The numerical-toolbox dependency is fetched automatically. Includes are namespaced by domain, e.g.
+Pin `GIT_TAG` to a commit SHA for reproducible builds. The dependencies
+[embedded-infra-lib](https://github.com/embedded-pro/embedded-infra-lib) (`infra.util`) and
+numerical-toolbox (`numerical.math`, `numerical.solver`) are fetched automatically unless the parent
+project already defines those targets. Includes are namespaced by domain, e.g.
 `#include "robotics/kinematics/ForwardKinematics.hpp"` and — for shared primitives —
 `#include "numerical/math/Matrix.hpp"`.
 
 ## Documentation
 
-| Category                             | Description                                                                                    |
-|--------------------------------------|-----------------------------------------------------------------------------------------------|
-| [Kinematics](doc/kinematics/README.md) | Forward Kinematics, Inverse Kinematics (Damped Least Squares)                                |
+| Category                               | Description                                                                                   |
+|----------------------------------------|-----------------------------------------------------------------------------------------------|
+| [Kinematics](doc/kinematics/README.md) | Forward Kinematics, Inverse Kinematics (Damped Least Squares)                                 |
 | [Dynamics](doc/dynamics/README.md)     | Euler-Lagrange, Newton-Euler, Recursive Newton-Euler (RNEA), Articulated Body Algorithm (ABA) |
 
 Each category page lists its algorithms with a brief description and links to the detailed
@@ -43,7 +46,7 @@ documentation.
 
 The entire documentation set is also published as a single book — read it online as a
 [GitHub Pages site](https://embedded-pro.github.io/robotics-toolbox-cpp/) or download the latest
-PDF from the [Releases page](../../releases/latest). Both are generated automatically from `doc/`
+PDF from the [Releases page](https://github.com/embedded-pro/robotics-toolbox-cpp/releases/latest). Both are generated automatically from `doc/`
 (cover, Summary/table of contents, one chapter per category, consolidated references, back cover).
 
 Build it locally with [Pandoc](https://pandoc.org) + XeLaTeX installed:
@@ -91,10 +94,19 @@ cmake --preset host && cmake --build --preset host
 ctest --preset host
 ```
 
+The `host` preset also builds the simulator and therefore needs Qt6. Without Qt6, use the
+library-only preset:
+
+```bash
+cmake --preset host-single-Debug && cmake --build --preset host-single-Debug
+ctest --preset host-single-Debug
+```
+
 ## Contributing
 
-Contributions, issues, and feature requests are welcome. Please check the contributing guidelines
-before submitting pull requests.
+Contributions, issues, and feature requests are welcome. Before opening a pull request, read
+[AGENTS.md](AGENTS.md) (coding, numeric and testing rules) and
+[roadmap/DEPLOYMENT.md](roadmap/DEPLOYMENT.md) (how a roadmap specification becomes shipped code).
 
 ## License
 

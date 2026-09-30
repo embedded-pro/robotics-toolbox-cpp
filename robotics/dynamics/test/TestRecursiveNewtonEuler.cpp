@@ -1,63 +1,87 @@
+#include "numerical/math/Tolerance.hpp"
+#include "robotics/dynamics/EulerLagrangeDynamics.hpp"
+#include "robotics/dynamics/EulerLagrangeSolver.hpp"
 #include "robotics/dynamics/RecursiveNewtonEuler.hpp"
 #include <cmath>
 #include <gtest/gtest.h>
 
 namespace
 {
-    constexpr float gravity = 9.81f;
-    const math::Vector<float, 3> gravityVec{ 0.0f, 0.0f, -gravity };
+    using Vector3 = math::Vector<float, 3>;
+    using Link = dynamics::RevoluteJointLink<float>;
 
-    // 1-DOF simple pendulum: single link rotating about z-axis
-    // Link hangs along x-axis, joint at origin, CoM at (l/2, 0, 0)
-    dynamics::RevoluteJointLink<float> MakePendulumLink(float mass, float length)
+    constexpr float gravity{ 9.81f };
+    const Vector3 gravityVector{ 0.0f, 0.0f, -gravity };
+    const Vector3 yAxis{ 0.0f, 1.0f, 0.0f };
+    const Vector3 zAxis{ 0.0f, 0.0f, 1.0f };
+
+    Link MakeRod(float mass, float length, const Vector3& axis, const Vector3& parentToJoint)
     {
-        float I = mass * length * length / 12.0f; // thin rod about CoM
+        const float inertia{ mass * length * length / 12.0f };
 
-        return dynamics::RevoluteJointLink<float>{
+        return Link{
             mass,
             math::SquareMatrix<float, 3>{
                 { 0.0f, 0.0f, 0.0f },
-                { 0.0f, I, 0.0f },
-                { 0.0f, 0.0f, I } },
-            math::Vector<float, 3>{ 0.0f, 0.0f, 1.0f },         // z-axis rotation
-            math::Vector<float, 3>{},                           // joint at parent origin
-            math::Vector<float, 3>{ length / 2.0f, 0.0f, 0.0f } // CoM at half-length
+                { 0.0f, inertia, 0.0f },
+                { 0.0f, 0.0f, inertia } },
+            axis,
+            parentToJoint,
+            Vector3{ length / 2.0f, 0.0f, 0.0f }
         };
     }
 
-    // 2-DOF planar arm: two links rotating about z-axis in x-y plane
-    std::array<dynamics::RevoluteJointLink<float>, 2> MakeTwoLinkArm(
-        float m1, float l1, float m2, float l2)
+    class UniformRodTwoLinkModel
+        : public dynamics::EulerLagrangeDynamics<float, 2>
     {
-        float I1 = m1 * l1 * l1 / 12.0f;
-        float I2 = m2 * l2 * l2 / 12.0f;
+    public:
+        UniformRodTwoLinkModel(float m1, float l1, float m2, float l2)
+            : m1{ m1 }
+            , l1{ l1 }
+            , m2{ m2 }
+            , l2{ l2 }
+        {}
 
-        dynamics::RevoluteJointLink<float> link1{
-            m1,
-            math::SquareMatrix<float, 3>{
-                { 0.0f, 0.0f, 0.0f },
-                { 0.0f, I1, 0.0f },
-                { 0.0f, 0.0f, I1 } },
-            math::Vector<float, 3>{ 0.0f, 0.0f, 1.0f },
-            math::Vector<float, 3>{},
-            math::Vector<float, 3>{ l1 / 2.0f, 0.0f, 0.0f }
-        };
+        MassMatrix ComputeMassMatrix(const StateVector& q) const override
+        {
+            const float c2{ std::cos(q.at(1, 0)) };
+            const float m12{ m2 * (l2 * l2 / 3.0f + l1 * l2 * c2 / 2.0f) };
 
-        dynamics::RevoluteJointLink<float> link2{
-            m2,
-            math::SquareMatrix<float, 3>{
-                { 0.0f, 0.0f, 0.0f },
-                { 0.0f, I2, 0.0f },
-                { 0.0f, 0.0f, I2 } },
-            math::Vector<float, 3>{ 0.0f, 0.0f, 1.0f },
-            math::Vector<float, 3>{ l1, 0.0f, 0.0f }, // joint 2 at end of link 1
-            math::Vector<float, 3>{ l2 / 2.0f, 0.0f, 0.0f }
-        };
+            return MassMatrix{
+                { m1 * l1 * l1 / 3.0f + m2 * (l1 * l1 + l2 * l2 / 3.0f + l1 * l2 * c2), m12 },
+                { m12, m2 * l2 * l2 / 3.0f }
+            };
+        }
 
-        return { link1, link2 };
-    }
+        StateVector ComputeCoriolisTerms(const StateVector& q, const StateVector& qDot) const override
+        {
+            const float h{ m2 * l1 * l2 / 2.0f * std::sin(q.at(1, 0)) };
+            const float qd1{ qDot.at(0, 0) };
+            const float qd2{ qDot.at(1, 0) };
 
-    class TestRecursiveNewtonEuler : public ::testing::Test
+            return StateVector{ -h * (2.0f * qd1 * qd2 + qd2 * qd2), h * qd1 * qd1 };
+        }
+
+        StateVector ComputeGravityTerms(const StateVector& q) const override
+        {
+            const float c1{ std::cos(q.at(0, 0)) };
+            const float c12{ std::cos(q.at(0, 0) + q.at(1, 0)) };
+
+            return StateVector{
+                -gravity * (m1 * l1 / 2.0f * c1 + m2 * (l1 * c1 + l2 / 2.0f * c12)),
+                -gravity * m2 * l2 / 2.0f * c12
+            };
+        }
+
+    private:
+        float m1;
+        float l1;
+        float m2;
+        float l2;
+    };
+
+    class TestRecursiveNewtonEuler
+        : public ::testing::Test
     {
     protected:
         dynamics::RecursiveNewtonEuler<float, 1> rnea1;
@@ -65,142 +89,75 @@ namespace
     };
 }
 
-TEST_F(TestRecursiveNewtonEuler, single_link_gravity_torque_at_horizontal)
+TEST_F(TestRecursiveNewtonEuler, horizontal_link_needs_half_weight_moment_to_hold)
 {
-    // Pendulum rotating about y-axis in x-z plane, horizontal at q=0 (link along x)
-    float mass = 1.0f;
-    float length = 1.0f;
-    float I = mass * length * length / 12.0f;
+    const float mass{ 1.0f };
+    const float length{ 1.0f };
+    std::array<Link, 1> links{ MakeRod(mass, length, yAxis, Vector3{}) };
 
-    dynamics::RevoluteJointLink<float> link{
-        mass,
-        math::SquareMatrix<float, 3>{
-            { 0.0f, 0.0f, 0.0f },
-            { 0.0f, I, 0.0f },
-            { 0.0f, 0.0f, I } },
-        math::Vector<float, 3>{ 0.0f, 1.0f, 0.0f },         // y-axis rotation
-        math::Vector<float, 3>{},                           // joint at parent origin
-        math::Vector<float, 3>{ length / 2.0f, 0.0f, 0.0f } // CoM at half-length
-    };
-    std::array<dynamics::RevoluteJointLink<float>, 1> links = { link };
+    auto tau = rnea1.InverseDynamics(links, math::Vector<float, 1>{ 0.0f }, math::Vector<float, 1>{}, math::Vector<float, 1>{}, gravityVector);
 
-    math::Vector<float, 1> q{ 0.0f };
-    math::Vector<float, 1> qDot{};
-    math::Vector<float, 1> qDDot{};
-
-    auto tau = rnea1.InverseDynamics(links, q, qDot, qDDot, gravityVec);
-
-    // At q=0: link along x, gravity in -z, rotating about y-axis
-    // Fictitious base acceleration = [0, 0, g], force on CoM = [0, 0, mg]
-    // Torque = rCoM x force = [l/2, 0, 0] x [0, 0, mg] = [0, -mg*l/2, 0]
-    // Projected on y-axis: tau = -m*g*l/2
-    float expected = -mass * gravity * (length / 2.0f);
-    EXPECT_NEAR(tau.at(0, 0), expected, 0.01f);
+    EXPECT_NEAR(tau.at(0, 0), -mass * gravity * length / 2.0f, math::Tolerance<float>());
 }
 
-TEST_F(TestRecursiveNewtonEuler, single_link_zero_gravity_zero_motion_gives_zero_torque)
+TEST_F(TestRecursiveNewtonEuler, rest_without_gravity_needs_no_torque)
 {
-    auto link = MakePendulumLink(1.0f, 1.0f);
-    std::array<dynamics::RevoluteJointLink<float>, 1> links = { link };
+    std::array<Link, 1> links{ MakeRod(1.0f, 1.0f, zAxis, Vector3{}) };
 
-    math::Vector<float, 1> q{ 0.5f };
-    math::Vector<float, 1> qDot{};
-    math::Vector<float, 1> qDDot{};
-    math::Vector<float, 3> zeroGravity{};
+    auto tau = rnea1.InverseDynamics(links, math::Vector<float, 1>{ 0.5f }, math::Vector<float, 1>{}, math::Vector<float, 1>{}, Vector3{});
 
-    auto tau = rnea1.InverseDynamics(links, q, qDot, qDDot, zeroGravity);
-
-    // No gravity, no motion → zero torque
-    EXPECT_NEAR(tau.at(0, 0), 0.0f, 1e-5f);
+    EXPECT_NEAR(tau.at(0, 0), 0.0f, math::Tolerance<float>());
 }
 
-TEST_F(TestRecursiveNewtonEuler, single_link_pure_acceleration_no_gravity)
+TEST_F(TestRecursiveNewtonEuler, angular_acceleration_needs_end_inertia_torque)
 {
-    float mass = 2.0f;
-    float length = 1.0f;
-    auto link = MakePendulumLink(mass, length);
-    std::array<dynamics::RevoluteJointLink<float>, 1> links = { link };
+    const float mass{ 2.0f };
+    const float length{ 1.0f };
+    std::array<Link, 1> links{ MakeRod(mass, length, zAxis, Vector3{}) };
 
-    math::Vector<float, 1> q{ 0.0f };
-    math::Vector<float, 1> qDot{};
-    math::Vector<float, 1> qDDot{ 1.0f }; // 1 rad/s^2
-    math::Vector<float, 3> zeroGravity{};
+    auto tau = rnea1.InverseDynamics(links, math::Vector<float, 1>{ 0.0f }, math::Vector<float, 1>{}, math::Vector<float, 1>{ 1.0f }, Vector3{});
 
-    auto tau = rnea1.InverseDynamics(links, q, qDot, qDDot, zeroGravity);
-
-    // For a thin rod about the end: I_end = m*l^2/3
-    // Torque = I_end * qDDot = 2 * 1 / 3 * 1 = 0.6667
-    float I_end = mass * length * length / 3.0f;
-    EXPECT_NEAR(tau.at(0, 0), I_end * 1.0f, 1e-3f);
+    EXPECT_NEAR(tau.at(0, 0), mass * length * length / 3.0f, math::Tolerance<float>());
 }
 
-TEST_F(TestRecursiveNewtonEuler, two_link_zero_gravity_zero_motion_gives_zero_torque)
+TEST_F(TestRecursiveNewtonEuler, constant_spin_needs_no_torque)
 {
-    auto links = MakeTwoLinkArm(1.0f, 1.0f, 1.0f, 1.0f);
+    std::array<Link, 1> links{ MakeRod(1.0f, 1.0f, zAxis, Vector3{}) };
 
-    math::Vector<float, 2> q{ 0.0f, 0.0f };
-    math::Vector<float, 2> qDot{};
-    math::Vector<float, 2> qDDot{};
-    math::Vector<float, 3> zeroGravity{};
+    auto tau = rnea1.InverseDynamics(links, math::Vector<float, 1>{ 0.0f }, math::Vector<float, 1>{ 2.0f }, math::Vector<float, 1>{}, Vector3{});
 
-    auto tau = rnea2.InverseDynamics(links, q, qDot, qDDot, zeroGravity);
-
-    EXPECT_NEAR(tau.at(0, 0), 0.0f, 1e-4f);
-    EXPECT_NEAR(tau.at(1, 0), 0.0f, 1e-4f);
+    EXPECT_NEAR(tau.at(0, 0), 0.0f, math::Tolerance<float>());
 }
 
-TEST_F(TestRecursiveNewtonEuler, two_link_joint2_acceleration_only)
+TEST_F(TestRecursiveNewtonEuler, elbow_acceleration_couples_into_shoulder_through_mass_matrix)
 {
-    float m1 = 1.0f, l1 = 1.0f, m2 = 1.0f, l2 = 1.0f;
-    auto links = MakeTwoLinkArm(m1, l1, m2, l2);
+    const float m2{ 1.0f };
+    const float l1{ 1.0f };
+    const float l2{ 1.0f };
+    std::array<Link, 2> links{ MakeRod(1.0f, l1, zAxis, Vector3{}), MakeRod(m2, l2, zAxis, Vector3{ l1, 0.0f, 0.0f }) };
 
-    math::Vector<float, 2> q{ 0.0f, 0.0f };
-    math::Vector<float, 2> qDot{};
-    math::Vector<float, 2> qDDot{ 0.0f, 1.0f }; // only joint 2 accelerates
-    math::Vector<float, 3> zeroGravity{};
+    auto tau = rnea2.InverseDynamics(links, math::Vector<float, 2>{ 0.0f, 0.0f }, math::Vector<float, 2>{}, math::Vector<float, 2>{ 0.0f, 1.0f }, Vector3{});
 
-    auto tau = rnea2.InverseDynamics(links, q, qDot, qDDot, zeroGravity);
-
-    // Joint 2 torque = I2_end * qDDot2 = m2*l2^2/3 * 1
-    float I2_end = m2 * l2 * l2 / 3.0f;
-    EXPECT_NEAR(tau.at(1, 0), I2_end, 1e-3f);
-
-    // Joint 1 should also feel a reaction torque (coupling term)
-    EXPECT_TRUE(std::abs(tau.at(0, 0)) > 1e-4f);
+    EXPECT_NEAR(tau.at(0, 0), m2 * (l2 * l2 / 3.0f + l1 * l2 / 2.0f), math::Tolerance<float>());
+    EXPECT_NEAR(tau.at(1, 0), m2 * l2 * l2 / 3.0f, math::Tolerance<float>());
 }
 
-TEST_F(TestRecursiveNewtonEuler, single_link_centrifugal_term)
+TEST_F(TestRecursiveNewtonEuler, matches_euler_lagrange_model_under_gravity_and_motion)
 {
-    // Link spinning at constant velocity → centrifugal force on CoM
-    float mass = 1.0f;
-    float length = 1.0f;
-    auto link = MakePendulumLink(mass, length);
-    std::array<dynamics::RevoluteJointLink<float>, 1> links = { link };
+    const float m1{ 1.2f };
+    const float l1{ 0.6f };
+    const float m2{ 0.7f };
+    const float l2{ 0.45f };
+    std::array<Link, 2> links{ MakeRod(m1, l1, yAxis, Vector3{}), MakeRod(m2, l2, yAxis, Vector3{ l1, 0.0f, 0.0f }) };
+    UniformRodTwoLinkModel model{ m1, l1, m2, l2 };
+    dynamics::EulerLagrangeSolver<float, 2> eulerLagrange;
+    math::Vector<float, 2> q{ 0.4f, -0.9f };
+    math::Vector<float, 2> qDot{ 1.1f, -0.6f };
+    math::Vector<float, 2> qDDot{ 0.8f, -1.7f };
 
-    math::Vector<float, 1> q{ 0.0f };
-    math::Vector<float, 1> qDot{ 2.0f }; // spinning at 2 rad/s
-    math::Vector<float, 1> qDDot{};      // constant velocity
-    math::Vector<float, 3> zeroGravity{};
+    auto tau = rnea2.InverseDynamics(links, q, qDot, qDDot, gravityVector);
+    auto reference = eulerLagrange.InverseDynamics(model, q, qDot, qDDot);
 
-    auto tau = rnea1.InverseDynamics(links, q, qDot, qDDot, zeroGravity);
-
-    // For a single link rotating in a plane, centrifugal force is radial
-    // and doesn't produce torque about the rotation axis → tau ≈ 0
-    EXPECT_NEAR(tau.at(0, 0), 0.0f, 1e-4f);
-}
-
-TEST_F(TestRecursiveNewtonEuler, two_link_symmetry_check)
-{
-    // Two identical links, both at q=0, both accelerating equally
-    auto links = MakeTwoLinkArm(1.0f, 1.0f, 1.0f, 1.0f);
-
-    math::Vector<float, 2> q{ 0.0f, 0.0f };
-    math::Vector<float, 2> qDot{};
-    math::Vector<float, 2> qDDot{ 1.0f, 1.0f };
-    math::Vector<float, 3> zeroGravity{};
-
-    auto tau = rnea2.InverseDynamics(links, q, qDot, qDDot, zeroGravity);
-
-    // Joint 1 should require more torque than joint 2 (it carries the full chain)
-    EXPECT_GT(std::abs(tau.at(0, 0)), std::abs(tau.at(1, 0)));
+    EXPECT_NEAR(tau.at(0, 0), reference.at(0, 0), math::Tolerance<float>());
+    EXPECT_NEAR(tau.at(1, 0), reference.at(1, 0), math::Tolerance<float>());
 }

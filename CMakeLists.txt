@@ -5,7 +5,6 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 endif()
 
 option(CMAKE_COMPILE_WARNING_AS_ERROR "Enable warnings-as-error" On)
-option(ROBOTICS_TOOLBOX_INCLUDE_DEFAULT_INIT "Include default initialization code; turn off when providing custom initialization" On)
 option(ROBOTICS_TOOLBOX_BUILD_SIMULATOR "Enable build of the Qt simulator applications" Off)
 option(ROBOTICS_TOOLBOX_BUILD_TESTS "Enable build of the tests" Off)
 option(ROBOTICS_TOOLBOX_ENABLE_OPTIMIZATIONS "Enable compiler optimizations for numerical routines" On)
@@ -14,11 +13,11 @@ if (ROBOTICS_TOOLBOX_BUILD_TESTS)
     # CTest cannot be included before the first project() statement, but Embedded Infastructure
     # Library needs to see that test utilities need to be built.
     set(BUILD_TESTING On)
-    add_definitions(-DROBOTICS_TOOLBOX_ENABLE_ASSERTIONS=1)
+    add_definitions(-DNUMERICAL_TOOLBOX_ENABLE_ASSERTIONS=1)
 endif()
 
 if (ROBOTICS_TOOLBOX_ENABLE_OPTIMIZATIONS)
-    add_definitions(-DRoboticsToolbox_ENABLE_OPTIMIZATIONS=1)
+    add_definitions(-DNumericalToolbox_ENABLE_OPTIMIZATIONS=1)
 endif()
 
 if (EMIL_ENABLE_COVERAGE)
@@ -30,9 +29,9 @@ include(RoboticsHeaderLibrary)
 
 add_definitions(-DEMIL_ENABLE_TRACING=1)
 
-if (ROBOTICS_TOOLBOX_STANDALONE)
-    include(FetchContent)
+include(FetchContent)
 
+if (NOT TARGET infra.util)
     FetchContent_Declare(
         emil
         GIT_REPOSITORY https://github.com/embedded-pro/embedded-infra-lib.git
@@ -46,28 +45,28 @@ if (ROBOTICS_TOOLBOX_STANDALONE)
     set(EMIL_ENABLE_DOCKER_TOOLS Off CACHE BOOL "" FORCE)
 
     FetchContent_MakeAvailable(emil)
+endif()
 
-    if (ROBOTICS_TOOLBOX_BUILD_SIMULATOR)
-        FetchContent_Declare(
-            ui
-            GIT_REPOSITORY https://github.com/embedded-pro/ui-cpp.git
-            GIT_TAG        main
-        )
-
-        set(UI_BUILD_QT_BACKEND On CACHE BOOL "" FORCE)
-    endif()
-
+if (NOT TARGET numerical.math)
     FetchContent_Declare(
         numerical_toolbox
         GIT_REPOSITORY https://github.com/embedded-pro/numerical-toolbox-cpp.git
-        GIT_TAG        main
+        GIT_TAG        1225b3c422beab93e0ff8fd7231f8d7e087f6da4 # main
     )
 
     FetchContent_MakeAvailable(numerical_toolbox)
+endif()
 
-    if (ROBOTICS_TOOLBOX_BUILD_SIMULATOR)
-        FetchContent_MakeAvailable(ui)
-    endif()
+if (ROBOTICS_TOOLBOX_BUILD_SIMULATOR AND NOT TARGET ui.model)
+    FetchContent_Declare(
+        ui
+        GIT_REPOSITORY https://github.com/embedded-pro/ui-cpp.git
+        GIT_TAG        13406639f7ffb6ca8811865b0a8b35034f46ebaf # main
+    )
+
+    set(UI_BUILD_QT_BACKEND On CACHE BOOL "" FORCE)
+
+    FetchContent_MakeAvailable(ui)
 endif()
 
 project(robotics-toolbox LANGUAGES C CXX ASM VERSION 1.0.0) # x-release-please-version
@@ -110,11 +109,9 @@ if (ROBOTICS_TOOLBOX_BUILD_SIMULATOR)
     add_subdirectory(simulator)
 endif()
 
-emil_clangformat_directories(robotics DIRECTORIES .)
-
-emil_coverage_targets(DIRECTORIES .)
-
 if (ROBOTICS_TOOLBOX_STANDALONE)
+    emil_clangformat_directories(robotics DIRECTORIES .)
+    emil_coverage_targets(DIRECTORIES .)
     emil_folderize_all_targets()
 endif()
 

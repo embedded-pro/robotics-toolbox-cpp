@@ -4,57 +4,47 @@
 
 ## Fixture
 
-```
-class TestContinuum : public ::testing::Test:
-    # single unit-length section, straight by default
-    std::array<ArcParameters<float>, 1> sec = { { kappa=0, phi=0, length=1 } }
-    ContinuumKinematics<float, 1> ck{ sec }
-# each case below is a TEST_F(TestContinuum, <name>)
+```cpp
+class TestContinuumKinematics : public ::testing::Test:
+    ArcParameters<float> quarter{ π/2, 0, 1 }         # θ = π/2, radius 2/π
+    ArcParameters<float> general{ 2.0, 0.7, 1.2 }     # θ = 2.4
+    ContinuumKinematics<float, 2> twoSections{ { general, general } }
+# each case below is a TEST_F(TestContinuumKinematics, <name>)
 ```
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 straight_section_is_pure_translation:
-    Act:    T = ck.SectionTransform({0, 0, 1})
-    Assert: T ≈ SE3(I, (0, 0, 1))
-
+    Assert: SectionTransform({0, 0, 1}) ≈ { I, (0, 0, 1) }
 quarter_circle_bend:
-    Arrange: κ = π/2, length = 1  ⇒ θ = π/2, radius = 2/π
-    Assert:  tip position ≈ (2/π)·(1, 0, 1)
-
+    Assert: SectionTransform(quarter).p ≈ (2/π)·(1, 0, 1) = (0.636620, 0, 0.636620); R ≈ Ry(π/2)
 bending_plane_angle_rotates_tip:
-    Arrange: same κ, s; φ = π/2
-    Assert:  tip bends in the y-z plane instead of the x-z plane
-
+    Assert: SectionTransform({π/2, π/2, 1}).p ≈ (0, 0.636620, 0.636620)
+tip_distance_equals_chord:
+    Assert: ‖SectionTransform(arc).p‖ ≈ 2·|sin(κs/2)|/|κ| for quarter (0.900316), general (0.932039),
+            and {−1.5, 0.3, 0.8} (0.752857)
+tip_tangent_matches_bend:
+    Assert: SectionTransform(general).R·ẑ ≈ (cos 0.7·sin 2.4, sin 0.7·sin 2.4, cos 2.4) = (0.516623, 0.435145, −0.737394)
 forward_composes_sections:
-    Arrange: two identical bent sections
-    Assert:  Forward = SectionTransform ∘ SectionTransform
-
+    Assert: twoSections.Forward() ≈ SectionTransform(general) * SectionTransform(general); p ≈ (0.348960, 0.293925, −0.498082)
 inverse_recovers_arc_parameters:
-    Arrange: known (κ, φ, s); pose = SectionTransform
-    Act:     arc = ck.InverseSection(pose)
-    Assert:  arc ≈ (κ, φ, s)
-
-curvature_zero_series_no_blowup:
-    Arrange: κ = 1e-9
-    Assert:  SectionTransform finite ≈ straight (no 1/κ overflow)
-
-arc_length_preserved:
-    Assert: geodesic length of the section == s regardless of κ
-
-tip_orientation_matches_bend:
-    Assert: section R rotates the tangent by θ = κ·s
+    Assert: InverseSection(SectionTransform(a).p) ≈ a for a ∈ {quarter, general};
+            {−1.5, 0.3, 0.8} ⇒ (1.5, 0.3 − π, 0.8)  (sign folded into φ)
+near_zero_curvature_uses_series:
+    Assert: SectionTransform({1e-9, 0.4, 1}) ≈ { I, (0, 0, 1) }; SectionTransform({1e-5, 0.4, 1}).p ≈ (4.605e-6, 1.947e-6, 1), finite
 ```
 
 ## Reference vectors
 
-- Straight unit section ⇒ tip `(0, 0, 1)`, `R = I`.
-- `κ = π/2`, `s = 1`, `φ = 0` ⇒ `θ = π/2`, radius `2/π`, tip `= (2/π)·(1, 0, 1)`.
+- Straight unit section ⇒ `(0, 0, 1)`, `R = I`.
+- `κ = π/2, s = 1, φ = 0` ⇒ tip `(0.636620, 0, 0.636620)`, chord `2√2/π = 0.900316`.
+- `κ = 2, φ = 0.7, s = 1.2` ⇒ tip `(0.664416, 0.559630, 0.337732)`, chord `sin 1.2 = 0.932039`.
+- All closed-form tips agree with a 4000-step numerical integration of the tangent `R(s)·ẑ` to `1e-8`.
 
 ## Edge cases
 
-- `κ → 0` ⇒ series fallback; `φ` undefined but the result is independent of `φ`.
-- Full loop `θ = 2π` ⇒ tip returns near the base (closed circle).
-- Negative `κ` ⇒ bends the opposite way; sign consistent with `φ`.
-- Multi-section inverse ⇒ falls back to iteration (documented, not closed-form).
+- Full loop `θ = 2π` ⇒ tip at the base `(0, 0, 0)`; `InverseSection` is limited to `κs < 2π`.
+- Negative `κ` ⇒ same arc as `(|κ|, φ + π)`.
+- Straight tip in `InverseSection` ⇒ `κ = 0`, `φ = 0`, `s = z`.
+- Multi-section inverse ⇒ iterative (M13), not here.

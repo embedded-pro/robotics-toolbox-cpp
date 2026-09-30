@@ -4,7 +4,7 @@
 
 ## Fixture
 
-```
+```cpp
 class TestPdGravityCompensation : public ::testing::Test:
     # Injected model mocked so torque math is verified in isolation:
     StrictMock<dynamics::MockEulerLagrangeDynamics<float,2>> model
@@ -16,7 +16,7 @@ class TestPdGravityCompensation : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
-```
+```cpp
 gravity_only_at_matched_setpoint:
     Arrange: q = qd, qDot = 0, model g(q) = [0, mgL]
     Act:     τ = ComputeTorque(q, 0, qd)

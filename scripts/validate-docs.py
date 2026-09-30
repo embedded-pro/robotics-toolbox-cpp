@@ -2,11 +2,12 @@
 """Validate that algorithm documentation files follow the project template.
 
 Checks every .md file under doc/ (excluding README.md, TEMPLATE.md, and backups)
-for the required section headings defined in the template.
+for the required section headings defined in the template, in template order,
+and checks that relative links in every .md file under doc/ resolve.
 
 Exit codes:
     0 — all files pass, or no algorithm documentation files found
-    1 — doc directory is missing, or one or more files have missing sections
+    1 — doc directory is missing, or one or more files fail a check
 """
 
 import pathlib
@@ -35,11 +36,32 @@ def extract_h2_headings(text: str) -> list[str]:
     return re.findall(r"^## (.+)$", text, re.MULTILINE)
 
 
+LINK_PATTERN = re.compile(r"\]\(([^)\s]+)\)")
+
+
 def validate_file(path: pathlib.Path) -> list[str]:
     text = path.read_text(encoding="utf-8")
     headings = extract_h2_headings(text)
-    missing = [s for s in REQUIRED_SECTIONS if s not in headings]
-    return missing
+    problems = [f"missing: ## {s}" for s in REQUIRED_SECTIONS if s not in headings]
+
+    present = [h for h in headings if h in REQUIRED_SECTIONS]
+    expected = [s for s in REQUIRED_SECTIONS if s in present]
+    if present != expected:
+        problems.append("sections out of template order: " + " → ".join(present))
+
+    return problems
+
+
+def broken_links(path: pathlib.Path) -> list[str]:
+    text = path.read_text(encoding="utf-8")
+    problems = []
+    for target in LINK_PATTERN.findall(text):
+        if target.startswith(("http://", "https://", "mailto:", "#")):
+            continue
+        relative = target.split("#", 1)[0]
+        if relative and not (path.parent / relative).exists():
+            problems.append(f"broken link: {target}")
+    return problems
 
 
 def main() -> int:
@@ -60,17 +82,24 @@ def main() -> int:
 
     failures: list[tuple[pathlib.Path, list[str]]] = []
     for path in md_files:
-        missing = validate_file(path)
-        if missing:
-            failures.append((path, missing))
+        problems = validate_file(path)
+        if problems:
+            failures.append((path, problems))
+
+    for path in sorted(DOC_ROOT.rglob("*.md")):
+        if path.name == "TEMPLATE.md" or any(part in SKIP_DIRS for part in path.parts):
+            continue
+        problems = broken_links(path)
+        if problems:
+            failures.append((path, problems))
 
     if failures:
         print(f"FAIL: {len(failures)} file(s) do not follow the template:\n")
         for path, missing in failures:
             rel = path.relative_to(DOC_ROOT)
             print(f"  {rel}")
-            for section in missing:
-                print(f"    - missing: ## {section}")
+            for problem in missing:
+                print(f"    - {problem}")
             print()
         return 1
 

@@ -1,79 +1,84 @@
-# Mobile-Manipulator Kinematics (Nonholonomic Base) — Implementation Pseudocode
+# Mobile-Manipulator Kinematics (Differential-Drive Base) — Implementation Pseudocode
 
 > Roadmap ref: #M24 (Tier 4) · Target: `robotics/kinematics` · Namespace `kinematics` · Type: `float` (templated on `T`, instantiated for `float` only)
 
 ## Data structures
 
-```
+```cpp
 template<typename T>                            # static_assert(std::is_floating_point_v<T>); instantiated for float
-struct BaseState:                               # differential-drive base pose
-    T x, y, phi                                 # planar position + heading
+struct BaseState:                               # planar pose of the axle midpoint in the world frame
+    T x, y, phi
 
-template<typename T, std::size_t NumArm>
+template<typename T, std::size_t ArmDof>
 class MobileManipulatorKinematics:
-    SpatialJacobian<T, NumArm>  armJac
-    SE3<T>                      baseToArm        # arm mount on the base
-    T                           wheelBase        # for the drive model
+    const JacobianProvider<T, 6, ArmDof>& arm   # M8: J and ToolPose in the arm-base frame
+    SE3Transform<T>                       mount # arm base in the mobile-base frame (M6)
+    T                                     wheelBase    # L, axle length
 ```
 
 ## Interface
 
+```cpp
+MobileManipulatorKinematics(const JacobianProvider<T, 6, ArmDof>& arm, const SE3Transform<T>& mount, T wheelBase)
+Matrix<T, 6, 2 + ArmDof>  Compute(const BaseState<T>& base, const JointVector& q) const   # hot path
+SE3Transform<T>           ToolPose(const BaseState<T>& base, const JointVector& q) const
+static Matrix<T, 3, 2>    BaseConstraint(T phi)                  # (ẋ, ẏ, φ̇) = S(φ)·(v, ω)
+std::array<T, 2>          WheelSpeeds(T v, T omega) const        # (left, right) rim speeds
 ```
-MobileManipulatorKinematics(armJac, SE3<T> baseToArm, T wheelBase)
-Matrix<T, 6, 2 + NumArm>  Compute(BaseState<T> base, JointVector q)    # combined J; hot path
-SE3<T>                    EndEffectorPose(BaseState<T> base, JointVector q)
-Matrix<T, 3, 2>           BaseConstraint(BaseState<T> base)            # S(φ): (v,ω) → q̇_base
-```
+
+Columns of `Compute` act on `u = (v, ω, q̇)`: base forward speed, base yaw rate, arm joint rates.
+Rows are the tool-point twist `(v; ω)` in the world frame (M6/M8 ordering).
 
 ## Algorithm (pseudocode)
 
-```
-function BaseConstraint(base):                  # nonholonomic: no side-slip
-    # Pfaffian constraint  [-sinφ, cosφ, 0]·q̇_base = 0  ⇒ parameterize by (v, ω)
-    return [[ cosφ, 0 ],
-            [ sinφ, 0 ],
-            [   0,  1 ]]                          # q̇_base = S(φ)·(v, ω)
+```cpp
+function ToolPose(base, q):
+    T_wb = { Rz(base.phi), (base.x, base.y, 0) }
+    return T_wb * mount * arm.ToolPose(q)
 
 function Compute(base, q):                       # OPTIMIZE_FOR_SPEED
-    # end-effector velocity = base contribution + arm contribution
-    J_arm  = armJac.Compute(q)                   # 6×NumArm, in the base frame
-    r      = EndEffectorPose(base, q).p - basePosition   # lever arm base → tool
-    J_base = [[ I₃ , -SkewSymmetric(r) ],         # planar base twist → tool twist
-              [ 0  ,        ẑ          ]]          # keep the (v, ω) columns only
-    J_base_reduced = J_base * lift(S(φ))          # apply nonholonomic S(φ) ⇒ 6×2
-    return [ J_base_reduced | J_arm ]             # 6 × (2 + NumArm)
+    R_wa = Rz(base.phi) · mount.R                # arm-base orientation in the world
+    J_arm = arm.Jacobian(q)                      # 6×ArmDof, arm-base frame
+    r = ToolPose(base, q).p − (base.x, base.y, 0)                # lever arm, world frame
+    column 0 (v) = ( (cos φ, sin φ, 0) ; 0 )
+    column 1 (ω) = ( CrossProduct(ẑ, r) ; ẑ )
+    columns 2.. = ( R_wa · J_arm.linear ; R_wa · J_arm.angular )  # blockdiag(R_wa, R_wa)·J_arm
+    return J
 
-function EndEffectorPose(base, q):
-    T_base = SE3(Rotz(base.phi), (base.x, base.y, 0))
-    return T_base * baseToArm * armForward(q)
+function BaseConstraint(φ):                      # no side-slip: [−sin φ, cos φ, 0]·(ẋ, ẏ, φ̇) = 0
+    return [[cos φ, 0], [sin φ, 0], [0, 1]]
+
+function WheelSpeeds(v, ω):
+    return (v − ω·L/2, v + ω·L/2)
 ```
 
 ## Complexity & memory
 
-- `Compute`: `O(NumArm)` — arm Jacobian plus a fixed base block and one `S(φ)` multiply.
-- Memory: one `6 × (2 + NumArm)` combined Jacobian; bounded, stack-allocated.
+- `Compute`: one arm `Jacobian` + `ToolPose`, `2·ArmDof` 3×3 rotations, two fixed base columns.
+- Memory: one `6 × (2 + ArmDof)` matrix; stack only.
 
 ## Numerical / embedded notes
 
-- The **nonholonomic constraint** (a differential-drive base cannot slide sideways) drops the base from
-  3 planar DOF to 2 controls `(v, ω)`; `S(φ)` enforces it — never command lateral base velocity directly.
-- Base and arm together are **redundant** for a 6-DOF task — resolve the split with null-space
-  projection (M14), e.g. prefer arm motion for fine moves and base motion for gross reach.
-- Compute the tool lever arm `r` in the **base frame** so the `[r]×` block and the arm Jacobian share
-  one convention; reuse `SkewSymmetric` (Geometry3D) and `SpatialJacobian` (M8).
-- Watch coupling: base rotation `ω` moves a far-out tool a lot (`|r|` large) — scale the two blocks so
-  the solver does not over-use the base.
-- Float-only: `static_assert(std::is_floating_point_v<T>)`; the generic `T` signature keeps a
-  `Q15`/`Q31` specialisation cheap to add later.
+- **Frames:** the arm Jacobian is expressed in the arm-base frame; it must be rotated by
+  `R_wa = Rz(φ)·R_mount` before being stacked with the world-frame base columns (skipping it gives an
+  error of order ‖J_arm·q̇‖ — 0.52 in the test configuration). No lever-arm correction is needed for the
+  arm block: its linear rows already describe the tool point.
+- **Nonholonomic base:** a differential drive has three planar coordinates but two controls; the base
+  columns are already the constrained ones, so no lateral-velocity column exists to command.
+- Base plus arm is redundant for a 6-DOF task — split the motion with M14 (e.g. arm for fine motion,
+  base for reach); scale the base columns (`|r|` amplifies yaw) before resolving.
+- Float-only: `static_assert(std::is_floating_point_v<T>)`.
 
 ## Deployment
 
 - Header: `robotics/kinematics/MobileManipulatorKinematics.hpp` — `#pragma once` →
   `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Compute`, and
-  `extern template class MobileManipulatorKinematics<float, NumArm>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
-- Coverage: `robotics/kinematics/MobileManipulatorKinematics.cpp` → `template class MobileManipulatorKinematics<float, NumArm>;`
+  `extern template class MobileManipulatorKinematics<float, 3>;` / `<float, 6>` under
+  `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
+- Coverage: `robotics/kinematics/MobileManipulatorKinematics.cpp` → the same instantiations.
 - Test: `robotics/kinematics/test/TestMobileManipulatorKinematics.cpp`
 - Doc: `doc/kinematics/MobileManipulatorKinematics.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestMobileManipulatorKinematics.cpp` → the `_test` target.
+- Depends on: M6 (`SE3Transform`), M8 (`JacobianProvider`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

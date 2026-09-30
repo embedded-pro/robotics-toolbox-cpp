@@ -3,6 +3,7 @@
 #include "ui/theme/Theme.hpp"
 #include <algorithm>
 #include <numbers>
+#include <span>
 
 namespace simulator::dynamics::view
 {

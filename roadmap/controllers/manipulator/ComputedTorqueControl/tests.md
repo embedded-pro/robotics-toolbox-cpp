@@ -4,65 +4,51 @@
 
 ## Fixture
 
-```
+```cpp
 class TestComputedTorqueControl : public ::testing::Test:
-    StrictMock<dynamics::MockEulerLagrangeDynamics<float,2>> model
+    StrictMock<dynamics::MockInverseDynamicsModel<float,2>> model
     SquareMatrix<float,2> Kp = diag(100, 100)
     SquareMatrix<float,2> Kd = diag( 20,  20)
     ComputedTorqueControl<float,2> controller{ model, Kp, Kd }
 # each case below is a TEST_F(TestComputedTorqueControl, <name>)
+# single-step cases set EXPECT_CALL(model, ComputeInverseDynamics(q, qDot, aqExpected)).Times(1)
 ```
 
 ## Test cases (Arrange / Act / Assert)
 
-```
-pure_feedforward_tracks_acceleration:
-    Arrange: model M=I, C=0, g=0; all errors 0, qdDdot = a
-    Act:     τ = ComputeTorque(...)
-    Assert:  τ == a           (M·aq reduces to the commanded acceleration)
+```cpp
+pure_feedforward_passes_desired_acceleration:
+    Arrange: q = qd, qDot = qdDot, qdDdot = a; model returns r
+    Act:     τ = ComputeTorque(q, qDot, qd, qdDot, qdDdot)
+    Assert:  called once with (q, qDot, a); τ == r      (model output returned unchanged)
 
-gravity_compensation_at_rest:
-    Arrange: model g(q) = [0, mgL]; all setpoints match state, aq = 0
-    Assert:  τ == g
+position_error_enters_command:
+    Arrange: e = qd − q != 0, eDot = 0, qdDdot = 0
+    Assert:  called once with aq == Kp · e
 
-coriolis_terms_added:
-    Arrange: model C(q,q̇)q̇ = c; aq = 0
-    Assert:  τ == c
+velocity_error_enters_command:
+    Arrange: eDot = qdDot − qDot != 0, e = 0, qdDdot = 0
+    Assert:  called once with aq == Kd · eDot
 
-mass_matrix_shapes_command:
-    Arrange: M = diag(2,3), aq = [1,1] (via qdDdot, errors 0)
-    Assert:  τ == [2,3]
-
-position_error_maps_through_mass:
-    Arrange: e = qd - q != 0, others 0, M = I
-    Assert:  τ == Kp · e
-
-velocity_error_maps_through_mass:
-    Arrange: eDot != 0, e = 0, M = I
-    Assert:  τ == Kd · eDot
-
-full_law_superposition:
-    Arrange: nonzero M, C, g, and errors
-    Assert:  τ == M·(qdDdot + Kd·ė + Kp·e) + Cq̇ + g
+full_command_superposition:
+    Arrange: e, eDot, qdDdot all nonzero
+    Assert:  called once with aq == qdDdot + Kd·eDot + Kp·e, and with the MEASURED q, qDot
 
 decoupled_error_dynamics:
-    Arrange: wrap plant q̈ = M⁻¹(τ − Cq̇ − g); run K steps
-    Assert:  ||qd − q|| -> 0 matching ë + Kd·ė + Kp·e = 0
-
-all_three_model_terms_queried:
-    Arrange: any state
-    Assert:  ComputeMassMatrix, ComputeCoriolisTerms, ComputeGravityTerms each called once
-             (StrictMock)
+    Arrange: 2-link plant M(q)q̈ + C(q,q̇)q̇ + g(q) = τ; mock Invoke returns M(q)·aq + C(q,q̇)q̇ + g(q)
+             of the same plant (exact model); run K steps from e(0) != 0
+    Assert:  e(t) matches the solution of ë + Kd·ė + Kp·e = 0 (same integrator), ||e|| -> 0
 ```
 
 ## Reference vectors
 
-- With the exact model, closed-loop error obeys `ë + Kd·ė + Kp·e = 0` — a linear ODE whose decay
-  rate is hand-computable from `Kp`, `Kd`.
-- 2-link at rest with all setpoints matched: golden `τ = g(q)`.
+- With the exact model, closed-loop error obeys `ë + Kd·ė + Kp·e = 0` — for `Kp = 100`, `Kd = 20`
+  critically damped: `e(t) = (e₀ + (ė₀ + 10e₀)t)·e^{−10t}` per joint.
+- `e = [0.1, −0.2]`, `ė = 0`, `q̈d = 0` ⇒ expected `aq = [10, −20]` passed to the model.
 
 ## Edge cases
 
-- Near-singular `M` (mock): still multiplied, never inverted ⇒ no torque blow-up.
-- Model mismatch (mock `M` scaled 1.2): bounded tracking error, closed loop stays stable.
+- Only `ComputeInverseDynamics` exists on the mock — no mass-matrix query is possible (StrictMock
+  fails on any unexpected call), pinning the single `O(n)` call.
+- Model mismatch (plant `M` scaled 1.2 vs the mocked model): bounded tracking error, closed loop stays stable.
 - Large `qdDdot`: torque stays within the documented actuator model.

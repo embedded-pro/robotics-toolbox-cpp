@@ -36,5 +36,6 @@ namespace simulator::dynamics::view
         ui::backend::qt::QtPaintedWidget* view3D;
         QTimer* simulationTimer;
         bool running = false;
+        bool paused = false;
     };
 }

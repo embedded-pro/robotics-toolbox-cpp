@@ -13,8 +13,7 @@ namespace dynamics
     {
         static_assert(std::is_floating_point_v<T>,
             "EulerLagrangeDynamics only supports floating-point types");
-        static_assert(math::detail::is_valid_dimensions_v<Dof, Dof>,
-            "Degrees of freedom must be positive");
+        static_assert(Dof > 0, "Degrees of freedom must be positive");
 
     public:
         using StateVector = math::Vector<T, Dof>;

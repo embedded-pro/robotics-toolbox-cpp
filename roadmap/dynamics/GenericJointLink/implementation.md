@@ -1,79 +1,86 @@
-# Generic (Revolute / Prismatic) Joint Link — Implementation Pseudocode
+# Generic (Revolute / Prismatic) Joint Link with Limits and Armature — Implementation Pseudocode
 
-> Roadmap ref: #M1 (Tier 1) · Target: `robotics/dynamics` · Namespace `dynamics` · Type: `float` (templated on `T`, instantiated for `float` only)
+> Roadmap ref: #M1 (Tier 1) · Target: `robotics/dynamics` (+ changes in `kinematics`) · Namespace `dynamics` · Type: `float` (templated on `T`, instantiated for `float` only)
 
 ## Data structures
 
-```
-enum class JointType : uint8_t { Revolute, Prismatic }
+```cpp
+enum class JointType : uint8_t { Revolute, Prismatic }          # shared with M7 / M30
 
-template<typename T>              # static_assert(std::is_floating_point_v<T>); instantiated for float
-struct GenericJointLink:
-    JointType                 type            # revolute (rotate) or prismatic (slide)
+template<typename T>                                            # static_assert(std::is_floating_point_v<T>); instantiated for float
+struct JointLimits:
+    T positionMin = −∞, positionMax = +∞                         # rad or m
+    T velocityMax = +∞                                           # rad/s or m/s
+    T effortMax   = +∞                                           # N·m or N
+
+template<typename T>
+struct JointLink:                                               # evolves the shipped RevoluteJointLink
     T                         mass
-    math::SquareMatrix<T, 3>  inertia         # inertia tensor at CoM, link frame
-    math::Vector<T, 3>        axis            # unit joint axis in link frame
-    math::Vector<T, 3>        parentToJoint   # fixed joint origin in parent frame
-    math::Vector<T, 3>        jointToCoM      # CoM position in link frame
+    math::SquareMatrix<T, 3>  inertia         # at the CoM, link frame
+    math::Vector<T, 3>        jointAxis       # unit, link frame (rotation axis or slide direction)
+    math::Vector<T, 3>        parentToJoint   # joint origin at q = 0, parent frame
+    math::Vector<T, 3>        jointToCoM      # link frame
+    JointType                 type = JointType::Revolute       # new fields are trailing and defaulted,
+    JointLimits<T>            limits = {}                       # so every existing aggregate
+    T                         armature = 0                      # initializer keeps compiling
+
+template<typename T> using RevoluteJointLink = JointLink<T>    # migration alias
 ```
+
+`armature` is the reflected actuator inertia (`G²·I_rotor`, kg·m² for revolute, kg for prismatic).
 
 ## Interface
 
-```
-# Relative transform produced by the joint variable q:
-(Matrix3 R, Vector3 p) JointTransform(T q) const            # hot path
-
-# Motion-subspace (screw) split — exactly one is the axis, the other is zero:
-Vector3 AngularAxis() const     # axis if Revolute else 0
-Vector3 LinearAxis()  const     # axis if Prismatic else 0
-
-# Adapter so existing revolute-only code keeps compiling:
-static GenericJointLink FromRevolute(const RevoluteJointLink<T>& link)
+```text
+(Matrix3 R, Vector3 offset) JointTransform(T q) const          # link frame relative to parent; hot path
+Vector3 AngularAxis() const    # axis if Revolute else 0        # motion subspace S = (AngularAxis; LinearAxis)
+Vector3 LinearAxis()  const    # axis if Prismatic else 0       # in the dynamics' (ω; v) ordering
 ```
 
 ## Algorithm (pseudocode)
 
-```
-function JointTransform(q):                        # OPTIMIZE_FOR_SPEED
-    if type == Revolute:
-        R = math::RotationAboutAxis(axis, q)       # rotate by angle q about axis
-        p = parentToJoint                          # origin fixed
-    else:  # Prismatic
-        R = Identity3                              # no rotation
-        p = parentToJoint + axis * q               # slide distance q along axis
-    return (R, p)
+```cpp
+function JointTransform(q):                                    # OPTIMIZE_FOR_SPEED
+    if type == Revolute:  return (RotationAboutAxis(jointAxis, q), parentToJoint)
+    else:                 return (Identity, parentToJoint + jointAxis·q)
 
-function AngularAxis():  return (type == Revolute)  ? axis : 0
-function LinearAxis():   return (type == Prismatic) ? axis : 0
+# Required changes in the shipped algorithms (per joint, link frame = parent rotated by R, offset r):
+FK / ChainPoseKinematics (M30):  origin_i = origin_{i−1} + R_{i−1}·r_i ;  R_i = R_{i−1}·R(q_i)
+                                  Jacobian column (M8): revolute (z × (p − o); z), prismatic (z; 0)
+RNEA forward pass, prismatic i:  ω_i = Rᵀω_{i−1} = ω_{i−1};  ω̇_i = ω̇_{i−1}
+                                  a_i = a_{i−1} + ω̇_{i−1}×r_i + ω_{i−1}×(ω_{i−1}×r_i) + 2·ω_i×(z·q̇_i) + z·q̈_i
+RNEA backward pass:               child offset is r_{i+1} (= parentToJoint + z·q for a prismatic child)
+                                  τ_i = z·n_i (revolute)   |   τ_i = z·f_i (prismatic)
+                                  τ_i += armature_i·q̈_i
+ABA (Featherstone, S = (0; z) for prismatic): U = I^A·S, D = SᵀU + armature, u = τ − Sᵀp^A,
+                                  c_i = v_i × S·q̇_i, transforms use r_i(q)
+CRBA (M28):                       S as above; M_ii += armature_i
+Limits:                           consumed by IK clamping (M13), trajectory planners (M2/M3/M9/M33), TOPP (M27)
 ```
 
 ## Complexity & memory
 
-- `JointTransform`: `O(1)` — one axis-angle rotation (revolute) or one scaled add (prismatic).
-- Memory: one enum byte + the existing inertial fields; no growth over `RevoluteJointLink`.
+- `JointTransform`: `O(1)`. The algorithm changes keep every pass `O(N)` (`O(N²)` for CRBA).
+- Memory: one enum byte, four limit scalars and the armature per link.
 
 ## Numerical / embedded notes
 
-- The `(AngularAxis, LinearAxis)` pair *is* the motion-subspace `S`: FK multiplies `JointTransform`
-  down the chain; the 6×N Jacobian (M8) fills column `i` from these two vectors; RNEA injects
-  `axis·q̇` into the angular channel (revolute) or the linear channel (prismatic).
-- Keep `axis` **unit-normalized** at construction; a non-unit axis silently rescales both the
-  rotation angle and the slide distance.
-- `RotationAboutAxis` (Rodrigues form) avoids gimbal issues and is branch-light — good for the FK loop.
-- A `Prismatic` joint contributes no rotation, so its inertia only shifts via the parallel-axis
-  term along `axis·q`; revolute links keep the existing propagation unchanged.
-- Float-only: `static_assert(std::is_floating_point_v<T>)`; the generic `T` signature keeps a
-  `Q15`/`Q31` specialisation cheap to add later.
+- **Migration:** keep the aggregate order of the shipped struct and append defaulted fields; alias
+  `RevoluteJointLink` so FK/IK/RNEA/ABA and their tests compile unchanged, then add the prismatic
+  branches behind `type`.
+- The prismatic `2ω×(z·q̇)` Coriolis term and the `z·f` projection are the two places a revolute-only
+  implementation silently goes wrong — both are pinned by tests.
+- Keep `jointAxis` unit-normalized (assert at construction); a non-unit axis rescales both the angle
+  and the slide.
+- Armature adds to the joint-space inertia only; it does not change the kinematics or gravity.
+- Float-only: `static_assert(std::is_floating_point_v<T>)`.
 
 ## Deployment
 
-- Header: `robotics/dynamics/GenericJointLink.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `JointTransform`, and
-  `extern template struct GenericJointLink<float>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
-- Coverage: `robotics/dynamics/GenericJointLink.cpp` →
-  `template struct GenericJointLink<float>;`
-- Test: `robotics/dynamics/test/TestGenericJointLink.cpp`
-- Doc: `doc/dynamics/GenericJointLink.md` (expand to follow `doc/TEMPLATE.md`)
-- CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
-  `TestGenericJointLink.cpp` → the `_test` target.
-- Generic pattern: see `roadmap/README.md` → "Deployment shape".
+- Header: `robotics/dynamics/JointLink.hpp` (and `RevoluteJointLink.hpp` becomes the alias) —
+  `#pragma once` → `#pragma GCC optimize("O3","fast-math")`, `extern template struct JointLink<float>;`
+  under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
+- Coverage: `robotics/dynamics/JointLink.cpp` → `template struct JointLink<float>;`
+- Tests: `robotics/dynamics/test/TestJointLink.cpp` plus prismatic cases in the RNEA/ABA/FK tests.
+- Doc: `doc/dynamics/JointLink.md` (per `doc/TEMPLATE.md`) and updates to the RNEA/ABA/FK docs.
+- Generic pattern: see `roadmap/DEPLOYMENT.md`.

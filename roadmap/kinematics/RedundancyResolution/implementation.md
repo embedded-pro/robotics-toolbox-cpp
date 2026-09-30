@@ -4,71 +4,81 @@
 
 ## Data structures
 
-```
-template<typename T, std::size_t NumLinks>      # static_assert(std::is_floating_point_v<T>); instantiated for float
-class RedundancyResolution:                     # NumLinks > 6 (redundant)
-    SpatialJacobian<T, NumLinks>  jac
-    T  damping                                  # λ for the damped pseudo-inverse
-    # scratch: JJt (6×6), Jpinv (N×6), P (N×N)
+```cpp
+template<typename T, std::size_t TaskDim, std::size_t Dof>   # static_assert(std::is_floating_point_v<T>); static_assert(Dof > TaskDim)
+class RedundancyResolution:                                    # instantiated for float
+    const JacobianProvider<T, TaskDim, Dof>& jacobian         # M8 seam; TaskDim 3 (position) or 6 (pose)
+    T  damping                                                 # λ — primary term only
+    T  rankTolerance                                           # relative: σᵢ > rankTolerance·σ₀ counts toward rank
+    solvers::SingularValueDecomposition<T, Dof, TaskDim> svd   # of Jᵀ (upstream needs Rows ≥ Cols)
 ```
 
 ## Interface
 
-```
-RedundancyResolution(SpatialJacobian<T, NumLinks> jac, T damping = 0)
-Matrix<T, N, 6>  PseudoInverse(JointVector q)                     # J⁺
-Matrix<T, N, N>  NullSpaceProjector(JointVector q)                # I − J⁺J
-JointVector      Resolve(JointVector q, Vector<T,6> xdot,
-                         JointVector qdot0)                       # hot path
+```text
+RedundancyResolution(const JacobianProvider<T, TaskDim, Dof>& jacobian, T damping, T rankTolerance = 1e-4)
+JointVector              Resolve(const JointVector& q, const TaskVector& xDot,
+                                 const JointVector& qDot0)                 # hot path
+Matrix<T, Dof, TaskDim>  DampedPseudoInverse(const JointVector& q)         # J⁺_λ (λ = 0 ⇒ rank-thresholded J⁺)
+Matrix<T, Dof, Dof>      NullSpaceProjector(const JointVector& q)          # P = I − J⁺J, undamped
 ```
 
 ## Algorithm (pseudocode)
 
-```
-function PseudoInverse(q):                       # right inverse, wide J
-    J   = jac.Compute(q)                         # 6×N
-    JJt = J * Transpose(J) + λ² I₆               # damped ⇒ singularity-robust
-    #  J⁺ = Jᵀ (JJt)⁻¹  via 6×6 solves (reuse GaussianElimination / QR item 27)
-    return Transpose(J) * Inverse(JJt)
+```cpp
+function Factor(q):
+    J = jacobian.Jacobian(q)                    # TaskDim × Dof
+    svd.Decompose(Jᵀ)                           # Jᵀ = U·Σ·Vᵀ ⇒ J = V·Σ·Uᵀ
+    # uᵢ = column i of U (Dof): right singular vectors of J;  vᵢ = column i of V (TaskDim)
+    τ = rankTolerance · σ₀;  r = #{ σᵢ > τ }
 
-function NullSpaceProjector(q):
-    J  = jac.Compute(q)
-    Jp = PseudoInverse(q)
-    return I_N - Jp * J                           # N×N, idempotent
+function Gain(σ):                               # damped inverse of one singular value
+    λ > 0 ? σ / (σ² + λ²) : (σ > τ ? 1/σ : 0)
 
-function Resolve(q, xdot, qdot0):                # OPTIMIZE_FOR_SPEED
-    Jp        = PseudoInverse(q)
-    qdot_task = Jp * xdot                         # minimum-norm primary solution
-    P         = I_N - Jp * jac.Compute(q)         # null-space projector
-    return qdot_task + P * qdot0                  # secondary objective in the null space
+function Resolve(q, ẋ, q̇₀):                    # OPTIMIZE_FOR_SPEED
+    Factor(q)
+    q̇ = Σᵢ Gain(σᵢ)·(vᵢ·ẋ)·uᵢ                  # primary: J⁺_λ·ẋ, lies in the row space of J
+    q̇ = q̇ + q̇₀ − Σ_{i<r} (uᵢ·q̇₀)·uᵢ           # secondary: P·q̇₀ without forming P, O(Dof·r)
+    return q̇
+
+function DampedPseudoInverse(q):   Factor(q);  return Σᵢ Gain(σᵢ)·uᵢ·vᵢᵀ
+function NullSpaceProjector(q):    Factor(q);  return I_Dof − Σ_{i<r} uᵢ·uᵢᵀ
+                                   # = I − J⁺J with J⁺ = Transpose(svd.PseudoInverse(τ))
 ```
 
 ## Complexity & memory
 
-- `PseudoInverse`: `O(6²N + 6³)` — form `J Jᵀ`, one 6×6 factorization, back-substitute.
-- `Resolve`: adds an `O(N²)` projector multiply for the secondary term.
-- Memory: `N×6`, `N×N`, and `6×6` scratch; all bounded, stack-allocated.
+- One Golub–Kahan SVD of the `Dof × TaskDim` matrix `Jᵀ` per call, then `O(Dof·TaskDim)`.
+- `NullSpaceProjector` (diagnostics/tests) adds `O(Dof²·r)`; `Resolve` never forms it.
+- Memory: SVD factors (`Dof×TaskDim`, `TaskDim×TaskDim`) + vectors; stack only.
 
 ## Numerical / embedded notes
 
-- The **right** pseudo-inverse `Jᵀ(J Jᵀ)⁻¹` is correct for a *wide* (redundant) `J`; the left form
-  applies to tall `J`. Damping `λ²` keeps `J Jᵀ` invertible near singularities.
-- `P = I − J⁺J` is a **projector**: `P² = P`. Anything it multiplies moves the joints *without*
-  disturbing the tool — so the secondary objective is exactly task-consistent.
-- Common secondary rates `q̇₀`: gradient of manipulability (M11), distance-to-joint-limits, or an
-  obstacle-avoidance potential. Scale `q̇₀` so it never dominates the primary task.
-- For best conditioning build `J⁺` from a **QR/SVD** (items 27/43) rather than an explicit inverse.
-- Float-only: `static_assert(std::is_floating_point_v<T>)`; the generic `T` signature keeps a
-  `Q15`/`Q31` specialisation cheap to add later.
+- **Why the projector is undamped:** with the damped inverse, `J·(I − J⁺_λJ) = λ²(JJᵀ + λ²I)⁻¹J ≠ 0`, so
+  `I − J⁺_λJ` is neither idempotent nor task-invisible (7-DOF fixture, `λ = 0.01`: `‖J·P_λ·q̇₀‖ = 2.8e-4`,
+  `‖P_λ² − P_λ‖ = 2.0e-3`). Built from the thresholded SVD, `P` is an exact orthogonal projector:
+  `P² = P`, `Pᵀ = P`, `J·P = Σ_{σᵢ ≤ τ} σᵢvᵢuᵢᵀ` (zero for exact rank loss, rounding-level at full rank).
+- **What the tool sees:** `J·q̇ = Σᵢ σᵢ·Gain(σᵢ)·vᵢvᵢᵀ·ẋ`. With `λ > 0` the primary task is met only
+  approximately: `‖J·q̇ − ẋ‖ ≤ λ²/(σ_min² + λ²)·‖ẋ‖` for `ẋ` in the range of `J`. The secondary term
+  adds nothing to the task velocity regardless of `λ` or `‖q̇₀‖`.
+- The primary term lies in the row space (`P·J⁺_λ·ẋ = 0`), so it is the minimum-norm solution.
+- Near a singularity `σ_min → 0`: the damped gain stays bounded (`≤ 1/(2λ)`), and the rank threshold
+  grows the null space (the lost task direction is not "protected" — by design).
+- Common `q̇₀`: gradient of manipulability (M11), distance to joint limits, obstacle potentials.
+- SVD: upstream `numerical/solvers/SingularValueDecomposition.hpp`
+  ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)).
+- Float-only: `static_assert(std::is_floating_point_v<T>)`.
 
 ## Deployment
 
 - Header: `robotics/kinematics/RedundancyResolution.hpp` — `#pragma once` →
   `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Resolve`, and
-  `extern template class RedundancyResolution<float, NumLinks>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
-- Coverage: `robotics/kinematics/RedundancyResolution.cpp` → `template class RedundancyResolution<float, NumLinks>;`
+  `extern template class RedundancyResolution<float, 6, 7>;` / `<float, 3, 7>` under
+  `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
+- Coverage: `robotics/kinematics/RedundancyResolution.cpp` → the same instantiations.
 - Test: `robotics/kinematics/test/TestRedundancyResolution.cpp`
 - Doc: `doc/kinematics/RedundancyResolution.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestRedundancyResolution.cpp` → the `_test` target.
+- Depends on: M8 (`JacobianProvider`); upstream `solvers::SingularValueDecomposition`.
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

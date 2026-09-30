@@ -1,174 +1,186 @@
 # Robotics Toolbox — Roadmap
 
 Prioritized backlog for the robot-manipulator stack (kinematics, dynamics, trajectories,
-and manipulator control). Shared numerical primitives (`math`, `solvers`, `controllers`)
-are consumed from [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp).
+and manipulator control). Shared numerical primitives (`math`, `solvers`, …) are consumed from
+[numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp); upstream already
+provides `Matrix`, `Quaternion`, `MatrixExponential`, Gaussian elimination, Cholesky, LU, QR, SVD,
+Jacobi eigen-solver and Runge-Kutta integrators, but no SE(3) type and no general QP solver.
 
 ## Robot manipulators & other manipulator types
 
-The library already has the hard parts of manipulator **modelling**: forward/inverse dynamics
+The library already has the core of manipulator **modelling**: forward/inverse dynamics
 ([RNEA](robotics/dynamics/RecursiveNewtonEuler.hpp), [ABA](robotics/dynamics/ArticulatedBodyAlgorithm.hpp),
-[Euler-Lagrange](robotics/dynamics/EulerLagrangeSolver.hpp) giving $M$, $C$, $g$) plus
-damped-least-squares [IK](robotics/kinematics/InverseKinematics.hpp). What is missing is the
-**control, planning, and full-pose kinematics layer** that turns those models into a usable
-manipulator stack. Two current limitations gate most of the items below:
+[Euler-Lagrange](robotics/dynamics/EulerLagrangeSolver.hpp)), position forward kinematics with base and
+tool offsets, and damped-least-squares [IK](robotics/kinematics/InverseKinematics.hpp). What is missing is
+the **full-pose kinematics, model plumbing, planning and control layer** that turns those models into a
+usable manipulator stack. Two current limitations gate many items below:
 
 > **Position-only, revolute-only.** [ForwardKinematics.hpp](robotics/kinematics/ForwardKinematics.hpp)
-> returns joint *positions* (a 3×N Jacobian lives privately inside IK), and only
-> [RevoluteJointLink](robotics/dynamics/RevoluteJointLink.hpp) exists. Items **M1** (prismatic/generic
-> joints) and **M8** (full 6×N spatial Jacobian) lift these limits and unblock the rest.
+> returns joint and tool *positions* (a 3×N Jacobian lives privately inside IK), and only
+> [RevoluteJointLink](robotics/dynamics/RevoluteJointLink.hpp) exists. Items **M1** (prismatic joints,
+> limits, armature), **M30** (full-pose kinematics) and **M8** (6×N Jacobian) lift these limits.
 
-All manipulator items are *(float-first)* — torques, lengths, and inertias exceed the `Q15`/`Q31`
-range, matching the existing `dynamics/` convention.
+**Conventions (normative for every item):** 6-vectors are ordered linear part first — twists `(v; ω)`,
+wrenches `(f; n)` — as defined by **M6**; the geometric Jacobian has linear rows first; orientation
+errors use the SE(3) logarithm (`PoseError`), never angle subtraction. Controllers receive dynamics and
+Jacobians through small interfaces (`EulerLagrangeDynamics`, `InverseDynamicsModel`, `JacobianProvider`)
+implemented by M29 / M8, so they can be tested with StrictMock and bound to concrete types on
+hard real-time paths.
+
+All items are *float-only* — torques, lengths, and inertias exceed the `Q15`/`Q31` range, matching the
+existing `dynamics/` convention.
 
 ### Manipulator list (by priority)
 
-| #   | Component                                               | Target module                   | Difficulty |
-|-----|---------------------------------------------------------|---------------------------------|------------|
-| M1  | Prismatic / generic joint link                          | `dynamics` + `kinematics`       | ★☆☆☆☆      |
-| M2  | Cubic / quintic polynomial joint trajectory             | `trajectory` (new)              | ★☆☆☆☆      |
-| M3  | Trapezoidal (LSPB) velocity profile                     | `trajectory` (new)              | ★☆☆☆☆      |
-| M4  | Friction compensation (Coulomb + viscous + Stribeck)    | `dynamics`                      | ★☆☆☆☆      |
-| M5  | PD + gravity compensation control                       | `controllers/manipulator` (new) | ★☆☆☆☆      |
-| M6  | Homogeneous transform / SE(3) + adjoint (twists)        | `math`                          | ★★☆☆☆      |
-| M7  | Denavit-Hartenberg parameters                           | `kinematics`                    | ★★☆☆☆      |
-| M8  | Geometric / analytic Jacobian (6×N)                     | `kinematics`                    | ★★☆☆☆      |
-| M9  | S-curve (jerk-limited) trajectory                       | `trajectory` (new)              | ★★☆☆☆      |
-| M10 | Cartesian path + orientation (SLERP) interpolation      | `trajectory` (new)              | ★★☆☆☆      |
-| M11 | Manipulability ellipsoid / Yoshikawa index              | `kinematics`                    | ★★☆☆☆      |
-| M12 | Computed-torque (inverse-dynamics) control              | `controllers/manipulator` (new) | ★★★☆☆      |
-| M13 | Full 6-DOF pose IK (position + orientation)             | `kinematics`                    | ★★★☆☆      |
-| M14 | Redundancy resolution / null-space projection           | `kinematics`                    | ★★★☆☆      |
-| M15 | Product-of-Exponentials forward kinematics              | `kinematics`                    | ★★★☆☆      |
-| M16 | Momentum-based collision-detection observer             | `estimators/online`             | ★★★☆☆      |
-| M17 | Impedance / admittance control                          | `controllers/manipulator` (new) | ★★★☆☆      |
-| M18 | Operational-space (task-space) control                  | `controllers/manipulator` (new) | ★★★★☆      |
-| M19 | Hybrid position/force control                           | `controllers/manipulator` (new) | ★★★★☆      |
-| M20 | Passivity-based adaptive control (Slotine-Li)           | `controllers/manipulator` (new) | ★★★★☆      |
-| M21 | Analytical IK (Pieper, wrist-partitioned 6R)            | `kinematics`                    | ★★★★☆      |
-| M22 | Dynamic (base-parameter) identification                 | `estimators/offline`            | ★★★★☆      |
-| M23 | Parallel-manipulator kinematics (Delta / Stewart-Gough) | `kinematics`                    | ★★★★☆      |
-| M24 | Mobile-manipulator / nonholonomic-base kinematics       | `kinematics`                    | ★★★★☆      |
-| M25 | Cable-driven tension distribution                       | `controllers/manipulator` (new) | ★★★★☆      |
-| M26 | Continuum / soft constant-curvature kinematics          | `kinematics`                    | ★★★★☆      |
-| M27 | Time-optimal path parameterization (TOPP)               | `trajectory` (new)              | ★★★★★      |
+| #   | Component                                                       | Target module             | Depends on | Difficulty |
+|-----|-----------------------------------------------------------------|---------------------------|------------|------------|
+| M1  | Generic joint link (prismatic, limits, armature)                | `dynamics` + `kinematics` | —          | ★☆☆☆☆      |
+| M2  | Cubic / quintic polynomial joint trajectory                     | `trajectory` (new)        | —          | ★☆☆☆☆      |
+| M3  | Trapezoidal (LSPB) velocity profile + synchronization           | `trajectory` (new)        | —          | ★☆☆☆☆      |
+| M4  | Friction compensation (Coulomb + viscous + Stribeck)            | `dynamics`                | —          | ★☆☆☆☆      |
+| M5  | PD + gravity compensation control                               | `controllers/manipulator` | M29        | ★☆☆☆☆      |
+| M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —          | ★☆☆☆☆      |
+| M6  | SE(3) transform, twists, wrenches, adjoint, exp/log             | `kinematics`              | —          | ★★☆☆☆      |
+| M28 | Composite Rigid Body Algorithm (mass matrix)                    | `dynamics`                | —          | ★★☆☆☆      |
+| M29 | Chain dynamics model (link chain → M, C, g, inverse dynamics)   | `dynamics`                | M28        | ★★☆☆☆      |
+| M30 | Chain pose kinematics (full-pose FK, frame chain)               | `kinematics`              | M6         | ★★☆☆☆      |
+| M7  | Denavit-Hartenberg parameters (standard + modified)             | `kinematics`              | M6, M30    | ★★☆☆☆      |
+| M8  | Geometric Jacobian (6×N), bias term, Jacobian provider          | `kinematics`              | M6, M30    | ★★☆☆☆      |
+| M9  | S-curve (jerk-limited) trajectory                               | `trajectory` (new)        | M3         | ★★☆☆☆      |
+| M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | M6         | ★★☆☆☆      |
+| M11 | Manipulability ellipsoid / Yoshikawa index                      | `kinematics`              | M8         | ★★☆☆☆      |
+| M33 | Cubic spline through via points                                 | `trajectory` (new)        | —          | ★★☆☆☆      |
+| M34 | Forward-dynamics integrator (simulation step)                   | `dynamics`                | —          | ★★☆☆☆      |
+| M12 | Computed-torque (inverse-dynamics) control                      | `controllers/manipulator` | M29        | ★★★☆☆      |
+| M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | M6, M8     | ★★★☆☆      |
+| M14 | Redundancy resolution / null-space projection                   | `kinematics`              | M8         | ★★★☆☆      |
+| M15 | Product-of-Exponentials forward kinematics                      | `kinematics`              | M6         | ★★★☆☆      |
+| M16 | Momentum-based collision-detection observer                     | `dynamics`                | M29, M31   | ★★★☆☆      |
+| M17 | Impedance control                                               | `controllers/manipulator` | M8, M29    | ★★★☆☆      |
+| M31 | Coriolis matrix and inertial-parameter regressor                | `dynamics`                | M28        | ★★★☆☆      |
+| M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29    | ★★★★☆      |
+| M19 | Hybrid position/force control                                   | `controllers/manipulator` | M8, M29    | ★★★★☆      |
+| M20 | Passivity-based adaptive control (Slotine-Li)                   | `controllers/manipulator` | M31        | ★★★★☆      |
+| M21 | Analytical IK for ortho-parallel 6R arms with a spherical wrist | `kinematics`              | M6         | ★★★★☆      |
+| M22 | Dynamic (base-parameter) identification                         | `dynamics`                | M31        | ★★★★☆      |
+| M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta)          | `kinematics`              | M6         | ★★★★☆      |
+| M24 | Mobile-manipulator / nonholonomic-base kinematics               | `kinematics`              | M8, M14    | ★★★★☆      |
+| M25 | Cable-driven tension distribution                               | `controllers/manipulator` | M6         | ★★★★☆      |
+| M26 | Continuum / soft constant-curvature kinematics                  | `kinematics`              | M6         | ★★★★☆      |
+| M27 | Time-optimal path parameterization (TOPP-RA)                    | `trajectory` (new)        | M29        | ★★★★★      |
 
 ### Tier 1 — Trivial ★☆☆☆☆
 
-**M1. Prismatic / generic joint link.** Generalize `RevoluteJointLink` to a joint type carrying an axis + type (revolute/prismatic), so FK/IK/dynamics handle sliding joints (SCARA, gantries, hydraulic actuators).
-- *Algorithm / paper:* J. J. Craig, *Introduction to Robotics: Mechanics and Control*, 4th ed., Ch. 3.
-- *Reuses / builds on:* [RevoluteJointLink.hpp](robotics/dynamics/RevoluteJointLink.hpp); unblocks FK, IK, RNEA for mixed chains.
+**M1. Generic joint link.** Evolve `RevoluteJointLink` (compatibly, via trailing defaulted fields) into a link with a joint type (revolute/prismatic), joint limits and armature, and add the prismatic branches to FK, RNEA, ABA, CRBA and the Jacobian.
+- *Algorithm / paper:* J. J. Craig, *Introduction to Robotics: Mechanics and Control*, 4th ed., Ch. 3 and 6; Featherstone (2008), Ch. 4.
 
 **M2. Cubic / quintic polynomial joint trajectory.** Point-to-point motion with matched position/velocity(/acceleration) boundary conditions via closed-form polynomial coefficients.
-- *Algorithm / paper:* Spong, Hutchinson, Vidyasagar, *Robot Modeling and Control*, Ch. 5 (polynomial trajectories).
-- *Reuses / builds on:* scalar `math`; new `trajectory/` module.
+- *Algorithm / paper:* Spong, Hutchinson, Vidyasagar, *Robot Modeling and Control*, Ch. 5.
 
-**M3. Trapezoidal (LSPB) velocity profile.** Linear-segment-with-parabolic-blends profile respecting velocity/acceleration limits.
+**M3. Trapezoidal (LSPB) velocity profile.** Linear-segment-with-parabolic-blends profile respecting velocity/acceleration limits, with duration-constrained planning for multi-axis synchronization.
 - *Algorithm / paper:* L. Biagiotti, C. Melchiorri, *Trajectory Planning for Automatic Machines and Robots* (2008), Ch. 3.
-- *Reuses / builds on:* new `trajectory/` module.
 
-**M4. Friction compensation model.** Feedforward Coulomb + viscous + Stribeck joint-friction term added to any torque controller.
-- *Algorithm / paper:* B. Armstrong-Hélouvry, P. Dupont, C. Canudas de Wit, "A survey of models, analysis tools and compensation methods for the control of machines with friction," *Automatica*, 30(7), 1994.
-- *Reuses / builds on:* `dynamics`; composes with M5/M12.
+**M4. Friction compensation model.** Feedforward Coulomb + viscous + Stribeck joint-friction term, clamped, added to any torque controller or folded into the chain dynamics model.
+- *Algorithm / paper:* B. Armstrong-Hélouvry, P. Dupont, C. Canudas de Wit, *Automatica*, 30(7), 1994.
 
 **M5. PD + gravity compensation control.** The simplest globally-stable set-point regulator: `τ = Kp·e − Kd·q̇ + g(q)`.
-- *Algorithm / paper:* M. Takegaki, S. Arimoto, "A New Feedback Method for Dynamic Control of Manipulators," *ASME J. Dyn. Sys. Meas. Control*, 1981.
-- *Reuses / builds on:* $g(q)$ from [RNEA](robotics/dynamics/RecursiveNewtonEuler.hpp) / Euler-Lagrange; new `controllers/manipulator/` module.
+- *Algorithm / paper:* M. Takegaki, S. Arimoto, *ASME J. Dyn. Sys. Meas. Control*, 1981.
+- *Reuses / builds on:* `g(q)` from M29.
+
+**M32. Inverse dynamics with an external tool wrench.** RNEA overload taking the environment's wrench on the tool; satisfies `τ(w) − τ(0) = −Jᵀw`.
+- *Algorithm / paper:* Luh, Walker, Paul (1980).
 
 ### Tier 2 — Easy ★★☆☆☆
 
-**M6. Homogeneous transform / SE(3) + adjoint.** Rigid-body transforms (4×4), twists/wrenches (6-vectors), and the adjoint map — the algebra all modern manipulator code is built on.
-- *Algorithm / paper:* K. Lynch, F. Park, *Modern Robotics* (2017), Ch. 3; Murray, Li, Sastry, *A Mathematical Introduction to Robotic Manipulation* (1994).
-- *Reuses / builds on:* [Geometry3D.hpp](numerical/math/Geometry3D.hpp), item 18 (Quaternion).
+**M6. SE(3) transform, twists and wrenches.** Rigid transforms, adjoint, twist/wrench transforms, exponential/logarithm and `PoseError`; fixes the library's `(v; ω)` convention.
+- *Algorithm / paper:* K. Lynch, F. Park, *Modern Robotics* (2017), Ch. 3; Murray, Li, Sastry (1994).
+- *Reuses / builds on:* upstream `Geometry3D`, `Quaternion`.
 
-**M7. Denavit-Hartenberg parameters.** Standard `(a, α, d, θ)` link description and per-joint transform generation.
-- *Algorithm / paper:* Craig, *Introduction to Robotics*, Ch. 3 (DH convention).
-- *Reuses / builds on:* M6, `math::Matrix`.
+**M28. Composite Rigid Body Algorithm.** `O(n²)` joint-space mass matrix, sharing the spatial algebra of ABA.
+- *Algorithm / paper:* Walker & Orin (1982); Featherstone (2008), Ch. 6.
 
-**M8. Geometric / analytic Jacobian (6×N).** Full spatial Jacobian mapping joint rates → end-effector linear + angular velocity (and its transpose for force mapping).
-- *Algorithm / paper:* Lynch & Park, *Modern Robotics*, Ch. 5 (velocity kinematics).
-- *Reuses / builds on:* promotes the private 3×N Jacobian in [InverseKinematics.hpp](robotics/kinematics/InverseKinematics.hpp); unblocks M11, M13, M14, M17, M18.
+**M29. Chain dynamics model.** Adapter implementing `EulerLagrangeDynamics` (M via CRBA, `Cq̇` and `g` via RNEA) and a one-call `InverseDynamicsModel` for the controllers.
+- *Reuses / builds on:* RNEA, M28.
 
-**M9. S-curve (jerk-limited) trajectory.** Seven-segment jerk-bounded profile for smooth, low-vibration motion.
-- *Algorithm / paper:* Biagiotti & Melchiorri, *Trajectory Planning*, Ch. 3 (double-S profiles).
-- *Reuses / builds on:* M3; new `trajectory/` module.
+**M30. Chain pose kinematics.** Full tool pose and a model-independent frame chain (joint origins/axes in the base frame) for the link model.
+- *Algorithm / paper:* Siciliano et al. (2009), Ch. 2.
 
-**M10. Cartesian path + orientation interpolation.** Straight-line/screw position paths with SLERP orientation blending for task-space moves.
-- *Algorithm / paper:* Lynch & Park, Ch. 9; K. Shoemake, SLERP, *SIGGRAPH* 1985.
-- *Reuses / builds on:* item 18 (Quaternion), M6.
+**M7. Denavit-Hartenberg parameters.** Standard and modified `(a, α, d, θ)` descriptions with joint offsets, producing the M30 frame chain.
+- *Algorithm / paper:* Craig, *Introduction to Robotics*, Ch. 3.
 
-**M11. Manipulability ellipsoid / Yoshikawa index.** Scalar dexterity/singularity measure `√det(J Jᵀ)` for posture optimization and singularity avoidance.
-- *Algorithm / paper:* T. Yoshikawa, "Manipulability of Robotic Mechanisms," *Int. J. Robotics Research*, 4(2), 1985.
-- *Reuses / builds on:* M8, item 43 (SVD) or determinant of `math::Matrix`.
+**M8. Geometric Jacobian (6×N).** Jacobian and `J̇q̇` from any frame chain, statics `τ = Jᵀw`, and the `JacobianProvider` seam used by IK and the task-space controllers; replaces IK's private 3×N Jacobian.
+- *Algorithm / paper:* Siciliano et al. (2009), Ch. 3; Lynch & Park (2017), Ch. 5.
+
+**M9. S-curve (jerk-limited) trajectory.** Seven-segment jerk-bounded rest-to-rest profile with all short-move cases in closed form.
+- *Algorithm / paper:* Biagiotti & Melchiorri (2008), Ch. 3.
+
+**M10. Cartesian path + orientation interpolation.** Straight-line position with SLERP orientation, one shared time law, twist feed-forward.
+- *Algorithm / paper:* Lynch & Park, Ch. 9; K. Shoemake, *SIGGRAPH* 1985.
+
+**M11. Manipulability ellipsoid / Yoshikawa index.** `√det(JJᵀ)` (or `√det(JᵀJ)` when the task has more rows than joints), condition number and ellipsoid axes via SVD, translational and rotational parts separately.
+- *Algorithm / paper:* T. Yoshikawa, *Int. J. Robotics Research*, 4(2), 1985.
+
+**M33. Cubic spline through via points.** C² multi-joint spline with clamped or natural ends, Thomas-algorithm solve.
+- *Algorithm / paper:* Biagiotti & Melchiorri (2008), Ch. 4.
+
+**M34. Forward-dynamics integrator.** Fixed-step semi-implicit Euler / RK4 simulation step on ABA for model-in-the-loop tests.
+- *Algorithm / paper:* Hairer, Lubich, Wanner (2006); Featherstone (2008), Ch. 7.
 
 ### Tier 3 — Moderate ★★★☆☆
 
-**M12. Computed-torque (inverse-dynamics) control.** Feedback-linearizing manipulator law `τ = M(q)(q̈_d + Kd·ė + Kp·e) + C(q,q̇)q̇ + g(q)` yielding decoupled error dynamics.
+**M12. Computed-torque (inverse-dynamics) control.** `τ = ID(q, q̇, q̈_d + Kd·ė + Kp·e)` in one `O(n)` call, yielding decoupled error dynamics.
 - *Algorithm / paper:* Spong et al., *Robot Modeling and Control*, Ch. 8; Luh, Walker, Paul (1980).
-- *Reuses / builds on:* **directly leverages existing [RNEA](robotics/dynamics/RecursiveNewtonEuler.hpp) / [Euler-Lagrange](robotics/dynamics/EulerLagrangeSolver.hpp)** for $M$, $C$, $g$; item 40 (feedback linearization).
 
-**M13. Full 6-DOF pose IK.** Extend damped-least-squares IK to a position **and** orientation target using the 6×N Jacobian and a quaternion/log orientation error.
-- *Algorithm / paper:* S. R. Buss, "Introduction to Inverse Kinematics with Jacobian Transpose, Pseudoinverse and Damped Least Squares methods," 2004; Nakamura & Hanafusa (1986).
-- *Reuses / builds on:* [InverseKinematics.hpp](robotics/kinematics/InverseKinematics.hpp), M8, item 18.
+**M13. Full 6-DOF pose IK.** Damped least squares on the SE(3) log-map error with position/rotation weighting, adaptive damping, step and joint-limit clamping.
+- *Algorithm / paper:* S. R. Buss (2004); Nakamura & Hanafusa (1986); Chiaverini (1997).
 
-**M14. Redundancy resolution / null-space projection.** Exploit extra DOF (7-DOF arms) via `q̇ = J⁺ẋ + (I − J⁺J)·q̇₀` for secondary objectives (joint-limit / obstacle avoidance).
-- *Algorithm / paper:* A. Liégeois, "Automatic supervisory control of the configuration and behavior of multibody mechanisms," *IEEE Trans. SMC*, 7(12), 1977.
-- *Reuses / builds on:* M8, item 27 (QR) / 43 (SVD) for the pseudo-inverse.
+**M14. Redundancy resolution / null-space projection.** `q̇ = J⁺_λ ẋ + (I − J⁺J)·q̇₀` with an exact (undamped, rank-thresholded) projector.
+- *Algorithm / paper:* A. Liégeois, *IEEE Trans. SMC*, 7(12), 1977.
 
-**M15. Product-of-Exponentials forward kinematics.** Screw-theory FK (`T = e^{[S₁]θ₁}···e^{[Sₙ]θₙ}·M`), avoiding DH frame bookkeeping.
+**M15. Product-of-Exponentials forward kinematics.** Screw-theory FK and the space Jacobian, with conversion to the geometric Jacobian.
 - *Algorithm / paper:* Lynch & Park, *Modern Robotics*, Ch. 4.
-- *Reuses / builds on:* M6 (SE(3)/twists), item 29 (matrix exponential).
 
-**M16. Momentum-based collision-detection observer.** Estimate external joint torques from generalized-momentum residual — no joint-torque sensors or acceleration needed.
-- *Algorithm / paper:* A. De Luca, A. Albu-Schäffer, S. Haddadin, G. Hirzinger, "Collision Detection and Safe Reaction with the DLR-III Lightweight Manipulator Arm," *IROS*, 2006.
-- *Reuses / builds on:* RNEA, `estimators/online`.
+**M16. Momentum-based collision-detection observer.** External joint-torque estimate from the generalized-momentum residual, using `Cᵀq̇`.
+- *Algorithm / paper:* A. De Luca, A. Albu-Schäffer, S. Haddadin, G. Hirzinger, *IROS*, 2006.
 
-**M17. Impedance / admittance control.** Render a programmable mass-spring-damper at the end-effector for safe contact and compliant assembly.
-- *Algorithm / paper:* N. Hogan, "Impedance Control: An Approach to Manipulation, Parts I–III," *ASME J. Dyn. Sys. Meas. Control*, 1985.
-- *Reuses / builds on:* M8, M12, `dynamics`; new `controllers/manipulator/` module.
+**M17. Impedance control.** Stiffness/damping impedance via `Jᵀ` (no force sensor), and inertia-shaping impedance with measured contact wrench via the task-space inertia.
+- *Algorithm / paper:* N. Hogan, *ASME J. Dyn. Sys. Meas. Control*, 1985.
+
+**M31. Coriolis matrix and inertial regressor.** Modified RNEA giving the Christoffel `C(q,q̇)q̇_r` (skew-symmetric `Ṁ − 2C`), `Cᵀq̇`, and the 10-parameter-per-link regressor.
+- *Algorithm / paper:* Echeandia & Wensing (2021); Niemeyer & Slotine (1991); Atkeson, An, Hollerbach (1986).
 
 ### Tier 4 — Advanced ★★★★☆
 
-**M18. Operational-space (task-space) control.** Control directly in Cartesian space using the task-space inertia `Λ = (J M⁻¹ Jᵀ)⁻¹` and dynamically-consistent null-space projection.
-- *Algorithm / paper:* O. Khatib, "A Unified Approach for Motion and Force Control of Robot Manipulators: The Operational Space Formulation," *IEEE J. Robotics and Automation*, 3(1), 1987.
-- *Reuses / builds on:* M8, M12, item 28 (LU) for the $M^{-1}$ solve.
+**M18. Operational-space control.** Task-space inertia `Λ = (J M⁻¹ Jᵀ)⁻¹`, `J̇q̇` compensation, full joint-space gravity/Coriolis compensation and a dynamically-consistent null space.
+- *Algorithm / paper:* O. Khatib, *IEEE J. Robotics and Automation*, 3(1), 1987.
 
-**M19. Hybrid position/force control.** Partition task directions into force-controlled and motion-controlled subspaces via a selection matrix.
-- *Algorithm / paper:* M. Raibert, J. Craig, "Hybrid Position/Force Control of Manipulators," *ASME J. Dyn. Sys. Meas. Control*, 1981.
-- *Reuses / builds on:* M8, M17, `controllers/manipulator/`.
+**M19. Hybrid position/force control.** Selection matrix in a constraint frame, PI force loop with anti-windup and damping, motion PD.
+- *Algorithm / paper:* M. Raibert, J. Craig, 1981; An & Hollerbach, 1987.
 
-**M20. Passivity-based adaptive control (Slotine-Li).** Track trajectories while online-estimating inertial parameters, exploiting linearity-in-parameters `Y(q,q̇,q̈)·a = τ`.
-- *Algorithm / paper:* J.-J. Slotine, W. Li, "On the Adaptive Control of Robot Manipulators," *Int. J. Robotics Research*, 6(3), 1987.
-- *Reuses / builds on:* RNEA regressor form, `estimators/online`; item 47 (MRAC) kinship.
+**M20. Passivity-based adaptive control (Slotine-Li).** Tracks trajectories while estimating inertial parameters on-line through the regressor `Y(q,q̇,q̇r,q̈r)`.
+- *Algorithm / paper:* J.-J. Slotine, W. Li, *Int. J. Robotics Research*, 6(3), 1987.
 
-**M21. Analytical IK (Pieper, wrist-partitioned 6R).** Closed-form inverse kinematics for the common 6R arm with a spherical wrist (all real solutions, no iteration).
-- *Algorithm / paper:* D. Pieper, "The Kinematics of Manipulators Under Computer Control," PhD thesis, Stanford, 1968.
-- *Reuses / builds on:* M6/M7, item 23 (CORDIC) or trig for the closed-form angles.
+**M21. Analytical IK for ortho-parallel 6R arms with a spherical wrist (OPW).** Closed-form, all eight solutions, covering shoulder, lateral and elbow offsets of common industrial arms.
+- *Algorithm / paper:* M. Brandstötter, A. Angerer, M. Hofbaur, Austrian Robotics Workshop, 2014; D. Pieper, PhD thesis, Stanford, 1968.
 
-**M22. Dynamic (base-parameter) identification.** Least-squares estimation of link inertial parameters from excitation trajectories via the linear regressor.
-- *Algorithm / paper:* C. Atkeson, C. An, J. Hollerbach, "Estimation of Inertial Parameters of Manipulator Loads and Links," *Int. J. Robotics Research*, 5(3), 1986.
-- *Reuses / builds on:* RNEA regressor, item 27 (QR) / 12 (poly LS), `estimators/offline`.
+**M22. Dynamic (base-parameter) identification.** Streaming QR least squares on the regressor with SVD rank reduction to the base parameters.
+- *Algorithm / paper:* Atkeson, An, Hollerbach (1986); Gautier & Khalil (1990).
 
-**M23. Parallel-manipulator kinematics (Delta / Stewart-Gough).** Closed-form inverse kinematics and iterative forward kinematics for parallel platforms (pick-and-place Delta, 6-DOF hexapods).
-- *Algorithm / paper:* J.-P. Merlet, *Parallel Robots*, 2nd ed. (2006); R. Clavel, delta robot (1990).
-- *Reuses / builds on:* M6, item 28 (LU) / Newton iteration for the forward solve.
+**M23. Parallel-manipulator kinematics.** Stewart-Gough (leg-length IK, Newton FK) and Delta (per-arm closed-form IK, three-sphere FK).
+- *Algorithm / paper:* J.-P. Merlet, *Parallel Robots*, 2nd ed. (2006); R. Clavel (1990).
 
-**M24. Mobile-manipulator / nonholonomic-base kinematics.** Combined base + arm Jacobian with nonholonomic (differential-drive) constraints.
-- *Algorithm / paper:* Y. Yamamoto, X. Yun, "Coordinating Locomotion and Manipulation of a Mobile Manipulator," *IEEE Trans. Automatic Control*, 39(6), 1994.
-- *Reuses / builds on:* M8, M14 (redundancy).
+**M24. Mobile-manipulator / nonholonomic-base kinematics.** Combined base + arm Jacobian in the world frame with differential-drive constraints.
+- *Algorithm / paper:* Y. Yamamoto, X. Yun, *IEEE Trans. Automatic Control*, 39(6), 1994.
 
-**M25. Cable-driven tension distribution.** Compute non-negative cable tensions realizing a desired wrench (cable robots, tendon-driven hands) via a bounded QP/LP.
-- *Algorithm / paper:* T. Bruckmann, A. Pott (eds.), *Cable-Driven Parallel Robots* (2013); Pott tension-distribution methods.
-- *Reuses / builds on:* [MPC](numerical/controllers/implementations/Mpc.hpp) QP machinery, M8.
+**M25. Cable-driven tension distribution.** Structure matrix from cable geometry and Pott's closed-form (improved) tension distribution within `[tMin, tMax]`.
+- *Algorithm / paper:* Pott, Bruckmann, Mikelsons (2009); A. Pott (2014).
 
-**M26. Continuum / soft constant-curvature kinematics.** Piecewise-constant-curvature FK/IK for tendon/pneumatic continuum arms.
-- *Algorithm / paper:* R. Webster, B. Jones, "Design and Kinematic Modeling of Constant Curvature Continuum Robots: A Review," *Int. J. Robotics Research*, 29(13), 2010.
-- *Reuses / builds on:* M6 (SE(3)), item 18 (Quaternion).
+**M26. Continuum / soft constant-curvature kinematics.** Piecewise-constant-curvature FK and single-section IK.
+- *Algorithm / paper:* R. Webster, B. Jones, *Int. J. Robotics Research*, 29(13), 2010.
 
 ### Tier 5 — Hard / research-grade ★★★★★
 
-**M27. Time-optimal path parameterization (TOPP).** Minimum-time traversal of a fixed geometric path subject to joint torque/velocity limits.
-- *Algorithm / paper:* J. Bobrow, S. Dubowsky, J. Gibson, "Time-Optimal Control of Robotic Manipulators Along Specified Paths," *IJRR*, 4(3), 1985; Q.-C. Pham, TOPP-RA, *IEEE T-RO*, 2014.
-- *Reuses / builds on:* RNEA (torque limits along path), M10 (path), new `trajectory/` module.
+**M27. Time-optimal path parameterization (TOPP-RA).** Minimum-time traversal of a fixed path under joint velocity and torque limits via reachability analysis (two-variable LPs per grid stage).
+- *Algorithm / paper:* J. Bobrow, S. Dubowsky, J. Gibson, *IJRR*, 4(3), 1985; H. Pham, Q.-C. Pham, "A New Approach to Time-Optimal Path Parameterization Based on Reachability Analysis," *IEEE T-RO*, 34(3), 2018.
 
 ---

@@ -4,10 +4,11 @@
 #pragma GCC optimize("O3", "fast-math")
 #endif
 
-#include "robotics/dynamics/EulerLagrangeDynamics.hpp"
+#include "infra/util/ReallyAssert.hpp"
+#include "numerical/math/CholeskyDecomposition.hpp"
 #include "numerical/math/CompilerOptimizations.hpp"
 #include "numerical/math/Matrix.hpp"
-#include "numerical/solvers/GaussianElimination.hpp"
+#include "robotics/dynamics/EulerLagrangeDynamics.hpp"
 
 namespace dynamics
 {
@@ -16,8 +17,7 @@ namespace dynamics
     {
         static_assert(std::is_floating_point_v<T>,
             "EulerLagrangeSolver only supports floating-point types");
-        static_assert(math::detail::is_valid_dimensions_v<Dof, Dof>,
-            "Degrees of freedom must be positive");
+        static_assert(Dof > 0, "Degrees of freedom must be positive");
 
     public:
         using StateVector = math::Vector<T, Dof>;
@@ -25,11 +25,9 @@ namespace dynamics
 
         EulerLagrangeSolver() = default;
 
-        // Forward dynamics: computes qDDot = M(q)^{-1} * (tau - C(q, qDot) - g(q))
         OPTIMIZE_FOR_SPEED StateVector ForwardDynamics(const EulerLagrangeDynamics<T, Dof>& model,
             const StateVector& q, const StateVector& qDot, const StateVector& tau) const;
 
-        // Inverse dynamics: computes tau = M(q) * qDDot + C(q, qDot) + g(q)
         OPTIMIZE_FOR_SPEED StateVector InverseDynamics(const EulerLagrangeDynamics<T, Dof>& model,
             const StateVector& q, const StateVector& qDot, const StateVector& qDDot) const;
     };
@@ -44,10 +42,10 @@ namespace dynamics
         auto C = model.ComputeCoriolisTerms(q, qDot);
         auto g = model.ComputeGravityTerms(q);
 
-        auto rhs = tau - C - g;
+        const auto qDDot{ math::CholeskyDecomposition<T, Dof>::Solve(M, StateVector{ tau - C - g }) };
+        really_assert(qDDot.has_value());
 
-        solvers::GaussianElimination<T, Dof> solver;
-        return solver.Solve(M, rhs);
+        return *qDDot;
     }
 
     template<typename T, std::size_t Dof>

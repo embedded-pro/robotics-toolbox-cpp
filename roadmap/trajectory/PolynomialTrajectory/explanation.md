@@ -27,4 +27,5 @@ trajectories).
 
 ## See also
 `TrapezoidalProfile` (limit-respecting, not fixed-time), `SCurveProfile` (jerk-bounded),
-`CartesianSlerpInterpolation` (task-space paths).
+`CubicSplineTrajectory` (many via points, C² — reduces to this cubic for two knots),
+`CartesianSlerpInterpolation` (task-space paths; a 0 → 1 polynomial can drive its time law).

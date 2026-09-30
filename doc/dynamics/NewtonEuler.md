@@ -104,7 +104,9 @@ The body accelerates about the z-axis despite no external torque — this is the
 ## Pitfalls & Edge Cases
 
 - **Singular inertia**: An inertia tensor must be positive definite. Zero or negative eigenvalues indicate a non-physical body definition.
-- **Body-frame vs. inertial frame**: The equations assume all quantities (forces, torques, velocities) are expressed in the body-fixed frame. Users must transform between frames externally.
+- **Body-frame vs. inertial frame**: The equations assume all quantities (forces, torques, velocities) are expressed in the body-fixed frame. Users must transform between frames externally, including gravity, which must be rotated into the body frame and added to the applied force.
+- **Frame origin at the center of mass**: The decoupled form above holds only when the body frame's origin is the center of mass and the inertia tensor is taken about it. With any other reference point the translational and rotational equations couple through $m\,c \times$ terms (the spatial-inertia form used by the recursive algorithms).
+- **Meaning of $\dot{v}$**: $\dot{v}$ is the rate of change of the body-frame velocity components, not the inertial acceleration of the center of mass (which is $F/m$ rotated into the inertial frame).
 - **Spherical inertia**: When $I = c \cdot \mathbf{I}_3$, the gyroscopic term $\omega \times (I\omega) = c(\omega \times \omega) = 0$, simplifying Euler's equation to $\tau = I\dot{\omega}$.
 - **Fixed-point arithmetic**: Like Euler-Lagrange, Newton-Euler involves physical quantities (forces in Newtons, torques in N·m) that typically exceed Q15/Q31 range. Use `float`.
 - **Energy conservation**: For torque-free motion, kinetic energy $T = \frac{1}{2}\omega^T I \omega$ and angular momentum $L = I\omega$ magnitude should be conserved. Numerical integration may violate this.
@@ -128,7 +130,7 @@ The body accelerates about the z-axis despite no external torque — this is the
 
 ## Connections to Other Algorithms
 
-- **Gaussian Elimination** ([GaussianElimination.md](../solvers/GaussianElimination.md)): Used to solve the $3 \times 3$ inertia system $I\dot{\omega} = \tau_{net}$ in forward dynamics
+- **Linear solvers** ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)): solve the $3 \times 3$ inertia system $I\dot{\omega} = \tau_{net}$ in forward dynamics
 - **Euler-Lagrange** ([EulerLagrange.md](EulerLagrange.md)): Joint-space counterpart; Euler-Lagrange derives the same dynamics from energy principles in generalized coordinates
 - **Recursive Newton-Euler (RNEA)**: Extends single-body Newton-Euler to kinematic chains by propagating velocities/accelerations forward and forces/torques backward through the chain
 

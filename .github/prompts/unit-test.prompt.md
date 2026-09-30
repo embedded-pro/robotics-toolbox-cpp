@@ -5,6 +5,8 @@ argument-hint: "Name the robotics/ algorithm to author unit tests for (e.g. Biqu
 model: "Claude Sonnet 5"
 ---
 
+# Unit Test
+
 Author (or extend) the unit tests for the named **robotics-toolbox** algorithm in
 `robotics/<domain>/test/Test<Name>.cpp`. Follow the `unit-tester` workflow: read the algorithm's
 public interface and doc; look up its family in `TESTING.md` and select the metric

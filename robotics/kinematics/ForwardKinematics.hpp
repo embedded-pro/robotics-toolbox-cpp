@@ -4,11 +4,12 @@
 #pragma GCC optimize("O3", "fast-math")
 #endif
 
-#include "robotics/dynamics/RevoluteJointLink.hpp"
 #include "numerical/math/CompilerOptimizations.hpp"
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
+#include "robotics/dynamics/RevoluteJointLink.hpp"
 #include <array>
+#include <cassert>
 
 namespace kinematics
 {
@@ -26,14 +27,21 @@ namespace kinematics
         using LinkArray = std::array<dynamics::RevoluteJointLink<T>, NumLinks>;
         using PositionArray = std::array<Vector3, NumLinks + 1>;
 
-        ForwardKinematics() = default;
+        explicit ForwardKinematics(const Vector3& toolOffset);
 
-        // Computes the 3D positions of all joints (including base at index 0
-        // and end-effector at index NumLinks) given link descriptions and
-        // joint angles.
         OPTIMIZE_FOR_SPEED PositionArray Compute(const LinkArray& links,
             const JointVector& q) const;
+
+        const Vector3& ToolOffset() const;
+
+    private:
+        Vector3 toolOffset;
     };
+
+    template<typename T, std::size_t NumLinks>
+    ForwardKinematics<T, NumLinks>::ForwardKinematics(const Vector3& toolOffset)
+        : toolOffset{ toolOffset }
+    {}
 
     template<typename T, std::size_t NumLinks>
     OPTIMIZE_FOR_SPEED
@@ -42,24 +50,26 @@ namespace kinematics
             const JointVector& q) const
     {
         PositionArray positions{};
-        positions[0] = Vector3{};
+        positions[0] = links[0].parentToJoint;
 
         auto R = Matrix3::Identity();
 
         for (std::size_t i = 0; i < NumLinks; ++i)
         {
+            assert(dynamics::HasUnitJointAxis(links[i]));
             R = R * math::RotationAboutAxis(links[i].jointAxis, q.at(i, 0));
 
-            Vector3 linkExtent;
-            if (i + 1 < NumLinks)
-                linkExtent = links[i + 1].parentToJoint;
-            else
-                linkExtent = links[i].jointToCoM * T(2);
-
-            positions[i + 1] = positions[i] + R * linkExtent;
+            const Vector3& offsetToNext = (i + 1 < NumLinks) ? links[i + 1].parentToJoint : toolOffset;
+            positions[i + 1] = positions[i] + R * offsetToNext;
         }
 
         return positions;
+    }
+
+    template<typename T, std::size_t NumLinks>
+    const typename ForwardKinematics<T, NumLinks>::Vector3& ForwardKinematics<T, NumLinks>::ToolOffset() const
+    {
+        return toolOffset;
     }
 
 #ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD

@@ -20,21 +20,23 @@ applyTo: "**/test/**"
 ## Fixture Test Pattern (float)
 
 ```cpp
-#include "numerical/solvers/DiscreteAlgebraicRiccatiEquation.hpp"
+#include "robotics/kinematics/ForwardKinematics.hpp"
+#include "numerical/math/Tolerance.hpp"
 #include <gtest/gtest.h>
 
 namespace
 {
-    class TestDare : public ::testing::Test
+    class TestForwardKinematics
+        : public ::testing::Test
     {
     protected:
-        solvers::DiscreteAlgebraicRiccatiEquation<float, 2, 1> solver;
+        kinematics::ForwardKinematics<float, 2> fk{ math::Vector<float, 3>{ 0.8f, 0.0f, 0.0f } };
     };
 }
 
-TEST_F(TestDare, solves_simple_system)
+TEST_F(TestForwardKinematics, elbow_at_ninety_degrees_places_tool_above_elbow)
 {
-    // Arrange, Act, Assert
+    // Arrange, Act, Assert — EXPECT_NEAR(actual, expected, math::Tolerance<float>())
 }
 ```
 

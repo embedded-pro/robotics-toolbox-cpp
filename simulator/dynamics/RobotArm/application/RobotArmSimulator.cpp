@@ -1,9 +1,46 @@
 #include "simulator/dynamics/RobotArm/application/RobotArmSimulator.hpp"
+#include "infra/util/ReallyAssert.hpp"
 
 namespace simulator::dynamics
 {
+    namespace
+    {
+        using Vector3 = math::Vector<float, 3>;
+        using Link = ::dynamics::RevoluteJointLink<float>;
+
+        constexpr float rodAxialInertia{ 0.001f };
+
+        const Vector3 xAxis{ 1.0f, 0.0f, 0.0f };
+        const Vector3 yAxis{ 0.0f, 1.0f, 0.0f };
+        const Vector3 zAxis{ 0.0f, 0.0f, 1.0f };
+
+        Link MakeRod(float mass, float length, const Vector3& jointAxis, const Vector3& parentToJoint, const Vector3& direction)
+        {
+            const float transverse{ mass * length * length / 12.0f };
+            const auto alongRod{ math::OuterProduct(direction, direction) };
+            const auto inertia{ (math::SquareMatrix<float, 3>::Identity() - alongRod) * transverse + alongRod * rodAxialInertia };
+
+            return Link{ mass, inertia, jointAxis, parentToJoint, direction * (length / 2.0f) };
+        }
+
+        template<std::size_t N>
+        math::Vector<float, N> ToVector(const std::vector<float>& values)
+        {
+            math::Vector<float, N> result{};
+
+            for (std::size_t i = 0; i < N; ++i)
+                result.at(i, 0) = values[i];
+
+            return result;
+        }
+    }
+
     void RobotArmSimulator::Configure(const RobotArmConfig& cfg)
     {
+        really_assert(cfg.dof == 2 || cfg.dof == 3);
+        really_assert(cfg.linkLengths.size() >= static_cast<std::size_t>(cfg.dof));
+        really_assert(cfg.linkMasses.size() >= static_cast<std::size_t>(cfg.dof));
+
         config = cfg;
         torques.assign(config.dof, 0.0f);
         Reset();
@@ -26,13 +63,10 @@ namespace simulator::dynamics
 
     void RobotArmSimulator::Step()
     {
-        if (config.dof == 2)
-            StepDof2();
+        if (config.dof == 3)
+            StepChain(BuildLinks3(), aba3, rnea3);
         else
-            StepDof3();
-
-        for (int i = 0; i < config.dof; ++i)
-            state.qDot[i] *= (1.0f - config.damping * config.dt);
+            StepChain(BuildLinks2(), aba2, rnea2);
 
         state.time += config.dt;
         UpdateForwardKinematics();
@@ -60,150 +94,68 @@ namespace simulator::dynamics
         return config;
     }
 
-    void RobotArmSimulator::StepDof2()
+    template<std::size_t N>
+    void RobotArmSimulator::StepChain(const LinkArray<N>& links, const ::dynamics::ArticulatedBodyAlgorithm<float, N>& aba,
+        const ::dynamics::RecursiveNewtonEuler<float, N>& rnea)
     {
-        auto links = BuildLinks2();
+        const Vector3 g{ 0.0f, 0.0f, -gravity };
+        const auto q{ ToVector<N>(state.q) };
+        const auto qDot{ ToVector<N>(state.qDot) };
 
-        math::Vector<float, 2> q{ { state.q[0] }, { state.q[1] } };
-        math::Vector<float, 2> qDot{ { state.qDot[0] }, { state.qDot[1] } };
-        math::Vector<float, 2> tau{ { torques[0] }, { torques[1] } };
-        math::Vector<float, 3> g{ { 0.0f }, { 0.0f }, { -gravity } };
+        const auto qDDot{ aba.ForwardDynamics(links, q, qDot, ToVector<N>(torques), g) };
+        const auto inverseDynamicsTorques{ rnea.InverseDynamics(links, q, qDot, qDDot, g) };
 
-        // ABA: forward dynamics — compute accelerations from applied torques
-        auto qDDot = aba2.ForwardDynamics(links, q, qDot, tau, g);
-
-        // Semi-implicit Euler integration
-        for (int i = 0; i < 2; ++i)
+        for (std::size_t i = 0; i < N; ++i)
         {
             state.qDDot[i] = qDDot.at(i, 0);
+            state.inverseDynamicsTorques[i] = inverseDynamicsTorques.at(i, 0);
             state.qDot[i] += qDDot.at(i, 0) * config.dt;
             state.q[i] += state.qDot[i] * config.dt;
+            state.qDot[i] *= 1.0f - config.damping * config.dt;
         }
-
-        // RNEA: inverse dynamics — compute torques required for current motion
-        math::Vector<float, 2> qNew{ { state.q[0] }, { state.q[1] } };
-        math::Vector<float, 2> qDotNew{ { state.qDot[0] }, { state.qDot[1] } };
-        auto idTorques = rnea2.InverseDynamics(links, qNew, qDotNew, qDDot, g);
-
-        for (int i = 0; i < 2; ++i)
-            state.inverseDynamicsTorques[i] = idTorques.at(i, 0);
     }
 
-    void RobotArmSimulator::StepDof3()
+    RobotArmSimulator::LinkArray<2> RobotArmSimulator::BuildLinks2() const
     {
-        auto links = BuildLinks3();
+        const auto& lengths = config.linkLengths;
+        const auto& masses = config.linkMasses;
 
-        math::Vector<float, 3> q{ { state.q[0] }, { state.q[1] }, { state.q[2] } };
-        math::Vector<float, 3> qDot{ { state.qDot[0] }, { state.qDot[1] }, { state.qDot[2] } };
-        math::Vector<float, 3> tau{ { torques[0] }, { torques[1] }, { torques[2] } };
-        math::Vector<float, 3> g{ { 0.0f }, { 0.0f }, { -gravity } };
-
-        // ABA: forward dynamics — compute accelerations from applied torques
-        auto qDDot = aba3.ForwardDynamics(links, q, qDot, tau, g);
-
-        for (int i = 0; i < 3; ++i)
-        {
-            state.qDDot[i] = qDDot.at(i, 0);
-            state.qDot[i] += qDDot.at(i, 0) * config.dt;
-            state.q[i] += state.qDot[i] * config.dt;
-        }
-
-        // RNEA: inverse dynamics — compute torques required for current motion
-        math::Vector<float, 3> qNew{ { state.q[0] }, { state.q[1] }, { state.q[2] } };
-        math::Vector<float, 3> qDotNew{ { state.qDot[0] }, { state.qDot[1] }, { state.qDot[2] } };
-        auto idTorques = rnea3.InverseDynamics(links, qNew, qDotNew, qDDot, g);
-
-        for (int i = 0; i < 3; ++i)
-            state.inverseDynamicsTorques[i] = idTorques.at(i, 0);
+        return LinkArray<2>{
+            MakeRod(masses[0], lengths[0], yAxis, Vector3{}, xAxis),
+            MakeRod(masses[1], lengths[1], yAxis, xAxis * lengths[0], xAxis)
+        };
     }
 
-    std::array<::dynamics::RevoluteJointLink<float>, 2> RobotArmSimulator::BuildLinks2() const
+    RobotArmSimulator::LinkArray<3> RobotArmSimulator::BuildLinks3() const
     {
-        std::array<::dynamics::RevoluteJointLink<float>, 2> links;
+        const auto& lengths = config.linkLengths;
+        const auto& masses = config.linkMasses;
 
-        float L0 = config.linkLengths[0];
-        float m0 = config.linkMasses[0];
-        float I0 = m0 * L0 * L0 / 12.0f;
-
-        links[0].mass = m0;
-        links[0].inertia = math::SquareMatrix<float, 3>{ { { I0, 0, 0 }, { 0, 0.001f, 0 }, { 0, 0, I0 } } };
-        links[0].jointAxis = math::Vector<float, 3>{ { 0.0f }, { 1.0f }, { 0.0f } };
-        links[0].parentToJoint = math::Vector<float, 3>{ { 0.0f }, { 0.0f }, { 0.0f } };
-        links[0].jointToCoM = math::Vector<float, 3>{ { L0 / 2.0f }, { 0.0f }, { 0.0f } };
-
-        float L1 = config.linkLengths[1];
-        float m1 = config.linkMasses[1];
-        float I1 = m1 * L1 * L1 / 12.0f;
-
-        links[1].mass = m1;
-        links[1].inertia = math::SquareMatrix<float, 3>{ { { I1, 0, 0 }, { 0, 0.001f, 0 }, { 0, 0, I1 } } };
-        links[1].jointAxis = math::Vector<float, 3>{ { 0.0f }, { 1.0f }, { 0.0f } };
-        links[1].parentToJoint = math::Vector<float, 3>{ { L0 }, { 0.0f }, { 0.0f } };
-        links[1].jointToCoM = math::Vector<float, 3>{ { L1 / 2.0f }, { 0.0f }, { 0.0f } };
-
-        return links;
+        return LinkArray<3>{
+            MakeRod(masses[0], lengths[0], zAxis, Vector3{}, zAxis),
+            MakeRod(masses[1], lengths[1], yAxis, zAxis * lengths[0], xAxis),
+            MakeRod(masses[2], lengths[2], yAxis, xAxis * lengths[1], xAxis)
+        };
     }
 
-    std::array<::dynamics::RevoluteJointLink<float>, 3> RobotArmSimulator::BuildLinks3() const
+    template<std::size_t N>
+    void RobotArmSimulator::UpdateJointPositions(const LinkArray<N>& links)
     {
-        std::array<::dynamics::RevoluteJointLink<float>, 3> links;
+        const ::kinematics::ForwardKinematics<float, N> fk{ xAxis * config.linkLengths[N - 1] };
+        const auto positions{ fk.Compute(links, ToVector<N>(state.q)) };
 
-        float L0 = config.linkLengths[0];
-        float m0 = config.linkMasses[0];
-        float I0 = m0 * L0 * L0 / 12.0f;
+        state.jointPositions.resize(N + 1);
 
-        links[0].mass = m0;
-        links[0].inertia = math::SquareMatrix<float, 3>{ { { I0, 0, 0 }, { 0, I0, 0 }, { 0, 0, 0.001f } } };
-        links[0].jointAxis = math::Vector<float, 3>{ { 0.0f }, { 0.0f }, { 1.0f } };
-        links[0].parentToJoint = math::Vector<float, 3>{ { 0.0f }, { 0.0f }, { 0.0f } };
-        links[0].jointToCoM = math::Vector<float, 3>{ { 0.0f }, { 0.0f }, { L0 / 2.0f } };
-
-        float L1 = config.linkLengths[1];
-        float m1 = config.linkMasses[1];
-        float I1 = m1 * L1 * L1 / 12.0f;
-
-        links[1].mass = m1;
-        links[1].inertia = math::SquareMatrix<float, 3>{ { { I1, 0, 0 }, { 0, 0.001f, 0 }, { 0, 0, I1 } } };
-        links[1].jointAxis = math::Vector<float, 3>{ { 0.0f }, { 1.0f }, { 0.0f } };
-        links[1].parentToJoint = math::Vector<float, 3>{ { 0.0f }, { 0.0f }, { L0 } };
-        links[1].jointToCoM = math::Vector<float, 3>{ { L1 / 2.0f }, { 0.0f }, { 0.0f } };
-
-        float L2 = config.linkLengths[2];
-        float m2 = config.linkMasses[2];
-        float I2 = m2 * L2 * L2 / 12.0f;
-
-        links[2].mass = m2;
-        links[2].inertia = math::SquareMatrix<float, 3>{ { { I2, 0, 0 }, { 0, 0.001f, 0 }, { 0, 0, I2 } } };
-        links[2].jointAxis = math::Vector<float, 3>{ { 0.0f }, { 1.0f }, { 0.0f } };
-        links[2].parentToJoint = math::Vector<float, 3>{ { L1 }, { 0.0f }, { 0.0f } };
-        links[2].jointToCoM = math::Vector<float, 3>{ { L2 / 2.0f }, { 0.0f }, { 0.0f } };
-
-        return links;
+        for (std::size_t i = 0; i <= N; ++i)
+            state.jointPositions[i] = { positions[i].at(0, 0), positions[i].at(1, 0), positions[i].at(2, 0) };
     }
 
     void RobotArmSimulator::UpdateForwardKinematics()
     {
-        int n = config.dof;
-        state.jointPositions.resize(n + 1);
-
-        if (n == 2)
-        {
-            auto links = BuildLinks2();
-            math::Vector<float, 2> q{ { state.q[0] }, { state.q[1] } };
-            auto positions = fk2.Compute(links, q);
-
-            for (int i = 0; i <= n; ++i)
-                state.jointPositions[i] = { positions[i].at(0, 0), positions[i].at(1, 0), positions[i].at(2, 0) };
-        }
+        if (config.dof == 3)
+            UpdateJointPositions(BuildLinks3());
         else
-        {
-            auto links = BuildLinks3();
-            math::Vector<float, 3> q{ { state.q[0] }, { state.q[1] }, { state.q[2] } };
-            auto positions = fk3.Compute(links, q);
-
-            for (int i = 0; i <= n; ++i)
-                state.jointPositions[i] = { positions[i].at(0, 0), positions[i].at(1, 0), positions[i].at(2, 0) };
-        }
+            UpdateJointPositions(BuildLinks2());
     }
 
     void RobotArmSimulator::UpdateTrail()

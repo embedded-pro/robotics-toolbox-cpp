@@ -4,11 +4,12 @@
 #pragma GCC optimize("O3", "fast-math")
 #endif
 
-#include "robotics/dynamics/RevoluteJointLink.hpp"
 #include "numerical/math/CompilerOptimizations.hpp"
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
+#include "robotics/dynamics/RevoluteJointLink.hpp"
 #include <array>
+#include <cassert>
 
 namespace dynamics
 {
@@ -27,8 +28,6 @@ namespace dynamics
 
         RecursiveNewtonEuler() = default;
 
-        // Inverse dynamics: given joint positions, velocities, and accelerations,
-        // compute the required joint torques. O(n) complexity.
         OPTIMIZE_FOR_SPEED JointVector InverseDynamics(const LinkArray& links,
             const JointVector& q, const JointVector& qDot, const JointVector& qDDot,
             const Vector3& gravity) const;
@@ -120,6 +119,7 @@ namespace dynamics
 
         for (std::size_t i = 0; i < NumLinks; ++i)
         {
+            assert(HasUnitJointAxis(links[i]));
             states[i].R = math::RotationAboutAxis(links[i].jointAxis, q.at(i, 0));
 
             if (i == 0)
@@ -176,12 +176,9 @@ namespace dynamics
                     states[i + 1].R, links[i + 1].parentToJoint);
         }
 
-        JointVector tau;
+        JointVector tau{};
         for (std::size_t i = 0; i < NumLinks; ++i)
-        {
-            auto dotProduct = links[i].jointAxis.Transpose() * torque[i];
-            tau.at(i, 0) = dotProduct.at(0, 0);
-        }
+            tau.at(i, 0) = math::DotProduct(links[i].jointAxis, torque[i]);
 
         return tau;
     }

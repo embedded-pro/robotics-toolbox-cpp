@@ -1,87 +1,109 @@
-# Pose Inverse Kinematics (Damped Least Squares) — Implementation Pseudocode
+# Pose Inverse Kinematics (Weighted Damped Least Squares) — Implementation Pseudocode
 
 > Roadmap ref: #M13 (Tier 3) · Target: `robotics/kinematics` · Namespace `kinematics` · Type: `float` (templated on `T`, instantiated for `float` only)
 
+Model-agnostic: the arm is a `JacobianProvider<T, 6, Dof>` (M8), so the same solver serves the link
+chain (`ChainTaskJacobian`, M30/M8), DH (`DhTaskJacobian`, M7) and PoE (M15).
+
 ## Data structures
 
-```
-template<typename T>                            # static_assert(std::is_floating_point_v<T>); instantiated for float
+```cpp
+template<typename T, std::size_t Dof>          # static_assert(std::is_floating_point_v<T>); instantiated for float
 struct PoseIkConfig:
-    T           damping      # λ (Levenberg-Marquardt)
-    T           tolerance    # 6-vector error norm to declare success
+    T           damping                  # λ₀
+    T           manipulabilityThreshold  # w₀; 0 ⇒ constant damping λ₀ (adaptive otherwise)
+    T           characteristicLength     # ρ (m): W = diag(1,1,1, ρ,ρ,ρ) makes rad commensurate with m
+    T           tolerance                # on ‖W·e‖ (m)
+    T           maxStep                  # Δmax on ‖Δq‖; +∞ disables
     std::size_t maxIterations
+    JointVector lowerLimits, upperLimits # ∓∞ disables
 
-template<typename T, std::size_t NumLinks>
+template<typename T, std::size_t Dof>
 struct PoseIkResult:
-    Vector<T, NumLinks> q
-    T                   finalError
-    std::size_t         iterations
-    bool                converged
+    JointVector q
+    T           finalError               # ‖W·PoseError(target, ToolPose(q))‖ at the returned q
+    std::size_t iterations
+    bool        converged
 
-template<typename T, std::size_t NumLinks>
+template<typename T, std::size_t Dof>
 class PoseInverseKinematics:
-    DenavitHartenberg<T, NumLinks>  fk
-    SpatialJacobian<T, NumLinks>    jac
-    PoseIkConfig<T>                 config
+    const JacobianProvider<T, 6, Dof>& arm      # Jacobian(q), ToolPose(q); injected
+    PoseIkConfig<T, Dof>               config
 ```
 
 ## Interface
 
-```
-PoseInverseKinematics(model, PoseIkConfig<T> cfg = {})
-PoseIkResult<T, N>  Solve(SE3<T> target, JointVector q0)        # hot path
-Vector<T, 6>        PoseError(SE3<T> target, SE3<T> current)     # [Δp; Δω]
+```text
+PoseInverseKinematics(const JacobianProvider<T, 6, Dof>& arm, const PoseIkConfig<T, Dof>& config)
+PoseIkResult<T, Dof>  Solve(const SE3Transform<T>& target, const JointVector& q0) const   # hot path
 ```
 
 ## Algorithm (pseudocode)
 
-```
-function PoseError(target, current):
-    e_p   = target.p - current.p                # position error
-    R_err = target.R * Transpose(current.R)     # relative rotation
-    e_ω   = AxisAngle(R_err)                      # log map → rotation vector
-    #  equivalently 2·(vector part of quaternion(R_err)); reuse item 18
-    return concat(e_p, e_ω)                       # 6-vector
+```text
+function WeightedError(target, q):
+    e = SE3Transform::PoseError(target, arm.ToolPose(q))   # (Δp; true log-map rotation vector), M6
+    return (e.linear; ρ·e.angular)
 
 function Solve(target, q0):                     # OPTIMIZE_FOR_SPEED
     q = q0
     for iter in 0..maxIterations-1:
-        T = fk.Forward(q)
-        e = PoseError(target, T)                # 6-vector
-        if norm(e) < tolerance: return { q, norm(e), iter, true }
-        J = jac.Compute(q)                      # 6×N
-        # damped least squares: Δq = Jᵀ (J Jᵀ + λ²I)⁻¹ e
-        A = J * Transpose(J) + λ² * I₆          # 6×6 SPD
-        y = GaussianElimination(A, e)            # solve A y = e  (reuse solver)
-        q = q + Transpose(J) * y
-    return { q, norm(e), maxIterations, false }
+        eW = WeightedError(target, q)
+        if ‖eW‖ < tolerance: return { q, ‖eW‖, iter, true }
+        JW = arm.Jacobian(q) with rows 3–5 scaled by ρ          # W·J
+        A0 = JW·JWᵀ                                              # 6×6
+        λ² = Damping(A0)
+        y  = LuDecomposition(A0 + λ²·I₆).Solve(eW)              # never invert explicitly
+        Δq = JWᵀ·y                                               # = Jᵀ W (W J Jᵀ W + λ² I)⁻¹ W e
+        if ‖Δq‖ > maxStep: Δq = Δq · maxStep / ‖Δq‖
+        q = clamp(q + Δq, lowerLimits, upperLimits)
+    eFinal = ‖WeightedError(target, q)‖                          # recomputed at the returned q
+    return { q, eFinal, maxIterations, eFinal < tolerance }
+
+function Damping(A0):                           # Nakamura–Hanafusa / Chiaverini adaptive form
+    if manipulabilityThreshold == 0: return λ₀²
+    w = LuDecomposition(A0) singular ? 0 : sqrt(max(0, Determinant(A0)))   # weighted manipulability
+                                                 # (≡ 0 when Dof < 6 or near-singular ⇒ λ = λ₀)
+    return w < w₀ ? λ₀²·(1 − (w / w₀)²) : 0
 ```
 
 ## Complexity & memory
 
-- Per iteration: `O(6²N)` to form `J Jᵀ` plus `O(6³)` for the 6×6 solve.
-- Total: `O(iters · (6²N + 6³))`; iteration count depends on `λ` and start pose.
-- Memory: one `6×N` Jacobian and a `6×6` system; no heap, no dynamic sizing.
+- Per iteration: one `ToolPose` + `Jacobian` (`O(Dof)`), `O(36·Dof)` for `JW·JWᵀ`, `O(6³)` LU.
+- One extra `ToolPose` after the loop for the final error.
+- Memory: one `6×Dof` Jacobian and a `6×6` system; stack only.
 
 ## Numerical / embedded notes
 
-- **Damping `λ`** trades accuracy for stability: it keeps `(J Jᵀ + λ²I)` invertible *through*
-  singularities (Nakamura's singularity-robust inverse) at the cost of a small steady-state error.
-- Orientation error **must** use the log/quaternion form — naive Euler-angle subtraction wraps and
-  stalls; reuse `Quaternion` (item 18) and fix the double-cover sign so the arm takes the short way.
-- Solve `A y = e` with `GaussianElimination`; never form `(J Jᵀ)⁻¹` explicitly.
+- **Damping does not bias the answer:** at a fixed point `JWᵀ·y = 0` with `JW` of full row rank forces
+  `y = 0`, hence `e = 0`. For a reachable, non-singular target iterative DLS converges to the exact pose;
+  `λ` only slows convergence (linear instead of quadratic). The residual is non-zero only for
+  unreachable targets, at singularities (DLS returns the damped least-squares compromise) or when a
+  joint limit is active.
+- **Units:** position error is in m, rotation error in rad. `ρ` (≈ the arm's reach or tool length) converts
+  radians to metres in both the stopping test and the step. With `λ = 0` and invertible `J`, `W` cancels
+  (`Δq = J⁻¹e`); it matters for damping, redundancy and unreachable targets.
+- **Orientation error** is `SE3Transform::PoseError` — the true log map, `|eR| ≤ π`, short way round.
+  `2·vec(error quaternion)` equals `2 sin(φ/2)·n̂`, which is only a small-angle approximation of `φ·n̂`
+  (0.959 vs 1 rad at φ = 1 rad) and must not be used.
+- **Adaptive damping:** `λ = 0` away from singularities (fast Newton convergence), rising smoothly to
+  `λ₀` as `w → 0`. Step clamping bounds the joint jump per iteration; joint limits are enforced by
+  clamping (projected iteration).
+- Upstream `LuDecomposition` reports singular below a relative pivot of `1e-6`; keep `λ₀² ≫ 1e-6·‖W·J‖²`
+  (assert `λ₀ > 0`) so the damped system never trips it — a tripped `A0` simply means `w = 0`, `λ = λ₀`.
 - Seed `q0` from the previous control cycle for warm-started, few-iteration convergence.
-- Float-only: `static_assert(std::is_floating_point_v<T>)`; the generic `T` signature keeps a
-  `Q15`/`Q31` specialisation cheap to add later.
+- Float-only: `static_assert(std::is_floating_point_v<T>)`.
 
 ## Deployment
 
 - Header: `robotics/kinematics/PoseInverseKinematics.hpp` — `#pragma once` →
   `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Solve`, and
-  `extern template class PoseInverseKinematics<float, NumLinks>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
-- Coverage: `robotics/kinematics/PoseInverseKinematics.cpp` → `template class PoseInverseKinematics<float, NumLinks>;`
+  `extern template class PoseInverseKinematics<float, 6>;` / `<float, 7>` under
+  `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
+- Coverage: `robotics/kinematics/PoseInverseKinematics.cpp` → the same instantiations.
 - Test: `robotics/kinematics/test/TestPoseInverseKinematics.cpp`
 - Doc: `doc/kinematics/PoseInverseKinematics.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestPoseInverseKinematics.cpp` → the `_test` target.
+- Depends on: M6 (`SE3Transform::PoseError`), M8 (`JacobianProvider`); upstream `solvers::LuDecomposition`.
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

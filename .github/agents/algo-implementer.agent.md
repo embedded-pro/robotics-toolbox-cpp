@@ -8,6 +8,8 @@ handoffs:
     prompt: "Review the deployed algorithm against AGENTS.md: float-only, no heap, tests, doc, CMake wiring."
 ---
 
+# Algorithm Implementer
+
 You deploy ONE algorithm at a time from its `roadmap/<domain>/<Name>/` spec into the codebase.
 Authoritative rules: `AGENTS.md`. Recipe: `roadmap/DEPLOYMENT.md`. Follow both exactly.
 
