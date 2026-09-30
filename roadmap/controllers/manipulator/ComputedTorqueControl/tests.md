@@ -11,7 +11,7 @@ class TestComputedTorqueControl : public ::testing::Test:
     SquareMatrix<float,2> Kd = diag( 20,  20)
     ComputedTorqueControl<float,2> controller{ model, Kp, Kd }
 # each case below is a TEST_F(TestComputedTorqueControl, <name>)
-# every case sets EXPECT_CALL(model, ComputeInverseDynamics(q, qDot, aqExpected)).Times(1)
+# single-step cases set EXPECT_CALL(model, ComputeInverseDynamics(q, qDot, aqExpected)).Times(1)
 ```
 
 ## Test cases (Arrange / Act / Assert)
