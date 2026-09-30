@@ -27,7 +27,7 @@ namespace simulator::dynamics
             GroupSpec{ field::firstLink, "Link 1", {} },
             GroupSpec{ field::secondLink, "Link 2", {} },
             GroupSpec{ field::thirdLink, "Link 3", spatialOnly },
-            GroupSpec{ field::torques, "Joint Torques (N·m)", {} },
+            GroupSpec{ field::torques, "Joint Torques (0.1 N·m)", {} },
             GroupSpec{ field::positions, "Initial Position (deg)", {} },
             GroupSpec{ field::simulation, "Simulation", {} }
         };

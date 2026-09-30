@@ -5,7 +5,6 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 endif()
 
 option(CMAKE_COMPILE_WARNING_AS_ERROR "Enable warnings-as-error" On)
-option(ROBOTICS_TOOLBOX_INCLUDE_DEFAULT_INIT "Include default initialization code; turn off when providing custom initialization" On)
 option(ROBOTICS_TOOLBOX_BUILD_SIMULATOR "Enable build of the Qt simulator applications" Off)
 option(ROBOTICS_TOOLBOX_BUILD_TESTS "Enable build of the tests" Off)
 option(ROBOTICS_TOOLBOX_ENABLE_OPTIMIZATIONS "Enable compiler optimizations for numerical routines" On)
@@ -14,11 +13,11 @@ if (ROBOTICS_TOOLBOX_BUILD_TESTS)
     # CTest cannot be included before the first project() statement, but Embedded Infastructure
     # Library needs to see that test utilities need to be built.
     set(BUILD_TESTING On)
-    add_definitions(-DROBOTICS_TOOLBOX_ENABLE_ASSERTIONS=1)
+    add_definitions(-DNUMERICAL_TOOLBOX_ENABLE_ASSERTIONS=1)
 endif()
 
 if (ROBOTICS_TOOLBOX_ENABLE_OPTIMIZATIONS)
-    add_definitions(-DRoboticsToolbox_ENABLE_OPTIMIZATIONS=1)
+    add_definitions(-DNumericalToolbox_ENABLE_OPTIMIZATIONS=1)
 endif()
 
 if (EMIL_ENABLE_COVERAGE)
@@ -52,7 +51,7 @@ if (NOT TARGET numerical.math)
     FetchContent_Declare(
         numerical_toolbox
         GIT_REPOSITORY https://github.com/embedded-pro/numerical-toolbox-cpp.git
-        GIT_TAG        main
+        GIT_TAG        1225b3c422beab93e0ff8fd7231f8d7e087f6da4 # main
     )
 
     FetchContent_MakeAvailable(numerical_toolbox)
@@ -62,7 +61,7 @@ if (ROBOTICS_TOOLBOX_BUILD_SIMULATOR AND NOT TARGET ui.model)
     FetchContent_Declare(
         ui
         GIT_REPOSITORY https://github.com/embedded-pro/ui-cpp.git
-        GIT_TAG        main
+        GIT_TAG        13406639f7ffb6ca8811865b0a8b35034f46ebaf # main
     )
 
     set(UI_BUILD_QT_BACKEND On CACHE BOOL "" FORCE)

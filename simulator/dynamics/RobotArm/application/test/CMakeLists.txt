@@ -9,4 +9,5 @@ target_link_libraries(robotics.simulator.dynamics.robotarm.application_test PUBL
 
 target_sources(robotics.simulator.dynamics.robotarm.application_test PRIVATE
     TestRobotArmForm.cpp
+    TestRobotArmSimulator.cpp
 )

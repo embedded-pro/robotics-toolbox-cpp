@@ -42,6 +42,7 @@ namespace simulator::dynamics::view
     RobotArmMainWindow::~RobotArmMainWindow()
     {
         delete view3D;
+        delete formView;
     }
 
     void RobotArmMainWindow::OnActionTriggered(ui::model::ActionId action)

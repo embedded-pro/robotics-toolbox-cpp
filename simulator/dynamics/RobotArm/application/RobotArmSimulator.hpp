@@ -24,13 +24,21 @@ namespace simulator::dynamics
         const RobotArmConfig& GetConfig() const;
 
     private:
-        void StepDof2();
-        void StepDof3();
+        template<std::size_t N>
+        using LinkArray = std::array<::dynamics::RevoluteJointLink<float>, N>;
+
+        template<std::size_t N>
+        void StepChain(const LinkArray<N>& links, const ::dynamics::ArticulatedBodyAlgorithm<float, N>& aba,
+            const ::dynamics::RecursiveNewtonEuler<float, N>& rnea);
+
+        template<std::size_t N>
+        void UpdateJointPositions(const LinkArray<N>& links);
+
         void UpdateForwardKinematics();
         void UpdateTrail();
 
-        std::array<::dynamics::RevoluteJointLink<float>, 2> BuildLinks2() const;
-        std::array<::dynamics::RevoluteJointLink<float>, 3> BuildLinks3() const;
+        LinkArray<2> BuildLinks2() const;
+        LinkArray<3> BuildLinks3() const;
 
         static constexpr float gravity = 9.81f;
         static constexpr std::size_t maxTrailSize = 500;
