@@ -1,6 +1,6 @@
+#include "numerical/math/Tolerance.hpp"
 #include "robotics/kinematics/ForwardKinematics.hpp"
 #include "robotics/kinematics/InverseKinematics.hpp"
-#include "numerical/math/Tolerance.hpp"
 #include <cmath>
 #include <gtest/gtest.h>
 #include <numbers>

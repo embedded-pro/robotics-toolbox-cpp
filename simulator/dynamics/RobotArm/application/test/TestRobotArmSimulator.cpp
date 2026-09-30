@@ -1,5 +1,5 @@
-#include "simulator/dynamics/RobotArm/application/RobotArmSimulator.hpp"
 #include "numerical/math/Tolerance.hpp"
+#include "simulator/dynamics/RobotArm/application/RobotArmSimulator.hpp"
 #include <cmath>
 #include <gtest/gtest.h>
 #include <numbers>

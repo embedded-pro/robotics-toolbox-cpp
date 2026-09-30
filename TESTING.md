@@ -48,13 +48,13 @@ Canonical rules still apply ([AGENTS.md](AGENTS.md), [testing.instructions.md](.
 
 ## Family → metric-type matrix
 
-| Family                                   | M1 | M3 | M4 | M5 | M6 | M7 | M8 | M9 |
-|------------------------------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| Kinematics                               | ●  |    |    | ●  | ●  | ●  |    | ○  |
-| Dynamics                                 | ●  | ○  |    |    | ●  | ●  |    | ○  |
-| Trajectory generation (planned)          | ●  | ●  |    |    | ●  | ●  |    |    |
-| Manipulator control (planned)            | ●  | ●  | ●  | ○  | ●  |    |    |    |
-| Estimation & identification (planned)    | ●  | ●  | ●  | ●  | ●  |    | ●  | ●  |
+| Family                                | M1 | M3 | M4 | M5 | M6 | M7 | M8 | M9 |
+|---------------------------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+| Kinematics                            | ●  |    |    | ●  | ●  | ●  |    | ○  |
+| Dynamics                              | ●  | ○  |    |    | ●  | ●  |    | ○  |
+| Trajectory generation (planned)       | ●  | ●  |    |    | ●  | ●  |    |    |
+| Manipulator control (planned)         | ●  | ●  | ●  | ○  | ●  |    |    |    |
+| Estimation & identification (planned) | ●  | ●  | ●  | ●  | ●  |    | ●  | ●  |
 
 ● primary   ○ situational
 

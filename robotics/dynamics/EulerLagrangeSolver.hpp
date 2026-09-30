@@ -5,10 +5,10 @@
 #endif
 
 #include "infra/util/ReallyAssert.hpp"
-#include "robotics/dynamics/EulerLagrangeDynamics.hpp"
 #include "numerical/math/CholeskyDecomposition.hpp"
 #include "numerical/math/CompilerOptimizations.hpp"
 #include "numerical/math/Matrix.hpp"
+#include "robotics/dynamics/EulerLagrangeDynamics.hpp"
 
 namespace dynamics
 {

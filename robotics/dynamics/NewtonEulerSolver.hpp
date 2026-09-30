@@ -5,11 +5,11 @@
 #endif
 
 #include "infra/util/ReallyAssert.hpp"
-#include "robotics/dynamics/NewtonEulerBody.hpp"
 #include "numerical/math/CholeskyDecomposition.hpp"
 #include "numerical/math/CompilerOptimizations.hpp"
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
+#include "robotics/dynamics/NewtonEulerBody.hpp"
 
 namespace dynamics
 {

@@ -110,7 +110,7 @@ namespace simulator::dynamics::view
         auto& state = simulator.GetState();
 
         shell.SetStatus(QString("t=%1s | Running")
-                .arg(static_cast<double>(state.time), 0, 'f', 2)
-                .toStdString());
+                            .arg(static_cast<double>(state.time), 0, 'f', 2)
+                            .toStdString());
     }
 }

@@ -67,12 +67,12 @@ sample_clamps_outside_domain:
 Computed by integrating the 7-segment constant-jerk profile (python3, exact): each ends at `h` with
 zero velocity/acceleration and respects `vMax`, `aMax`, `jMax`.
 
-| Case | Limits `(vMax, aMax, jMax)` | `h` | Branch | `Tj` | `Ta` | `Tv` | `tf` | `aLim` | `vLim` |
-|------|-----------------------------|-----|--------|------|------|------|------|--------|--------|
-| full | (1, 2, 10) | 5    | 1 (`vj ≥ a²`) | 0.2 | 0.7 | 4.3 | 5.7 | 2 | 1   |
-| low jerk | (1, 2, 1) | 5  | 1 (`vj < a²`) | 1.0 | 2.0 | 3.0 | 7.0 | 1 | 1   |
-| short | (1, 2, 10) | 0.3  | 2 | 0.2 | 0.5 | 0 | 1.0 | 2 | 0.6 |
-| very short | (1, 2, 10) | 0.02 | 3 | 0.1 | 0.2 | 0 | 0.4 | 1 | 0.1 |
+| Case       | Limits `(vMax, aMax, jMax)` | `h`  | Branch        | `Tj` | `Ta` | `Tv` | `tf` | `aLim` | `vLim` |
+|------------|-----------------------------|------|---------------|------|------|------|------|--------|--------|
+| full       | (1, 2, 10)                  | 5    | 1 (`vj ≥ a²`) | 0.2  | 0.7  | 4.3  | 5.7  | 2      | 1      |
+| low jerk   | (1, 2, 1)                   | 5    | 1 (`vj < a²`) | 1.0  | 2.0  | 3.0  | 7.0  | 1      | 1      |
+| short      | (1, 2, 10)                  | 0.3  | 2             | 0.2  | 0.5  | 0    | 1.0  | 2      | 0.6    |
+| very short | (1, 2, 10)                  | 0.02 | 3             | 0.1  | 0.2  | 0    | 0.4  | 1      | 0.1    |
 
 - Step 2 for `h = 0.3`: `Δ = 2⁴/10² + 4·2·0.3 = 2.56`, `Ta = (0.4 + 1.6)/4 = 0.5 ≥ 2·Tj = 0.4`.
 - Step 3 for `h = 0.02`: `Tj = (0.02/20)^{1/3} = 0.1`.

@@ -1,5 +1,5 @@
-#include "robotics/kinematics/ForwardKinematics.hpp"
 #include "numerical/math/Tolerance.hpp"
+#include "robotics/kinematics/ForwardKinematics.hpp"
 #include <gtest/gtest.h>
 #include <numbers>
 

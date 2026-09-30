@@ -1,6 +1,6 @@
+#include "numerical/math/Tolerance.hpp"
 #include "robotics/dynamics/ArticulatedBodyAlgorithm.hpp"
 #include "robotics/dynamics/RecursiveNewtonEuler.hpp"
-#include "numerical/math/Tolerance.hpp"
 #include <cmath>
 #include <gtest/gtest.h>
 

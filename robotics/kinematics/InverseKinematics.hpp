@@ -5,12 +5,12 @@
 #endif
 
 #include "infra/util/ReallyAssert.hpp"
-#include "robotics/dynamics/RevoluteJointLink.hpp"
-#include "robotics/kinematics/ForwardKinematics.hpp"
 #include "numerical/math/CompilerOptimizations.hpp"
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
 #include "numerical/solvers/GaussianElimination.hpp"
+#include "robotics/dynamics/RevoluteJointLink.hpp"
+#include "robotics/kinematics/ForwardKinematics.hpp"
 #include <array>
 #include <cstddef>
 

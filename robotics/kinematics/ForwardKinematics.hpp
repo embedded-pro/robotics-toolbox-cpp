@@ -4,10 +4,10 @@
 #pragma GCC optimize("O3", "fast-math")
 #endif
 
-#include "robotics/dynamics/RevoluteJointLink.hpp"
 #include "numerical/math/CompilerOptimizations.hpp"
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
+#include "robotics/dynamics/RevoluteJointLink.hpp"
 #include <array>
 #include <cassert>
 

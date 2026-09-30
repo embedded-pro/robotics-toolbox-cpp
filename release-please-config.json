@@ -1,16 +1,11 @@
 {
   "include-component-in-tag": false,
-  "plugins": [
-    "sentence-case"
-  ],
+  "plugins": ["sentence-case"],
   "packages": {
     ".": {
       "release-type": "simple",
       "package-name": "robotics-toolbox",
-      "extra-files": [
-        "CMakeLists.txt",
-        "sonar-project.properties"
-      ],
+      "extra-files": ["CMakeLists.txt", "sonar-project.properties"],
       "changelog-sections": [
         {
           "type": "feat",

@@ -33,11 +33,11 @@ and Jacobians reach controllers through interfaces implemented by
 
 Each spec maps to this concrete artifact set when deployed into `robotics/`:
 
-| Spec file           | Deploys to                                                              |
-|---------------------|-------------------------------------------------------------------------|
+| Spec file           | Deploys to                                                             |
+|---------------------|------------------------------------------------------------------------|
 | `implementation.md` | `robotics/<domain>/<Name>.hpp` + `<Name>.cpp` (coverage instantiation) |
 | `tests.md`          | `robotics/<domain>/test/Test<Name>.cpp`                                |
-| `explanation.md`    | `doc/<domain>/<Name>.md` (expanded to follow `doc/TEMPLATE.md`)         |
+| `explanation.md`    | `doc/<domain>/<Name>.md` (expanded to follow `doc/TEMPLATE.md`)        |
 
 Header shape (mirroring existing components such as `ForwardKinematics.hpp`):
 

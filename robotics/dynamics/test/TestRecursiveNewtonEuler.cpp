@@ -1,7 +1,7 @@
+#include "numerical/math/Tolerance.hpp"
 #include "robotics/dynamics/EulerLagrangeDynamics.hpp"
 #include "robotics/dynamics/EulerLagrangeSolver.hpp"
 #include "robotics/dynamics/RecursiveNewtonEuler.hpp"
-#include "numerical/math/Tolerance.hpp"
 #include <cmath>
 #include <gtest/gtest.h>
 
