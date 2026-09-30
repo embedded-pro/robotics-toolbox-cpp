@@ -12,7 +12,7 @@ namespace simulator::dynamics
         std::vector<float> linkLengths = { 0.5f, 0.4f, 0.3f };
         std::vector<float> linkMasses = { 1.0f, 0.8f, 0.6f };
         float damping = 0.05f;
-        float dt = 1.0f / 120.0f;
+        float dt = 0.008f;
     };
 
     struct RobotArmState

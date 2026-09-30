@@ -9,6 +9,7 @@
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
 #include <array>
+#include <cassert>
 
 namespace kinematics
 {
@@ -55,6 +56,7 @@ namespace kinematics
 
         for (std::size_t i = 0; i < NumLinks; ++i)
         {
+            assert(dynamics::HasUnitJointAxis(links[i]));
             R = R * math::RotationAboutAxis(links[i].jointAxis, q.at(i, 0));
 
             const Vector3& offsetToNext = (i + 1 < NumLinks) ? links[i + 1].parentToJoint : toolOffset;

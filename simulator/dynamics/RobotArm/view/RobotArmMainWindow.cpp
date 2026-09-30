@@ -29,6 +29,7 @@ namespace simulator::dynamics::view
         view3D->SetPanCursorEnabled(true);
         shell.SetContent(view3D);
 
+        simulationTimer->setTimerType(Qt::PreciseTimer);
         connect(simulationTimer, &QTimer::timeout, this, &RobotArmMainWindow::OnSimulationStep);
 
         form.Model().onActionTriggered = [this](ui::model::ActionId action)
@@ -68,9 +69,11 @@ namespace simulator::dynamics::view
     {
         if (!running)
         {
-            ApplyConfiguration();
-            simulator.SetInitialPositions(form.InitialPositions());
+            if (!paused)
+                ApplyConfiguration();
+
             running = true;
+            paused = false;
             simulationTimer->start();
             shell.SetStatus("Simulation running...");
         }
@@ -78,14 +81,19 @@ namespace simulator::dynamics::view
 
     void RobotArmMainWindow::OnStopRequested()
     {
+        if (!running)
+            return;
+
         running = false;
+        paused = true;
         simulationTimer->stop();
-        shell.SetStatus("Simulation stopped");
+        shell.SetStatus("Simulation paused (Start resumes, Reset applies new parameters)");
     }
 
     void RobotArmMainWindow::OnResetRequested()
     {
         running = false;
+        paused = false;
         simulationTimer->stop();
         ApplyConfiguration();
         shell.SetStatus("Simulation reset");

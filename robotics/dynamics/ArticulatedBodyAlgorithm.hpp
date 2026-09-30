@@ -4,17 +4,16 @@
 #pragma GCC optimize("O3", "fast-math")
 #endif
 
+#include "infra/util/ReallyAssert.hpp"
 #include "robotics/dynamics/RevoluteJointLink.hpp"
 #include "numerical/math/CompilerOptimizations.hpp"
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
 #include <array>
+#include <cassert>
 
 namespace dynamics
 {
-    // Articulated Body Algorithm (ABA): O(n) forward dynamics for serial chains.
-    // Given joint positions, velocities, and applied torques, computes joint accelerations
-    // directly without forming or inverting the mass matrix.
     template<typename T, std::size_t NumLinks>
     class ArticulatedBodyAlgorithm
     {
@@ -65,16 +64,12 @@ namespace dynamics
             Vector3 UaLin;
         };
 
-        // ── Pass 1: Forward kinematics ──
-
         static std::array<LinkKinematics, NumLinks> ComputeForwardKinematics(
             const LinkArray& links, const JointVector& q, const JointVector& qDot);
 
         static void PropagateKinematicsFromParent(
             LinkKinematics& current, const LinkKinematics& parent,
             const RevoluteJointLink<T>& link, T qDot_i);
-
-        // ── Pass 2: Backward articulated-body inertias ──
 
         static SpatialInertia ComputeRigidBodyInertia(
             const RevoluteJointLink<T>& link);
@@ -116,8 +111,6 @@ namespace dynamics
             std::array<BiasWrench, NumLinks>& pA,
             std::array<JointProjection, NumLinks>& proj);
 
-        // ── Pass 3: Forward accelerations ──
-
         static T ComputeJointAcceleration(
             const JointProjection& proj,
             const Vector3& aHatAng, const Vector3& aHatLin);
@@ -154,6 +147,7 @@ namespace dynamics
 
         for (std::size_t i = 0; i < NumLinks; ++i)
         {
+            assert(HasUnitJointAxis(links[i]));
             kin[i].R = math::RotationAboutAxis(links[i].jointAxis, q.at(i, 0));
 
             if (i == 0)
@@ -208,11 +202,10 @@ namespace dynamics
         proj.Ua = Ia.rot * axis;
         proj.UaLin = Ia.cross.Transpose() * axis;
 
-        auto dVec = axis.Transpose() * proj.Ua;
-        proj.D = dVec.at(0, 0);
+        proj.D = math::DotProduct(axis, proj.Ua);
+        really_assert(proj.D > T(0));
 
-        auto sTpA = axis.Transpose() * pA.torque;
-        proj.u = tau - sTpA.at(0, 0);
+        proj.u = tau - math::DotProduct(axis, pA.torque);
 
         return proj;
     }
@@ -285,8 +278,7 @@ namespace dynamics
         const JointProjection& proj,
         const Vector3& aPrimeAng, const Vector3& aPrimeLin)
     {
-        auto UaTa = proj.Ua.Transpose() * aPrimeAng + proj.UaLin.Transpose() * aPrimeLin;
-        return (proj.u - UaTa.at(0, 0)) / proj.D;
+        return (proj.u - math::DotProduct(proj.Ua, aPrimeAng) - math::DotProduct(proj.UaLin, aPrimeLin)) / proj.D;
     }
 
     template<typename T, std::size_t NumLinks>

@@ -5,10 +5,6 @@
 
 namespace
 {
-    // Simple pendulum: 1-DOF
-    //   M(q) = m * l^2
-    //   C(q, qDot) = 0
-    //   g(q) = m * gravity * l * sin(q)
     class SimplePendulum : public dynamics::EulerLagrangeDynamics<float, 1>
     {
     public:
@@ -32,21 +28,17 @@ namespace
         }
     };
 
-    // Two-link planar arm: 2-DOF
-    //   m1, m2: link masses
-    //   l1, l2: link lengths
-    //   lc1, lc2: center-of-mass distances
-    //   I1, I2: link inertias
     class TwoLinkPlanarArm : public dynamics::EulerLagrangeDynamics<float, 2>
     {
     public:
         static constexpr float m1 = 1.0f;
         static constexpr float m2 = 1.0f;
         static constexpr float l1 = 1.0f;
+        static constexpr float l2 = 1.0f;
         static constexpr float lc1 = 0.5f;
         static constexpr float lc2 = 0.5f;
-        static constexpr float I1 = 0.083f; // m1 * l1^2 / 12
-        static constexpr float I2 = 0.083f;
+        static constexpr float I1 = m1 * l1 * l1 / 12.0f;
+        static constexpr float I2 = m2 * l2 * l2 / 12.0f;
         static constexpr float gravity = 9.81f;
 
         MassMatrix ComputeMassMatrix(const StateVector& q) const override
@@ -98,13 +90,12 @@ namespace
 
 TEST_F(TestEulerLagrangeSolver, forward_dynamics_at_rest_returns_gravity_acceleration)
 {
-    math::Vector<float, 1> q{ 0.5f }; // 0.5 rad from vertical
+    math::Vector<float, 1> q{ 0.5f };
     math::Vector<float, 1> qDot{};
     math::Vector<float, 1> tau{};
 
     auto qDDot = solver1Dof.ForwardDynamics(pendulum, q, qDot, tau);
 
-    // qDDot = -g * sin(q) / l = -9.81 * sin(0.5)
     float expected = -SimplePendulum::gravity * std::sin(0.5f) / SimplePendulum::length;
     EXPECT_NEAR(qDDot.at(0, 0), expected, 1e-4f);
 }
@@ -117,7 +108,6 @@ TEST_F(TestEulerLagrangeSolver, inverse_dynamics_at_rest_returns_gravity_compens
 
     auto tau = solver1Dof.InverseDynamics(pendulum, q, qDot, qDDot);
 
-    // tau = g(q) = m * gravity * l * sin(q)
     float expected = SimplePendulum::mass * SimplePendulum::gravity * SimplePendulum::length * std::sin(0.5f);
     EXPECT_NEAR(tau.at(0, 0), expected, 1e-4f);
 }
@@ -136,7 +126,6 @@ TEST_F(TestEulerLagrangeSolver, forward_inverse_roundtrip_consistency)
 
 TEST_F(TestEulerLagrangeSolver, identity_mass_matrix_forward_dynamics_reduces_to_subtraction)
 {
-    // A trivial model: M=I, C=0, g=0
     class TrivialModel : public dynamics::EulerLagrangeDynamics<float, 2>
     {
     public:
@@ -182,13 +171,12 @@ TEST_F(TestEulerLagrangeSolver, two_link_forward_inverse_roundtrip)
 
 TEST_F(TestEulerLagrangeSolver, two_link_at_rest_returns_gravity_torques)
 {
-    math::Vector<float, 2> q{ 0.0f, 0.0f }; // hanging straight down
+    math::Vector<float, 2> q{ 0.0f, 0.0f };
     math::Vector<float, 2> qDot{};
     math::Vector<float, 2> tau{};
 
     auto qDDot = solver2Dof.ForwardDynamics(twoLinkArm, q, qDot, tau);
 
-    // At q = [0, 0], sin(q1)=0, sin(q1+q2)=0 → g=[0,0] → qDDot=[0,0]
     EXPECT_NEAR(qDDot.at(0, 0), 0.0f, 1e-4f);
     EXPECT_NEAR(qDDot.at(1, 0), 0.0f, 1e-4f);
 }

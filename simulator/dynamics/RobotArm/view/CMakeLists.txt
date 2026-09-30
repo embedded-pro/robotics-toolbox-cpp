@@ -27,10 +27,6 @@ target_sources(robotics.simulator.dynamics.robotarm.view PRIVATE
 
 if(MSVC)
     target_compile_options(robotics.simulator.dynamics.robotarm.view PRIVATE /W4 /wd4244 /wd4100)
-else()
-    target_compile_options(robotics.simulator.dynamics.robotarm.view PRIVATE
-        -Wno-error
-    )
 endif()
 
 if (ROBOTICS_TOOLBOX_BUILD_TESTS)
