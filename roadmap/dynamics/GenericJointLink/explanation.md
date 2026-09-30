@@ -1,33 +1,32 @@
 # Generic Joint Link — Overview
 
 ## What it is
-A single struct that describes **either** a revolute (rotating) **or** a prismatic (sliding) joint,
-by carrying a joint *type* alongside a unit *axis* and the usual inertial parameters. It generalizes
-the revolute-only link so one chain can mix hinges and slides.
+One link description that covers both revolute (rotating) and prismatic (sliding) joints and also
+carries joint limits and the actuator's reflected inertia (armature).
 
 ## Why it matters (embedded)
-Real machines are rarely all-revolute: SCARA arms, gantry/Cartesian robots, hydraulic rams, and
-3-D printers all contain sliding axes. Encoding the joint type once — as a byte-sized enum plus a
-shared code path — lets forward kinematics, the Jacobian, and inverse dynamics handle mixed chains
-without duplicating an entire link/algorithm family per joint type.
+Real machines are rarely all-revolute: SCARA arms, gantries, linear axes and hydraulic rams contain
+sliding joints. Limits are needed by every planner and inverse-kinematics solver, and the armature of
+geared actuators often dominates the effective inertia of small arms — ignoring it makes
+model-based control markedly worse.
 
 ## How it works (intuition)
-Every 1-DOF joint moves along a **screw axis**. A revolute joint spends its motion in the *angular*
-part of that screw (it rotates by `q` about the axis); a prismatic joint spends it in the *linear*
-part (it slides by `q` along the axis). The link therefore exposes two things: the relative
-transform produced by `q`, and which channel — angular or linear — the axis occupies. Downstream
-algorithms read those and stay joint-type-agnostic.
+Every one-degree-of-freedom joint moves along a screw axis: a revolute joint spends its motion in
+the angular channel, a prismatic joint in the linear channel. The kinematic and dynamic recursions
+only need to know which channel the joint drives; for prismatic joints the torque projection becomes
+a force projection and an extra Coriolis term appears when the slider rides on a rotating link.
+Armature adds a rotor inertia that only the joint itself feels.
 
 ## Key parameters
-- **type** — `Revolute` or `Prismatic`.
-- **axis** — unit vector; rotation axis (revolute) or slide direction (prismatic).
-- **parentToJoint / jointToCoM** — link geometry, unchanged from the revolute link.
-- **mass / inertia** — rigid-body inertial parameters.
+- **type** — revolute or prismatic.
+- **axis** — unit rotation axis or slide direction.
+- **limits** — position, velocity and effort bounds.
+- **armature** — reflected actuator inertia.
 
 ## Reference
-J. J. Craig, *Introduction to Robotics: Mechanics and Control*, 4th ed., Ch. 3
-(link description and joint transforms).
+J. J. Craig, *Introduction to Robotics: Mechanics and Control*, 4th ed., Ch. 3 and 6;
+R. Featherstone, *Rigid Body Dynamics Algorithms* (2008), Ch. 4 (joint models).
 
 ## See also
-`RevoluteJointLink` (the specialization it generalizes), `RecursiveNewtonEuler` (consumes the
-motion subspace), Denavit-Hartenberg parameters (M7), spatial Jacobian (M8).
+`RecursiveNewtonEuler`, `ArticulatedBodyAlgorithm`, `CompositeRigidBodyAlgorithm` (M28),
+`ChainPoseKinematics` (M30), `DenavitHartenberg` (M7).

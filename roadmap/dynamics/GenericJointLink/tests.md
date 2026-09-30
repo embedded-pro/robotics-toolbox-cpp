@@ -5,60 +5,43 @@
 ## Fixture
 
 ```
-class TestGenericJointLink : public ::testing::Test:
-    # unit axes for readable expectations
-    Vector3 z = {0, 0, 1}
-    Vector3 x = {1, 0, 0}
-    GenericJointLink<float> MakeRevolute(axis, parentToJoint)
-    GenericJointLink<float> MakePrismatic(axis, parentToJoint)
-# each case below is a TEST_F(TestGenericJointLink, <name>)
+class TestJointLink : public ::testing::Test:
+    Vector3 x = {1, 0, 0}, z = {0, 0, 1}
+    JointLink<float> MakeRevolute(axis, parentToJoint), MakePrismatic(axis, parentToJoint)
+# each case below is a TEST_F(TestJointLink, <name>)   (algorithm cases live in the RNEA/ABA/FK tests)
 ```
 
 ## Test cases (Arrange / Act / Assert)
 
 ```
-revolute_rotates_about_axis:
-    Arrange: revolute about z, q = pi/2
-    Act:     (R, p) = JointTransform(q)
-    Assert:  R maps x -> y (±tol), p == parentToJoint
-
-revolute_zero_angle_is_identity:
-    Arrange: revolute about z, q = 0
-    Assert:  R == I, p == parentToJoint
-
-prismatic_translates_along_axis:
-    Arrange: prismatic along x, parentToJoint = {0,0,0}, q = 0.3
-    Act:     (R, p) = JointTransform(q)
-    Assert:  R == I, p == {0.3, 0, 0}
-
-prismatic_keeps_orientation:
-    Arrange: prismatic along z, sweep q
-    Assert:  R == I for all q (no rotation)
-
-revolute_motion_subspace:
-    Arrange: revolute about axis a
-    Assert:  AngularAxis() == a, LinearAxis() == 0
-
-prismatic_motion_subspace:
-    Arrange: prismatic along axis a
-    Assert:  LinearAxis() == a, AngularAxis() == 0
-
-from_revolute_matches_legacy:
-    Arrange: RevoluteJointLink r; g = FromRevolute(r)
-    Assert:  same mass/inertia/axis; JointTransform is a pure rotation
-
-offset_joint_origin_applied:
-    Arrange: prismatic along x, parentToJoint = {0,1,0}, q = 0.5
-    Assert:  p == {0.5, 1, 0}
+existing_aggregate_initializers_default_to_revolute:
+    Arrange: RevoluteJointLink<float>{ m, I, axis, offset, com }
+    Assert:  type == Revolute, armature == 0, limits unbounded
+revolute_transform_rotates_about_axis:
+    Assert: JointTransform(π/2) about z maps x → y, offset == parentToJoint
+prismatic_transform_slides_along_axis:
+    Assert: JointTransform(0.3) along x == (I, parentToJoint + (0.3, 0, 0))
+motion_subspace_selects_one_channel:
+    Assert: revolute → (axis; 0), prismatic → (0; axis)
+vertical_slider_needs_weight_plus_inertial_force:           # RNEA test file
+    Arrange: prismatic along z, mass m, gravity (0, 0, −g), q̈ = a
+    Assert:  τ = m·(g + a)
+prismatic_coriolis_term_on_rotating_base:                    # RNEA test file
+    Arrange: revolute base about z spinning at ω, prismatic slider along x at q = r, q̇ = v
+    Assert:  base torque = 2·m·r·v·ω (Coriolis) + inertial terms per closed form
+mixed_chain_round_trips_through_aba:                         # ABA test file
+    Assert: ABA(RNEA(q̈)) ≈ q̈ for a revolute–prismatic–revolute chain under gravity
+armature_adds_to_diagonal_inertia:
+    Assert: single rod: τ = (m l²/3 + armature)·q̈ in RNEA; ABA inverts it; CRBA M = m l²/3 + armature
 ```
 
 ## Reference vectors
 
-- Revolute z, q = π/2: `R·[1,0,0]ᵀ = [0,1,0]ᵀ`.
-- Prismatic x, q = d: `p = parentToJoint + [d,0,0]ᵀ`, `R = I`.
+- Slider: `m = 2`, `a = 1`: `τ = 2·(9.81 + 1) = 21.62 N`.
+- Rotating slider (point mass at `r` on an arm spinning at `ω`, extending at `v`): Coriolis torque
+  `2 m r v ω` about the base axis.
 
 ## Edge cases
 
-- Negative `q` (reverse rotation / retracting slide) mirrors the positive case.
-- Non-unit `axis` — assert construction normalizes (or a guard rejects it).
-- Full `2π` revolute wrap returns to identity within tolerance.
+- Negative `q` retracts the slider / reverses the rotation.
+- Full `2π` revolute wrap returns to identity.

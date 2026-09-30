@@ -1,31 +1,32 @@
-# Spatial Jacobian — Overview
+# Geometric Jacobian — Overview
 
 ## What it is
-The Jacobian is the matrix that links how fast the joints move to how fast the end-effector moves.
-For an `N`-joint arm it is `6×N`: the top three rows give the tool's linear velocity, the bottom three
-its angular velocity, as a linear function of the joint-rate vector `q̇`.
+The matrix that maps joint rates to the tool's velocity: for an `N`-joint arm it is `6×N`, the top
+three rows giving the linear velocity of the tool point and the bottom three its angular velocity,
+both expressed in the base frame. Its transpose maps a force and moment applied at the tool to joint
+torques. The companion term `J̇q̇` is the tool acceleration produced by joint velocities alone.
 
 ## Why it matters (embedded)
-It is the workhorse of manipulator control. Velocity control, force control, singularity detection,
-and every Jacobian-based inverse-kinematics solver need it. Its transpose maps end-effector
-forces/torques back to joint torques — so the same matrix does velocity kinematics *and* statics,
-exactly the reuse an embedded arm controller wants.
+It is the workhorse of manipulator control: velocity control, force control, singularity detection,
+pose inverse kinematics, impedance and operational-space control all need it, and task-space
+controllers additionally need `J̇q̇`. Building it from one generic "frame chain" means a single,
+well-tested routine serves every kinematic description in the library.
 
 ## How it works (intuition)
-Each joint contributes one column. A **revolute** joint spins the tool about its own axis `zᵢ`, so it
-adds angular velocity `zᵢ` and linear velocity `zᵢ × r`, where `r` is the lever arm from the joint to
-the tool. A **prismatic** joint slides the tool along `zᵢ`, adding pure linear velocity `zᵢ` and no
-rotation. Stack those columns and you have the map `twist = J·q̇`. When two columns line up the arm is
-**singular** — it has locally lost a direction of motion, and `J` can no longer be inverted safely.
+Each joint contributes one column. A revolute joint spins everything outboard about its axis `z`, so
+the tool gains angular velocity `z` and linear velocity `z × r`, where `r` runs from the joint to the
+tool. A prismatic joint slides the tool along `z`. `J̇q̇` follows from differentiating those columns
+while the axes and lever arms are carried along by the moving links.
 
 ## Key parameters
-- **joint axes `zᵢ`** and **origins `oᵢ`** — read off the forward-kinematics frame chain.
-- **joint types** — revolute vs prismatic pick the column formula.
-- **twist ordering** — `(v; ω)` (linear first) here; must be consistent everywhere downstream.
+- **Frame chain** — joint origins, axes and types plus the tool pose, in the base frame.
+- **Ordering** — `(v; ω)`, linear first, as everywhere in the library.
 
 ## Reference
-K. M. Lynch, F. C. Park, *Modern Robotics* (2017), Ch. 5 (velocity kinematics and the Jacobian).
+B. Siciliano et al., *Robotics: Modelling, Planning and Control* (2009), Ch. 3 (geometric Jacobian);
+K. M. Lynch, F. C. Park, *Modern Robotics* (2017), Ch. 5 (for the space/body Jacobian variants).
 
 ## See also
-`DenavitHartenberg` (M7) / `ProductOfExponentials` (M15) supply the frames; `ManipulabilityIndex`
-(M11) scores it; `PoseInverseKinematics` (M13) and `RedundancyResolution` (M14) invert it.
+`ChainPoseKinematics` (M30), `DenavitHartenberg` (M7) and `ProductOfExponentials` (M15) produce the
+frame chain; `ManipulabilityIndex` (M11) scores the Jacobian; `PoseInverseKinematics` (M13),
+`RedundancyResolution` (M14) and the task-space controllers (M17–M19) use it.

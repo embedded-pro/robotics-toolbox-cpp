@@ -13,6 +13,7 @@ struct JointFrictionParameters:             # one per joint
     T stribeckVelocity # v_s  — width of the Stribeck dip (> 0)
     T stribeckShape    # delta — exponent, typically 1 or 2
     T smoothingVelocity# eps  — zero-crossing smoothing width (> 0)
+    T maxCompensation  # |τ_f| cap — over-compensation can drive the joint (> 0)
 
 template<typename T, std::size_t NumJoints> # static_assert(std::is_floating_point_v<T>); instantiated for float
 class FrictionCompensation:
@@ -40,7 +41,7 @@ function JointTorque(p, v):                         # OPTIMIZE_FOR_SPEED
     level = p.coulomb + (p.stiction - p.coulomb) * fall
     # smooth sign (tanh boundary layer) avoids chattering at v = 0
     dir   = tanh(v / p.smoothingVelocity)
-    return level * dir + p.viscous * v
+    return clamp(level * dir + p.viscous * v, −p.maxCompensation, p.maxCompensation)
 
 function Compute(qDot):                              # OPTIMIZE_FOR_SPEED
     for i in 0 .. NumJoints-1:
@@ -61,8 +62,11 @@ function Compute(qDot):                              # OPTIMIZE_FOR_SPEED
   smoothing width `eps` trades tracking sharpness against chattering either way.
 - The ideal `sign(v)` is replaced by `tanh(v/eps)`: too small an `eps` reintroduces limit cycles
   near zero velocity; too large under-compensates stiction on slow moves.
-- Over-compensation is worse than under (it can drive the joint), so cap each term and validate
-  `stiction >= coulomb`, `stribeckVelocity > 0`, `smoothingVelocity > 0` at construction.
+- Over-compensation is worse than under (it can drive the joint), so the output is clamped to
+  `maxCompensation`; validate `stiction >= coulomb`, `stribeckVelocity > 0`, `smoothingVelocity > 0`
+  and `maxCompensation > 0` at construction.
+- The same model can be folded into the dynamics: `ChainDynamicsModel` (M29) adds it to inverse
+  dynamics, and its parameters can be identified together with the inertial ones (M22).
 - Float-only: `static_assert(std::is_floating_point_v<T>)`; the generic `T` signature keeps a
   `Q15`/`Q31` specialisation cheap to add later.
 
@@ -70,9 +74,9 @@ function Compute(qDot):                              # OPTIMIZE_FOR_SPEED
 
 - Header: `robotics/dynamics/FrictionCompensation.hpp` — `#pragma once` →
   `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Compute`/`JointTorque`, and
-  `extern template class FrictionCompensation<float, NumJoints>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
+  `extern template class FrictionCompensation<float, 1>;` / `<float, 3>` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/dynamics/FrictionCompensation.cpp` →
-  `template class FrictionCompensation<float, NumJoints>;`
+  `template class FrictionCompensation<float, 1>;` and `<float, 3>`.
 - Test: `robotics/dynamics/test/TestFrictionCompensation.cpp`
 - Doc: `doc/dynamics/FrictionCompensation.md` (expand to follow `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;

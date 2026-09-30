@@ -1,60 +1,49 @@
-# Spatial Jacobian — Unit Test Plan (Pseudocode)
+# Geometric Jacobian — Unit Test Plan (Pseudocode)
 
 > GoogleTest · `TEST_F` (`float`) · `StrictMock` only · no heap.
 
 ## Fixture
 
 ```
-class TestSpatialJacobian : public ::testing::Test:
-    # 2-link unit planar arm, both revolute, in the x-y plane
-    DenavitHartenberg<float, 2>  arm{ ... }
-    SpatialJacobian<float, 2>    jac{ arm }
-# each case below is a TEST_F(TestSpatialJacobian, <name>)
+class TestGeometricJacobian : public ::testing::Test:
+    # 2-link unit planar arm, z-axis joints, joint 2 at (1,0,0), tool at (1,0,0) of link 2
+    std::array<RevoluteJointLink<float>, 2> planar{ ... }
+    ChainPoseKinematics<float, 2> kinematics{ SE3Transform{ I, (1, 0, 0) } }
+# each case below is a TEST_F(TestGeometricJacobian, <name>)
 ```
 
 ## Test cases (Arrange / Act / Assert)
 
 ```
-planar_arm_column_dimensions:
-    Act:    J = jac.Compute({0, 0})
-    Assert: J is 6×2
-
-stretched_arm_linear_block:
-    Arrange: q = (0, 0), tip at (2,0,0)
-    Act:     J = jac.Compute(q)
-    Assert:  Jv column0 ≈ (0, 2, 0),  Jv column1 ≈ (0, 1, 0)
-
-revolute_angular_block_is_axis:
-    Assert: Jw columns ≈ ẑ for both joints (rotation about z)
-
-twist_matches_finite_difference:
-    Arrange: q̇ = (1, 0)
-    Assert:  EndEffectorTwist ≈ (FK(q + εq̇) - FK(q)) / ε
-
-transpose_maps_wrench_to_torque:
-    Arrange: unit force f = x̂ at the tip
-    Assert:  JointTorques ≈ hand-computed moment arms
-
+stretched_planar_arm_columns:
+    Act:    J = GeometricJacobian::Compute(kinematics.Compute(planar, (0, 0)))
+    Assert: linear rows [[0,0],[2,1],[0,0]], angular rows [[0,0],[0,0],[1,1]]
+linear_rows_match_finite_difference_of_tool_position:
+    Arrange: q = (0.4, −0.7), q̇ = (0.3, −0.5)
+    Assert:  J_linear·q̇ ≈ (p(q + εq̇) − p(q)) / ε
+angular_rows_match_finite_difference_of_tool_rotation:
+    Assert: J_angular·q̇ ≈ Log(R(q + εq̇)·R(q)ᵀ).angular / ε   (spatial 3-link arm, mixed axes)
+bias_acceleration_matches_finite_difference:
+    Assert: BiasAcceleration(frames, q̇) ≈ (J(q + εq̇) − J(q)) / ε · q̇
 prismatic_column_is_pure_translation:
-    Arrange: chain with a prismatic joint
-    Assert:  that column = (axis; 0)
-
-singular_configuration_drops_rank:
-    Arrange: fully stretched arm (q = (0,0))
-    Assert:  columns linearly dependent ⇒ rank < 2
-
-zero_config_is_deterministic:
-    Assert: Compute is repeatable and side-effect free
+    Arrange: FrameChain with a prismatic joint along ŷ
+    Assert:  its column = (ŷ; 0)
+wrench_along_link_line_needs_no_torque:
+    Assert: JointTorques(J(0,0), (x̂; 0)) ≈ (0, 0)
+link_model_and_dh_frames_give_the_same_jacobian:
+    Arrange: same 2-link arm described by DH (M7) and by links (M30)
+    Assert:  Compute(dhFrames) ≈ Compute(linkFrames)
+task_jacobian_position_rows_match_six_dof_rows:
+    Assert: ChainTaskJacobian<float, 3, 2>::Jacobian(q) == first three rows of the 6-row version
 ```
 
 ## Reference vectors
 
-- 2-link unit arm at `q = (0,0)`: `Jv = [[0,0],[2,1],[0,0]]`, `Jw = [[0,0],[0,0],[1,1]]`.
-- Unit tip force `x̂` on that arm ⇒ joint torques `(0, 0)` (force along the link line).
+- 2-link unit arm at `q = (0,0)`: linear `[[0,0],[2,1],[0,0]]`, angular `[[0,0],[0,0],[1,1]]`.
+- Tool force `x̂` on the stretched arm acts along the links ⇒ joint torques `(0, 0)`.
 
 ## Edge cases
 
-- Fully stretched / folded arm ⇒ rank-deficient Jacobian (singularity).
-- Prismatic-only chain ⇒ zero angular block.
-- Single-joint arm ⇒ `6×1` Jacobian, no cross-column coupling.
-- Twist ordering `(v; ω)` vs `(ω; v)` ⇒ pin the convention in one assertion.
+- Stretched arm ⇒ columns linearly dependent (singular).
+- `q̇ = 0` ⇒ `BiasAcceleration = 0`.
+- Single joint ⇒ `6×1`.
