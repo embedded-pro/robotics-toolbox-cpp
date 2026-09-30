@@ -50,7 +50,8 @@ estimate_persists_across_calls:
     Assert:  aHat integrates twice; ParameterEstimate() reflects both
 
 convergence_tracks_trajectory:
-    Arrange: wrap a plant M q̈ + Cq̇ + g = τ with unknown a; run K steps
+    Arrange: horizontal 2-link plant M q̈ + C q̇ = τ with true a (3 params); mock Invoke returns its
+             regressor Y(q,q̇,q̇r,q̈r) built with the Christoffel C; aHat0 = 0 ≠ a; run K steps
     Assert:  ||q − qd|| -> 0 (tracking) even though aHat != a
 
 reset_restores_initial_estimate:
@@ -67,6 +68,9 @@ regressor_queried_once_per_call:
 - By construction `s = q̃̇ + Λq̃`; single joint, `Λ=λ`, constant `q̃=e`, `q̃̇=0` ⇒ `s = λe` (hand-checkable).
 - With `aHat = a` (true params) the law reduces to computed-torque-like `τ = Y·a − Kd·s`.
 - One adaptation step: `Δa = −Γ·Yᵀ·s·dt` — exact, hand-verifiable.
+- Horizontal 2-link arm, `a = (a1, a2, a3)` (Spong, Hutchinson, Vidyasagar):
+  `M = [[a1 + 2a2c₂, a3 + a2c₂], [a3 + a2c₂, a3]]`, Christoffel `C = a2s₂·[[−q̇₂, −(q̇₁+q̇₂)], [q̇₁, 0]]` ⇒
+  `Y = [[q̈r₁, c₂(2q̈r₁ + q̈r₂) − s₂(q̇₂q̇r₁ + (q̇₁+q̇₂)q̇r₂), q̈r₂], [0, c₂q̈r₁ + s₂q̇₁q̇r₁, q̈r₁ + q̈r₂]]`.
 
 ## Edge cases
 

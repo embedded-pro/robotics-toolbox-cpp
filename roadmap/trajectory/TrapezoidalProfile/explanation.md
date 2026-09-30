@@ -21,6 +21,8 @@ peaks below `vMax` and immediately decelerates — a triangle. A single distance
 - **`vMax`** — cruise velocity ceiling; caps the flat top of the trapezoid.
 - **`aMax`** — ramp acceleration; sets the blend duration `vMax/aMax`.
 - **Distance `qf − q0`** — decides trapezoid vs triangle and the total time.
+- **Duration `T` (fixed-time variant)** — for synchronizing several axes: keep `aMax`, solve for the
+  lower cruise speed that finishes exactly at `T` (feasible iff `aMax·T² ≥ 4·distance`).
 
 ## Reference
 L. Biagiotti, C. Melchiorri, *Trajectory Planning for Automatic Machines and Robots* (2008),
@@ -28,4 +30,5 @@ Ch. 3 (trapezoidal / LSPB profiles).
 
 ## See also
 `PolynomialTrajectory` (fixed-time, smooth), `SCurveProfile` (jerk-limited upgrade),
-`SaturationRateLimiter` (online slew limiting).
+`SaturationRateLimiter` from [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)
+(online slew limiting).

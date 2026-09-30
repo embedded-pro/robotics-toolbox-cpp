@@ -14,8 +14,11 @@ vibration-sensitive machines (pick-and-place, CNC, semiconductor handling).
 ## How it works (intuition)
 The velocity curve is built from seven phases: jerk up, hold acceleration, jerk down (to reach
 cruise velocity), cruise, then the mirror-image deceleration triple. Depending on the distance and
-limits, some phases shrink to zero — a short move may never reach `aMax` or `vMax`. All phase
-durations follow from closed-form algebra on the velocity/acceleration/jerk ceilings.
+limits, some phases shrink to zero — a short move may never reach `aMax` or `vMax`. For rest-to-rest
+moves the phase durations follow from a three-step closed form: assume `vMax` is reached; if the move is
+too short, drop the cruise and assume only `aMax` is reached; if still too short, neither is reached and
+the acceleration ramps are pure triangles. Several axes finish together by stretching the faster ones in
+time by a common factor `λ` (velocity `/λ`, acceleration `/λ²`, jerk `/λ³`).
 
 ## Key parameters
 - **`vMax`** — cruise-velocity ceiling.
@@ -24,7 +27,8 @@ durations follow from closed-form algebra on the velocity/acceleration/jerk ceil
 
 ## Reference
 L. Biagiotti, C. Melchiorri, *Trajectory Planning for Automatic Machines and Robots* (2008),
-Ch. 3 (double-S / jerk-limited profiles).
+§3.4 (double-S / jerk-limited profiles; the non-zero boundary-velocity case there needs an iterative
+`aMax` reduction and is future work).
 
 ## See also
 `TrapezoidalProfile` (jerk-unbounded predecessor), `PolynomialTrajectory` (fixed-time quintic),

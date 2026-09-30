@@ -29,6 +29,10 @@ cubic_peak_velocity_matches_formula:
     Arrange: rest-to-rest, distance d, duration tf
     Assert:  max |velocity| ≈ 1.5 * d / tf  (at midpoint)
 
+cubic_jerk_is_constant_third_derivative:
+    Arrange: q0=0, qf=1, tf=2 rest-to-rest cubic
+    Assert:  Sample(t).jerk ≈ 6·a3 = -1.5 for t ∈ {0, 1, 2}
+
 quintic_endpoint_accelerations_are_zero:
     Arrange: quintic, a0 = af = 0
     Assert:  Sample(0).acceleration ≈ 0  and  Sample(tf).acceleration ≈ 0
@@ -49,6 +53,8 @@ reset_recomputes_coefficients:
 
 - Rest-to-rest cubic, `q0=0, qf=1, tf=2`: `q(t) = 3(t/2)² − 2(t/2)³`; `q(1) = 0.5`, `v(1) = 0.75`.
 - Peak velocity of a rest-to-rest cubic `= 1.5·(qf−q0)/tf`.
+- Same cubic: `a3 = −2·(qf−q0)/tf³ = −0.25` ⇒ constant jerk `6·a3 = −1.5`.
+- `q0=0, qf=1, v0=vf=1, tf=1` cubic ⇒ `a2 = a3 = 0`, i.e. `s(t) = t` (linear time law).
 
 ## Edge cases
 

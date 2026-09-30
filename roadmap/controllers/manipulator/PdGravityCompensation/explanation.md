@@ -18,7 +18,7 @@ the spring no longer fights it and the joint lands precisely on the set-point. A
 energy argument (kinetic + spring potential) guarantees the arm always converges.
 
 ## Key parameters
-- **model** — injected dynamics object supplying the gravity term `g(q)`.
+- **model** — injected dynamics object supplying the gravity term `g(q)` (typically `ChainDynamicsModel`, M29).
 - **Kp (stiffness)** — how hard the controller pulls toward the target.
 - **Kd (damping)** — how strongly it resists velocity; pick `Kd ≈ 2√(Kp·inertia)` for critical damping.
 
@@ -28,4 +28,5 @@ M. Takegaki, S. Arimoto, "A New Feedback Method for Dynamic Control of Manipulat
 
 ## See also
 `ComputedTorqueControl` (full inverse-dynamics tracking); `ImpedanceControl` (compliant contact);
-`FrictionCompensation` (adds a friction feedforward); `dynamics/EulerLagrangeDynamics` (the injected model).
+`FrictionCompensation` (adds a friction feedforward); `dynamics/EulerLagrangeDynamics` (the injected
+interface); `ChainDynamicsModel` (M29, its link-chain implementation).

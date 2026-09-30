@@ -4,21 +4,20 @@
 
 ## Data structures
 
+`TrajectoryState<T>` and `MotionLimits<T>` come from `robotics/trajectory/TrajectoryTypes.hpp`
+(canonical definition: PolynomialTrajectory spec → Data structures); not redefined here. This profile
+requires `vMax`, `aMax`, `jMax > 0`.
+
 ```
 template<typename T>               # static_assert(std::is_floating_point_v<T>); instantiated for float
-struct MotionLimits:
-    T vMax, aMax, jMax             # velocity, acceleration, jerk ceilings (> 0)
-
-template<typename T>               # static_assert(std::is_floating_point_v<T>); instantiated for float
-struct TrajectoryState:
-    T position, velocity, acceleration, jerk
-
-template<typename T>               # static_assert(std::is_floating_point_v<T>); instantiated for float
 class SCurveProfile:
-    T q0, direction
+    T q0, direction, jMax
+    T Tj, Ta, Tv                   # jerk sub-phase, whole accel phase, cruise
     array<T, 7> segT               # duration of each of the 7 phases
+    array<T, 8> segStart           # start time of each phase (+ tf)
     array<T, 8> segPos, segVel, segAcc   # state at each phase boundary
     T tf
+    bool reachesMaxAccel, reachesMaxVel
 ```
 
 ## Interface
@@ -32,47 +31,75 @@ bool ReachesMaxAccel() / ReachesMaxVel()
 
 ## Algorithm (pseudocode)
 
+Rest-to-rest closed form (Biagiotti & Melchiorri §3.4, `v0 = v1 = 0`), `h = |qf − q0|`:
+
 ```
 # Seven phases: [+j][a=const][-j][v=const][-j][a=const][+j]
 function plan(q0, qf, lim):
-    d = |qf - q0|;  direction = sign(qf - q0)
-    # --- acceleration sub-phase durations (rest-to-rest) ---
-    if (lim.vMax * lim.jMax) >= lim.aMax^2:      # aMax is reached
+    h = |qf - q0|;  direction = sign(qf - q0);  jMax = lim.jMax
+    if h == 0: all durations 0; return
+    # Step 1 — assume vMax is reached
+    if lim.vMax * lim.jMax >= lim.aMax^2:        # aMax reached on the way to vMax
         Tj = lim.aMax / lim.jMax
         Ta = Tj + lim.vMax / lim.aMax
-    else:                                        # triangular accel (aMax not reached)
+    else:                                        # triangular accel, peak jMax·Tj < aMax
         Tj = sqrt(lim.vMax / lim.jMax)
         Ta = 2*Tj
-    # --- constant-velocity phase ---
-    Tv = d / lim.vMax - Ta                       # shrink/kill accel phase if Tv < 0
-    if Tv < 0: recompute Ta, Tj for a short move (no cruise)
-    segT = [Tj, Ta-2*Tj, Tj, Tv, Tj, Ta-2*Tj, Tj]
-    integrate boundary states segPos/segVel/segAcc from constant-jerk kinematics
+    Tv = h / lim.vMax - Ta
+    if Tv < 0:
+        # Step 2 — vMax not reached (Tv = 0), assume aMax still reached
+        Tv = 0
+        Tj = lim.aMax / lim.jMax
+        Δ  = lim.aMax^4 / lim.jMax^2 + 4*lim.aMax*h
+        Ta = (lim.aMax^2 / lim.jMax + sqrt(Δ)) / (2*lim.aMax)
+        if Ta < 2*Tj:
+            # Step 3 — neither aMax nor vMax reached
+            Tj = cbrt(h / (2*lim.jMax))
+            Ta = 2*Tj
+    aLim = jMax*Tj;  vLim = aLim*(Ta - Tj)       # peak |acc|, peak |vel|
+    reachesMaxAccel = (Ta > 2*Tj);  reachesMaxVel = (Tv > 0)
+    segT = [Tj, Ta-2*Tj, Tj, Tv, Tj, Ta-2*Tj, Tj]            # tf = 2·Ta + Tv
+    jerkOfPhase = [+jMax, 0, -jMax, 0, -jMax, 0, +jMax]
+    segPos[0] = segVel[0] = segAcc[0] = 0
+    for i in 0..6:                               # exact constant-jerk integration
+        τ = segT[i];  j = jerkOfPhase[i]
+        segPos[i+1] = segPos[i] + segVel[i]*τ + segAcc[i]*τ^2/2 + j*τ^3/6
+        segVel[i+1] = segVel[i] + segAcc[i]*τ + j*τ^2/2
+        segAcc[i+1] = segAcc[i] + j*τ
+        segStart[i+1] = segStart[i] + τ
 
 function Sample(t):                              # OPTIMIZE_FOR_SPEED
     t = clamp(t, 0, tf)
-    i, tau = locateSegment(t)                    # phase index + local time
-    j = jerkOfPhase(i)                           # +jMax, 0, or -jMax
+    i = last phase with segStart[i] ≤ t (i ≤ 6);  tau = t - segStart[i]
+    j = jerkOfPhase[i]
     acc = segAcc[i] + j*tau
     vel = segVel[i] + segAcc[i]*tau + 0.5*j*tau^2
     s   = segPos[i] + segVel[i]*tau + 0.5*segAcc[i]*tau^2 + (1/6)*j*tau^3
     return { q0 + direction*s, direction*vel, direction*acc, direction*j }
 ```
 
+Branch consistency (checked numerically on 20 000 random `h, vMax, aMax, jMax`): every branch ends at `h`
+with zero velocity and acceleration, `|v| ≤ vMax`, `|a| ≤ aMax`, `|j| = jMax`; no phase duration is
+negative (`Ta − 2Tj = vMax/aMax − aMax/jMax ≥ 0` in step 1a; the step-2 test guards it otherwise).
+
 ## Complexity & memory
 
-- Planning: `O(1)` — a fixed set of algebraic phase-duration formulas, no iteration.
+- Planning: `O(1)` — at most three closed-form candidates (one `sqrt`, one `cbrt`), no iteration.
 - `Sample`: `O(1)` — locate one of seven phases, evaluate a cubic-in-time (Horner).
-- Memory: `O(1)` — three 8-entry boundary tables plus seven durations; stack only, no heap.
+- Memory: `O(1)` — four 8-entry tables plus seven durations; stack only, no heap.
 
 ## Numerical / embedded notes
 
 - Precompute the seven durations and boundary states **once**; each tick is one cubic evaluation.
-- Handle the degenerate cases: short moves where `aMax` and/or `vMax` are never reached collapse
-  segments to zero length — never emit a negative duration.
-- Bounded jerk means acceleration is **continuous** ⇒ far less vibration than a trapezoid; this is
-  the reason to pay for the extra bookkeeping.
-- Profile is symmetric about its midpoint for rest-to-rest moves — reuse the accel table, mirrored.
+- Short moves collapse segments to zero length (`Tv = 0`, `Ta = 2·Tj`) — never a negative duration.
+- Bounded jerk means acceleration is **continuous** ⇒ far less vibration than a trapezoid.
+- Profile is symmetric about its midpoint for rest-to-rest moves (`Td = Ta`).
+- **Synchronization:** multi-axis moves finish together by uniform time scaling of every non-slowest
+  axis by `λ = T_sync / T_axis ≥ 1`: velocity, acceleration and jerk become `v/λ, a/λ², j/λ³`, sampled at
+  `t/λ`. Replanning with limits `(vMax/λ, aMax/λ², jMax/λ³)` gives exactly `Duration() = λ·T_axis` in every
+  branch (branch tests and the step formulas are invariant under this scaling) — planning stays `O(1)`.
+- **Non-rest boundary velocities** (`v0, v1 ≠ 0`, B&M §3.4 general case) need the iterative `aMax`
+  reduction (`aMax ← γ·aMax`, `0 < γ < 1`) plus a feasibility pre-check; not covered — future work.
 - Float-only: `static_assert(std::is_floating_point_v<T>)`; the generic `T` signature keeps a
   `Q15`/`Q31` specialisation cheap to add later.
 
@@ -81,12 +108,15 @@ function Sample(t):                              # OPTIMIZE_FOR_SPEED
 - Header: `robotics/trajectory/SCurveProfile.hpp` — `#pragma once` →
   `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class SCurveProfile<float>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
-- Coverage: `robotics/trajectory/SCurveProfile.cpp` →
-  `template class SCurveProfile<float>;`
+- Uses `robotics/trajectory/TrajectoryTypes.hpp` (create it if this is the first trajectory item).
+- Coverage: `robotics/trajectory/SCurveProfile.cpp` → `template class SCurveProfile<float>;`
 - Test: `robotics/trajectory/test/TestSCurveProfile.cpp`
-- Doc: `doc/trajectory/SCurveProfile.md` (expand to follow `doc/TEMPLATE.md`)
-- CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
-  `TestSCurveProfile.cpp` → the `_test` target.
-- New module: create `robotics/trajectory/CMakeLists.txt` via `robotics_add_header_library(...)`,
-  add a `test/` subdir, register it in `robotics/CMakeLists.txt`, and add a `doc/trajectory/` folder.
+- Doc: `doc/trajectory/SCurveProfile.md` (per `doc/TEMPLATE.md`) + row in `doc/trajectory/README.md`.
+- CMake: `.hpp` → `target_sources(robotics.trajectory …)`;
+  `robotics_add_coverage_sources(robotics.trajectory SCurveProfile.cpp)`;
+  `TestSCurveProfile.cpp` → `robotics.trajectory_test`.
+- New module (first trajectory item only): `robotics/trajectory/CMakeLists.txt` with
+  `robotics_add_header_library(robotics.trajectory)`, `TrajectoryTypes.hpp` in `target_sources`, a
+  `test/` subdir, `add_subdirectory(trajectory)` in `robotics/CMakeLists.txt`, and a `doc/trajectory/` folder.
+- Depends on: M3 (shares the synchronization scheme).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.
