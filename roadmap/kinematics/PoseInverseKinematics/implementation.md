@@ -62,7 +62,8 @@ function Solve(target, q0):                     # OPTIMIZE_FOR_SPEED
 
 function Damping(A0):                           # Nakamura–Hanafusa / Chiaverini adaptive form
     if manipulabilityThreshold == 0: return λ₀²
-    w = sqrt(max(0, Determinant(A0)))            # weighted manipulability (≡ 0 when Dof < 6 ⇒ λ = λ₀)
+    w = LuDecomposition(A0) singular ? 0 : sqrt(max(0, Determinant(A0)))   # weighted manipulability
+                                                 # (≡ 0 when Dof < 6 or near-singular ⇒ λ = λ₀)
     return w < w₀ ? λ₀²·(1 − (w / w₀)²) : 0
 ```
 
@@ -77,7 +78,8 @@ function Damping(A0):                           # Nakamura–Hanafusa / Chiaveri
 - **Damping does not bias the answer:** at a fixed point `JWᵀ·y = 0` with `JW` of full row rank forces
   `y = 0`, hence `e = 0`. For a reachable, non-singular target iterative DLS converges to the exact pose;
   `λ` only slows convergence (linear instead of quadratic). The residual is non-zero only for
-  unreachable targets or at singularities, where DLS returns the damped least-squares compromise.
+  unreachable targets, at singularities (DLS returns the damped least-squares compromise) or when a
+  joint limit is active.
 - **Units:** position error is in m, rotation error in rad. `ρ` (≈ the arm's reach or tool length) converts
   radians to metres in both the stopping test and the step. With `λ = 0` and invertible `J`, `W` cancels
   (`Δq = J⁻¹e`); it matters for damping, redundancy and unreachable targets.
@@ -87,6 +89,8 @@ function Damping(A0):                           # Nakamura–Hanafusa / Chiaveri
 - **Adaptive damping:** `λ = 0` away from singularities (fast Newton convergence), rising smoothly to
   `λ₀` as `w → 0`. Step clamping bounds the joint jump per iteration; joint limits are enforced by
   clamping (projected iteration).
+- Upstream `LuDecomposition` reports singular below a relative pivot of `1e-6`; keep `λ₀² ≫ 1e-6·‖W·J‖²`
+  (assert `λ₀ > 0`) so the damped system never trips it — a tripped `A0` simply means `w = 0`, `λ = λ₀`.
 - Seed `q0` from the previous control cycle for warm-started, few-iteration convergence.
 - Float-only: `static_assert(std::is_floating_point_v<T>)`.
 

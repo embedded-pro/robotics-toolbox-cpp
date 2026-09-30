@@ -85,7 +85,7 @@ function Solve(flange):                         # OPTIMIZE_FOR_SPEED — closed 
             slot[j] = Emit(arm[j], w, true);  slot[j + 4] = empty
     return slot
 
-function acosV(c):  |c| > 1 + tol ⇒ invalid (branch unreachable);  else acos(clamp(c, −1, 1))
+function acosV(c):  zero denominator or |c| > 1 + tol ⇒ invalid (branch unreachable);  else acos(clamp(c, −1, 1))
 function Emit(arm, w, singular):  q = signs ⊙ ((arm, w) + offsets), each wrapped to (−π, π]
 ```
 

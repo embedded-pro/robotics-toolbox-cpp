@@ -18,7 +18,7 @@ class ManipulabilityIndex:
 ```
 explicit ManipulabilityIndex(const JacobianProvider<T, TaskDim, Dof>& jacobian)
 T                    Compute(const JointVector& q) const            # w of rows 0..Rows−1 (translational for TaskDim 3/6); hot path
-T                    ComputeRotational(const JointVector& q) const  # TaskDim = 6 only (static_assert): rows 3–5
+T                    ComputeRotational(const JointVector& q) const requires (TaskDim == 6)   # rows 3–5
 std::array<T, Axes>  EllipsoidAxes(const JointVector& q) const      # singular values of the Compute block, descending
 T                    ConditionNumber(const JointVector& q) const    # σ_max / σ_min of that block; +∞ when σ_min ≤ ε
 bool                 NearSingular(const JointVector& q, T eps) const   # Compute(q) < eps
@@ -30,7 +30,9 @@ bool                 NearSingular(const JointVector& q, T eps) const   # Compute
 function GramRoot(B):                           # B: Rows × Dof, one unit
     if Rows ≤ Dof:  G = B·Bᵀ                    # Rows × Rows: task-space ellipsoid volume
     else:           G = Bᵀ·B                    # Dof × Dof: B·Bᵀ would be rank ≤ Dof ⇒ det ≡ 0
-    return sqrt(max(0, LuDecomposition<T, dim(G)>.Determinant(G)))   # clamp −0 from rounding
+    lu = solvers::LuDecomposition<T, dim(G)>
+    if !lu.Decompose(G): return 0               # upstream flags pivot < 1e-6·max ⇒ σ_min/σ_max ≲ 1e-3
+    return sqrt(max(0, lu.Determinant()))       # clamp −0 from rounding
 
 function Compute(q):                            # OPTIMIZE_FOR_SPEED
     J = jacobian.Jacobian(q)                    # TaskDim × Dof
@@ -71,8 +73,11 @@ function NearSingular(q, eps):
 - `det(G) = (∏ σᵢ)²`; when conditioning or axes are needed use the SVD (upstream
   `numerical/solvers/SingularValueDecomposition.hpp`,
   [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)) — it avoids the
-  squaring of `G`. For `Rows = Dof`, `w = |det B|` directly.
+  squaring of `G` (the Gram/LU path reports `0` once `σ_min/σ_max ≲ 1e-3`; `∏ EllipsoidAxes` stays
+  accurate below that). For `Rows = Dof`, `w = |det B|` directly.
 - Use `NearSingular` as a guard *before* any Jacobian inverse.
+- `ComputeRotational` is constrained with `requires` (C++20), not `static_assert`, so explicit
+  coverage instantiations with `TaskDim ≠ 6` still compile.
 - Float-only: `static_assert(std::is_floating_point_v<T>)`.
 
 ## Deployment

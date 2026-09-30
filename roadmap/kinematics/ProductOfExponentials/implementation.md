@@ -46,8 +46,8 @@ function Frames(q):                             # same loop, one pass
     A = Identity
     for i in 0..N-1:
         (v; ω) = A.Adjoint() · screws[i]        # current screw of joint i in the base frame
-        if ‖ω‖ > 0:  jointAxes[i] = ω;  jointOrigins[i] = ω × v;  jointTypes[i] = Revolute
-                                                # ω × v = foot of the perpendicular from the base origin (unit ω)
+        if ‖ω‖ > 0:  jointAxes[i] = ω/‖ω‖;  jointOrigins[i] = (ω × v)/‖ω‖²;  jointTypes[i] = Revolute
+                                                # = foot of the perpendicular from the base origin to the axis
         else:        jointAxes[i] = v;  jointOrigins[i] = A.p;    jointTypes[i] = Prismatic
         A = A * SE3Transform::Exp(screws[i], q[i])
     frames.tool = A * home
