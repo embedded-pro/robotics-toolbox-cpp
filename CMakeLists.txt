@@ -16,10 +16,6 @@ if (ROBOTICS_TOOLBOX_BUILD_TESTS)
     add_definitions(-DNUMERICAL_TOOLBOX_ENABLE_ASSERTIONS=1)
 endif()
 
-if (ROBOTICS_TOOLBOX_ENABLE_OPTIMIZATIONS)
-    add_definitions(-DNumericalToolbox_ENABLE_OPTIMIZATIONS=1)
-endif()
-
 if (EMIL_ENABLE_COVERAGE)
     add_definitions(-DROBOTICS_TOOLBOX_COVERAGE_BUILD=1)
 endif()
@@ -51,8 +47,10 @@ if (NOT TARGET numerical.math)
     FetchContent_Declare(
         numerical_toolbox
         GIT_REPOSITORY https://github.com/embedded-pro/numerical-toolbox-cpp.git
-        GIT_TAG        1225b3c422beab93e0ff8fd7231f8d7e087f6da4 # main
+        GIT_TAG        69ff13e719895b74b167c4742130442c6b96a857 # main
     )
+
+    set(NUMERICAL_TOOLBOX_ENABLE_OPTIMIZATIONS ${ROBOTICS_TOOLBOX_ENABLE_OPTIMIZATIONS} CACHE BOOL "" FORCE)
 
     FetchContent_MakeAvailable(numerical_toolbox)
 endif()
