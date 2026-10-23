@@ -47,7 +47,7 @@ if (NOT TARGET numerical.math)
     FetchContent_Declare(
         numerical_toolbox
         GIT_REPOSITORY https://github.com/embedded-pro/numerical-toolbox-cpp.git
-        GIT_TAG        9b37e0885d31a9e444739a5cfaa3bc004aad9d37 # main
+        GIT_TAG        adfc10d342591df8e46a0b1f0a91329bc76023e0 # main
     )
 
     set(NUMERICAL_TOOLBOX_ENABLE_OPTIMIZATIONS ${ROBOTICS_TOOLBOX_ENABLE_OPTIMIZATIONS} CACHE BOOL "" FORCE)
