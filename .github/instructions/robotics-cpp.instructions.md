@@ -5,7 +5,7 @@ applyTo: "**/*.{hpp,cpp,h}"
 
 # Robotics Toolbox C++ Rules
 
-This project is a robot-manipulator algorithms library (kinematics, dynamics, trajectories, and manipulator control) targeting resource-constrained embedded systems. It consumes the shared numerical primitives (`math`, `solvers`, …) from numerical-toolbox-cpp via FetchContent. Follow these rules strictly.
+This project is a robotics algorithms library (manipulator kinematics, dynamics, trajectories and control today; mobile, aerial, legged and marine families planned) targeting resource-constrained embedded systems. It consumes the shared numerical primitives (`math`, `solvers`, …) from numerical-toolbox-cpp via FetchContent. Follow these rules strictly.
 
 ## Memory — No Heap Allocation
 

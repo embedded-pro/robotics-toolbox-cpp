@@ -7,7 +7,7 @@ model: "Claude Sonnet 4.6"
 
 # Orchestrate
 
-Analyze the following task for the **robotics-toolbox** project — a robot-manipulator algorithms library (kinematics, dynamics, trajectories, and manipulator control) targeting resource-constrained embedded systems, consuming shared numerical primitives from numerical-toolbox-cpp via FetchContent.
+Analyze the following task for the **robotics-toolbox** project — a robotics algorithms library (manipulator kinematics, dynamics, trajectories and control today; mobile, aerial, legged and marine families planned) targeting resource-constrained embedded systems, consuming shared numerical primitives from numerical-toolbox-cpp via FetchContent.
 Gather relevant context from the codebase — identify affected modules, existing patterns, the float-only numeric policy, and documentation requirements.
 Then provide a brief scope summary and use the handoff buttons to route to the appropriate specialist:
 

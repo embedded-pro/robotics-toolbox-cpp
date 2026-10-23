@@ -2,9 +2,10 @@
 
 ## Overview
 
-This library provides robot-manipulator algorithms — kinematics, rigid-body dynamics, trajectory
-generation, and manipulator control — designed for robust and efficient real-time use on
-resource-constrained embedded systems (no heap, deterministic, float-only). It builds on the shared
+This library provides robotics algorithms — today robot-manipulator kinematics, rigid-body dynamics,
+trajectory generation and manipulator control; mobile, aerial, legged and marine robots are on the
+[roadmap](ROADMAP.md) — designed for robust and efficient real-time use on resource-constrained
+embedded systems (no heap, deterministic, float-only). It builds on the shared
 numerical primitives (linear algebra, solvers, controllers) provided by
 [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp), which it consumes
 via CMake `FetchContent`.
@@ -75,9 +76,10 @@ Prerequisites: `qt6-base-dev` and `libgl1-mesa-dev` (Ubuntu/Debian).
 
 ## Roadmap
 
-Planned algorithms and components are tracked in [ROADMAP.md](ROADMAP.md) — a prioritized backlog of
-manipulator kinematics, dynamics, trajectory, and control components ordered by implementation
-difficulty. Design-level pseudocode specifications live under [roadmap/](roadmap/README.md).
+Planned algorithms and components are tracked in [ROADMAP.md](ROADMAP.md) — a prioritized backlog
+per robot family (manipulators, wheeled, aerial, legged, marine, grasping, planning, localization,
+calibration, safety) ordered by implementation difficulty. Design-level pseudocode specifications live
+under [roadmap/](roadmap/README.md); generic algorithms go to numerical-toolbox-cpp.
 
 ## Testing
 

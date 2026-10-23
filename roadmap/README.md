@@ -1,8 +1,10 @@
 # Roadmap — Pseudocode Specifications
 
-Design-level pseudocode for every proposed component in [../ROADMAP.md](../ROADMAP.md).
+Design-level pseudocode for proposed components in [../ROADMAP.md](../ROADMAP.md).
 These are **specifications, not compilable code** — they describe *what* to build and *how*
-the algorithm works, so an implementer can produce the real templated C++ afterwards.
+the algorithm works, so an implementer can produce the real templated C++ afterwards. Every manipulator
+(M) item has a spec; the other families (F, W, A, L, S, G, P, E, C, H) are ROADMAP entries only, and their
+specs are added here family by family.
 
 ## Convention
 

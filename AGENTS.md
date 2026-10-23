@@ -4,8 +4,9 @@ Single source of truth for **Claude and Copilot**. `CLAUDE.md` and
 `.github/copilot-instructions.md` point here. Code-file specifics load on demand from
 `.github/instructions/`. Deployment recipe: `roadmap/DEPLOYMENT.md`.
 
-Robot manipulator algorithms library (kinematics, dynamics, trajectories, manipulator control) for
-resource-constrained embedded systems. Real-time, deterministic, no heap. The shared numerical
+Robotics algorithms library for resource-constrained embedded systems: robot manipulators today
+(kinematics, dynamics, trajectories, manipulator control); mobile, aerial, legged and marine families
+are planned in `ROADMAP.md`. Real-time, deterministic, no heap. The shared numerical
 primitives (`math`, `solvers`, …) are consumed from
 [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp) via `FetchContent`
 and included as `numerical/<domain>/…`.
@@ -54,8 +55,10 @@ and included as `numerical/<domain>/…`.
 
 ## Namespaces
 
-`dynamics`, `kinematics`, and new: `trajectory`, `controllers` (manipulator control). Shared
-primitives keep their upstream namespaces (`math`, `solvers`, …) from numerical-toolbox.
+`dynamics`, `kinematics`, and new: `trajectory`, `controllers` (manipulator control). Planned by the
+roadmap families: `mobile`, `aerial`, `legged`, `marine`, `grasping`, `planning`, `localization`,
+`calibration`, `safety`. Shared primitives keep their upstream namespaces (`math`, `solvers`, …) from
+numerical-toolbox; generic algorithms belong there, not here.
 
 ## Kinematics & dynamics conventions
 
