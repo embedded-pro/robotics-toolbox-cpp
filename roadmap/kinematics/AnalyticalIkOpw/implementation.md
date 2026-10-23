@@ -121,5 +121,5 @@ function Emit(arm, w, singular):  q = signs ⊙ ((arm, w) + offsets), each wrapp
 - Doc: `doc/kinematics/AnalyticalIkOpw.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestAnalyticalIkOpw.cpp` → the `_test` target.
-- Depends on: M6 (`SE3Transform`).
+- Depends on: NT53 (`math::SE3Transform`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

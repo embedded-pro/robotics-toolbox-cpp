@@ -24,7 +24,7 @@ The canonical worked example is
 [trajectory/PolynomialTrajectory](trajectory/PolynomialTrajectory/implementation.md).
 
 Conventions shared by every spec: 6-vectors are ordered linear part first — twists `(v; ω)`, wrenches
-`(f; n)` — as fixed by [kinematics/SE3Transform](kinematics/SE3Transform/implementation.md); dynamics
+`(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE3Transform/implementation.md) (NT53); dynamics
 and Jacobians reach controllers through interfaces implemented by
 [dynamics/ChainDynamicsModel](dynamics/ChainDynamicsModel/implementation.md) and
 [kinematics/GeometricJacobian](kinematics/GeometricJacobian/implementation.md).
@@ -79,10 +79,14 @@ with `EXPECT_NEAR` and `math::Tolerance<float>()` (or an explicit tolerance).
 > **Float-only.** The `template<typename T>` signature is retained so `Q15`/`Q31` could be enabled
 > per algorithm later by relaxing the `static_assert` and adding instantiations; none is planned.
 
+Generic algorithms are specified in numerical-toolbox-cpp's own `roadmap/` and referenced here as
+**NT** plus its master-list item number (NT53 is upstream item 53); see `../ROADMAP.md` → Upstream
+prerequisites.
+
 ## Index
 
 ### `kinematics`
-`SE3Transform` (M6) · `DenavitHartenberg` (M7) · `GeometricJacobian` (M8) · `ManipulabilityIndex` (M11) · `PoseInverseKinematics` (M13) · `RedundancyResolution` (M14) · `ProductOfExponentials` (M15) · `AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26) · `ChainPoseKinematics` (M30)
+`DenavitHartenberg` (M7) · `GeometricJacobian` (M8) · `ManipulabilityIndex` (M11) · `PoseInverseKinematics` (M13) · `RedundancyResolution` (M14) · `ProductOfExponentials` (M15) · `AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26) · `ChainPoseKinematics` (M30)
 
 ### `dynamics`
 `GenericJointLink` (M1) · `FrictionCompensation` (M4) · `MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CompositeRigidBodyAlgorithm` (M28) · `ChainDynamicsModel` (M29) · `CoriolisMatrixAndRegressor` (M31) · `RneaExternalWrench` (M32) · `ForwardDynamicsIntegrator` (M34)

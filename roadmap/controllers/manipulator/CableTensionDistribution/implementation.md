@@ -11,7 +11,7 @@ serial-arm Jacobian — and no QP solver is needed.
 ```cpp
 template<typename T, std::size_t NumCables, std::size_t WrenchDim>   # static_assert(std::is_floating_point_v<T>); instantiated for float
 class CableTensionDistribution:            # static_assert(WrenchDim == 6 || WrenchDim <= 3); NumCables ≥ WrenchDim
-    # WrenchDim = 6: spatial platform, wrench (f; n) about the platform origin, world frame (M6 order)
+    # WrenchDim = 6: spatial platform, wrench (f; n) about the platform origin, world frame (NT53 order)
     # WrenchDim ≤ 3: point-mass platform, force rows only (2 = planar xy); platform anchors ignored
     std::array<math::Vector<T,3>, NumCables> baseAnchors       # aᵢ, world frame
     std::array<math::Vector<T,3>, NumCables> platformAnchors   # bᵢ, platform frame
@@ -28,11 +28,11 @@ using WrenchVector    = math::Vector<T, WrenchDim>              # wrench the cab
 ```cpp
 CableTensionDistribution(const AnchorArray& baseAnchors, const AnchorArray& platformAnchors, T tMin, T tMax)
 
-std::optional<StructureMatrix> ComputeStructureMatrix(const kinematics::SE3Transform<T>& platformPose) const
+std::optional<StructureMatrix> ComputeStructureMatrix(const math::SE3Transform<T>& platformPose) const
 
 # nullopt when the wrench is not reachable with tMin ≤ t ≤ tMax (or the geometry is degenerate):
 std::optional<TensionVector> Distribute(const WrenchVector& wrench,
-                                        const kinematics::SE3Transform<T>& platformPose) const   # hot path
+                                        const math::SE3Transform<T>& platformPose) const   # hot path
 ```
 
 ## Algorithm (pseudocode)
@@ -107,6 +107,6 @@ function Distribute(w, pose):                           # OPTIMIZE_FOR_SPEED
 - New module: create `robotics/controllers/manipulator/CMakeLists.txt` via `robotics_add_header_library(...)`,
   add a `test/` subdir, register it in `robotics/CMakeLists.txt`, and add a
   `doc/controllers/manipulator/` folder.
-- Depends on: M6 (`SE3Transform`); `solvers::TrySolveSystem` from
+- Depends on: NT53 (`math::SE3Transform`); `solvers::TrySolveSystem` from
   [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

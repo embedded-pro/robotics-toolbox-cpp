@@ -40,7 +40,7 @@ function SectionTransform(arc):                 # OPTIMIZE_FOR_SPEED, robot-inde
 
 function Forward():                             # OPTIMIZE_FOR_SPEED
     A = Identity
-    for i in 0..NumSections-1: A = A * SectionTransform(sections[i])   # M6 compose
+    for i in 0..NumSections-1: A = A * SectionTransform(sections[i])   # NT53 compose
     return A
 
 function InverseSection(tip):                   # tip position in the section base frame, κs < 2π
@@ -81,5 +81,5 @@ function InverseSection(tip):                   # tip position in the section ba
 - Doc: `doc/kinematics/ContinuumKinematics.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestContinuumKinematics.cpp` → the `_test` target.
-- Depends on: M6 (`SE3Transform`).
+- Depends on: NT53 (`math::SE3Transform`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

@@ -30,6 +30,6 @@ orders screws `(ω; v)`, this library `(v; ω)`); R. W. Brockett, "Robotic Manip
 of Exponentials Formula," 1984.
 
 ## See also
-`SE3Transform` (M6, `Exp` and `Adjoint`), `ChainPoseKinematics` (M30, `FrameChain`),
+`math::SE3Transform` (NT53, `Exp` and `Adjoint`), `ChainPoseKinematics` (M30, `FrameChain`),
 `GeometricJacobian` (M8), `DenavitHartenberg` (M7, the frame-based alternative), `MatrixExponential`
 ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp), test cross-check).

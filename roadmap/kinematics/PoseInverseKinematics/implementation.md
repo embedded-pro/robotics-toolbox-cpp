@@ -42,7 +42,7 @@ PoseIkResult<T, Dof>  Solve(const SE3Transform<T>& target, const JointVector& q0
 
 ```text
 function WeightedError(target, q):
-    e = SE3Transform::PoseError(target, arm.ToolPose(q))   # (Δp; true log-map rotation vector), M6
+    e = SE3Transform::PoseError(target, arm.ToolPose(q))   # (Δp; true log-map rotation vector), NT53
     return (e.linear; ρ·e.angular)
 
 function Solve(target, q0):                     # OPTIMIZE_FOR_SPEED
@@ -83,7 +83,7 @@ function Damping(A0):                           # Nakamura–Hanafusa / Chiaveri
 - **Units:** position error is in m, rotation error in rad. `ρ` (≈ the arm's reach or tool length) converts
   radians to metres in both the stopping test and the step. With `λ = 0` and invertible `J`, `W` cancels
   (`Δq = J⁻¹e`); it matters for damping, redundancy and unreachable targets.
-- **Orientation error** is `SE3Transform::PoseError` — the true log map, `|eR| ≤ π`, short way round.
+- **Orientation error** is `math::SE3Transform::PoseError` — the true log map, `|eR| ≤ π`, short way round.
   `2·vec(error quaternion)` equals `2 sin(φ/2)·n̂`, which is only a small-angle approximation of `φ·n̂`
   (0.959 vs 1 rad at φ = 1 rad) and must not be used.
 - **Adaptive damping:** `λ = 0` away from singularities (fast Newton convergence), rising smoothly to
@@ -105,5 +105,5 @@ function Damping(A0):                           # Nakamura–Hanafusa / Chiaveri
 - Doc: `doc/kinematics/PoseInverseKinematics.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestPoseInverseKinematics.cpp` → the `_test` target.
-- Depends on: M6 (`SE3Transform::PoseError`), M8 (`JacobianProvider`); upstream `solvers::LuDecomposition`.
+- Depends on: NT53 (`math::SE3Transform::PoseError`), M8 (`JacobianProvider`); upstream `solvers::LuDecomposition`.
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

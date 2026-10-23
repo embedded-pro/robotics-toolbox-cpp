@@ -35,6 +35,6 @@ A. Pott, T. Bruckmann, L. Mikelsons, "Closed-form Force Distribution for Paralle
 Over-Constrained Cable-Driven Parallel Robots," *Computational Kinematics*, 2014.
 
 ## See also
-`SE3Transform` (M6, platform pose and wrench convention); `ParallelManipulatorKinematics` (M23,
+`math::SE3Transform` (NT53, platform pose and wrench convention); `ParallelManipulatorKinematics` (M23,
 platform pose from actuator lengths); `solvers::TrySolveSystem` (the small wrench-space solve, from
 [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)).

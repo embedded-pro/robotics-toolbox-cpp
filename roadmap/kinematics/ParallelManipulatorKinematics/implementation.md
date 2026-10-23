@@ -64,7 +64,7 @@ function Inverse(pose):                          # OPTIMIZE_FOR_SPEED, closed fo
 
 function LegJacobian(pose):                      # row i = (nᵢᵀ, (R·pᵢ × nᵢ)ᵀ), nᵢ = unit leg vector
     for i: a = pose.R·pᵢ;  n = Normalize(a + pose.p − bᵢ);  row i = (n ; CrossProduct(a, n))
-    # (v; ω): platform-origin velocity and angular velocity, base frame (M6 order); statics: wrench (f; n) = Jᵀ·legForces
+    # (v; ω): platform-origin velocity and angular velocity, base frame (NT53 order); statics: wrench (f; n) = Jᵀ·legForces
 
 function Forward(L, guess):                      # Newton on SE(3)
     x = guess
@@ -128,5 +128,5 @@ function Forward(θ):                             # three-sphere intersection, c
 - Tests: `robotics/kinematics/test/TestStewartGoughKinematics.cpp`, `robotics/kinematics/test/TestDeltaKinematics.cpp`
 - Doc: `doc/kinematics/ParallelManipulatorKinematics.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`; both tests → the `_test` target.
-- Depends on: M6 (`SE3Transform`).
+- Depends on: NT53 (`math::SE3Transform`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

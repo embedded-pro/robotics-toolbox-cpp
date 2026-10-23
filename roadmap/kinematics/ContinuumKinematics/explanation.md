@@ -34,6 +34,6 @@ R. J. Webster III, B. A. Jones, "Design and Kinematic Modeling of Constant Curva
 A Review," *Int. J. Robotics Research*, 29(13), 2010.
 
 ## See also
-`SE3Transform` (M6, per-section transform and composition), `PoseInverseKinematics` (M13, the
+`math::SE3Transform` (NT53, per-section transform and composition), `PoseInverseKinematics` (M13, the
 iterative multi-section inverse), `Quaternion`
 ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp), orientation blending).

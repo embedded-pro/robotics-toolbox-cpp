@@ -3,8 +3,10 @@
 Prioritized backlog for the robot-manipulator stack (kinematics, dynamics, trajectories,
 and manipulator control). Shared numerical primitives (`math`, `solvers`, …) are consumed from
 [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp); upstream already
-provides `Matrix`, `Quaternion`, `MatrixExponential`, Gaussian elimination, Cholesky, LU, QR, SVD,
-Jacobi eigen-solver and Runge-Kutta integrators, but no SE(3) type and no general QP solver.
+provides `Matrix`, `Quaternion`, `MatrixExponential`, Gaussian elimination, Cholesky, LU, QR, SVD
+(tall and wide), Jacobi eigen-solver and Runge-Kutta integrators, but no general QP solver. Generic
+pieces this roadmap needs are specified and built upstream; see
+[Upstream prerequisites](#upstream-prerequisites-numerical-toolbox).
 
 ## Robot manipulators & other manipulator types
 
@@ -21,14 +23,24 @@ usable manipulator stack. Two current limitations gate many items below:
 > limits, armature), **M30** (full-pose kinematics) and **M8** (6×N Jacobian) lift these limits.
 
 **Conventions (normative for every item):** 6-vectors are ordered linear part first — twists `(v; ω)`,
-wrenches `(f; n)` — as defined by **M6**; the geometric Jacobian has linear rows first; orientation
-errors use the SE(3) logarithm (`PoseError`), never angle subtraction. Controllers receive dynamics and
-Jacobians through small interfaces (`EulerLagrangeDynamics`, `InverseDynamicsModel`, `JacobianProvider`)
-implemented by M29 / M8, so they can be tested with StrictMock and bound to concrete types on
-hard real-time paths.
+wrenches `(f; n)` — as defined by upstream `math::SE3Transform` (**NT53**); the geometric Jacobian
+has linear rows first; orientation errors use the SE(3) logarithm (`PoseError`), never angle
+subtraction. Controllers receive dynamics and Jacobians through small interfaces
+(`EulerLagrangeDynamics`, `InverseDynamicsModel`, `JacobianProvider`) implemented by M29 / M8, so
+they can be tested with StrictMock and bound to concrete types on hard real-time paths.
 
 All items are *float-only* — torques, lengths, and inertias exceed the `Q15`/`Q31` range, matching the
 existing `dynamics/` convention.
+
+### Upstream prerequisites (numerical-toolbox)
+
+Generic algorithms live in numerical-toolbox-cpp and are referenced here as **NT** plus its
+master-list item number (NT53 is upstream item 53). A robotics item that depends on one needs a
+numerical-toolbox pin that ships it.
+
+| #    | Component                                             | Upstream module | Spec                                                                                                                             | Needed by                                      |
+|------|-------------------------------------------------------|-----------------|----------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------|
+| NT53 | SE(3) transform, twists, wrenches, exp/log, PoseError | `math`          | [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE3Transform/implementation.md) | M7, M8, M10, M13, M15, M21, M23, M25, M26, M30 |
 
 ### Manipulator list (by priority)
 
@@ -40,33 +52,32 @@ existing `dynamics/` convention.
 | M4  | Friction compensation (Coulomb + viscous + Stribeck)            | `dynamics`                | —          | ★☆☆☆☆      |
 | M5  | PD + gravity compensation control                               | `controllers/manipulator` | M29        | ★☆☆☆☆      |
 | M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —          | ★☆☆☆☆      |
-| M6  | SE(3) transform, twists, wrenches, adjoint, exp/log             | `kinematics`              | —          | ★★☆☆☆      |
 | M28 | Composite Rigid Body Algorithm (mass matrix)                    | `dynamics`                | —          | ★★☆☆☆      |
 | M29 | Chain dynamics model (link chain → M, C, g, inverse dynamics)   | `dynamics`                | M28        | ★★☆☆☆      |
-| M30 | Chain pose kinematics (full-pose FK, frame chain)               | `kinematics`              | M6         | ★★☆☆☆      |
-| M7  | Denavit-Hartenberg parameters (standard + modified)             | `kinematics`              | M6, M30    | ★★☆☆☆      |
-| M8  | Geometric Jacobian (6×N), bias term, Jacobian provider          | `kinematics`              | M6, M30    | ★★☆☆☆      |
+| M30 | Chain pose kinematics (full-pose FK, frame chain)               | `kinematics`              | NT53       | ★★☆☆☆      |
+| M7  | Denavit-Hartenberg parameters (standard + modified)             | `kinematics`              | NT53, M30  | ★★☆☆☆      |
+| M8  | Geometric Jacobian (6×N), bias term, Jacobian provider          | `kinematics`              | NT53, M30  | ★★☆☆☆      |
 | M9  | S-curve (jerk-limited) trajectory                               | `trajectory` (new)        | M3         | ★★☆☆☆      |
-| M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | M6         | ★★☆☆☆      |
+| M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | NT53       | ★★☆☆☆      |
 | M11 | Manipulability ellipsoid / Yoshikawa index                      | `kinematics`              | M8         | ★★☆☆☆      |
 | M33 | Cubic spline through via points                                 | `trajectory` (new)        | —          | ★★☆☆☆      |
 | M34 | Forward-dynamics integrator (simulation step)                   | `dynamics`                | —          | ★★☆☆☆      |
 | M12 | Computed-torque (inverse-dynamics) control                      | `controllers/manipulator` | M29        | ★★★☆☆      |
-| M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | M6, M8     | ★★★☆☆      |
+| M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, M8   | ★★★☆☆      |
 | M14 | Redundancy resolution / null-space projection                   | `kinematics`              | M8         | ★★★☆☆      |
-| M15 | Product-of-Exponentials forward kinematics                      | `kinematics`              | M6         | ★★★☆☆      |
+| M15 | Product-of-Exponentials forward kinematics                      | `kinematics`              | NT53       | ★★★☆☆      |
 | M16 | Momentum-based collision-detection observer                     | `dynamics`                | M29, M31   | ★★★☆☆      |
 | M17 | Impedance control                                               | `controllers/manipulator` | M8, M29    | ★★★☆☆      |
 | M31 | Coriolis matrix and inertial-parameter regressor                | `dynamics`                | M28        | ★★★☆☆      |
 | M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29    | ★★★★☆      |
 | M19 | Hybrid position/force control                                   | `controllers/manipulator` | M8, M29    | ★★★★☆      |
 | M20 | Passivity-based adaptive control (Slotine-Li)                   | `controllers/manipulator` | M31        | ★★★★☆      |
-| M21 | Analytical IK for ortho-parallel 6R arms with a spherical wrist | `kinematics`              | M6         | ★★★★☆      |
+| M21 | Analytical IK for ortho-parallel 6R arms with a spherical wrist | `kinematics`              | NT53       | ★★★★☆      |
 | M22 | Dynamic (base-parameter) identification                         | `dynamics`                | M31        | ★★★★☆      |
-| M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta)          | `kinematics`              | M6         | ★★★★☆      |
+| M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta)          | `kinematics`              | NT53       | ★★★★☆      |
 | M24 | Mobile-manipulator / nonholonomic-base kinematics               | `kinematics`              | M8, M14    | ★★★★☆      |
-| M25 | Cable-driven tension distribution                               | `controllers/manipulator` | M6         | ★★★★☆      |
-| M26 | Continuum / soft constant-curvature kinematics                  | `kinematics`              | M6         | ★★★★☆      |
+| M25 | Cable-driven tension distribution                               | `controllers/manipulator` | NT53       | ★★★★☆      |
+| M26 | Continuum / soft constant-curvature kinematics                  | `kinematics`              | NT53       | ★★★★☆      |
 | M27 | Time-optimal path parameterization (TOPP-RA)                    | `trajectory` (new)        | M29        | ★★★★★      |
 
 ### Tier 1 — Trivial ★☆☆☆☆
@@ -91,10 +102,6 @@ existing `dynamics/` convention.
 - *Algorithm / paper:* Luh, Walker, Paul (1980).
 
 ### Tier 2 — Easy ★★☆☆☆
-
-**M6. SE(3) transform, twists and wrenches.** Rigid transforms, adjoint, twist/wrench transforms, exponential/logarithm and `PoseError`; fixes the library's `(v; ω)` convention.
-- *Algorithm / paper:* K. Lynch, F. Park, *Modern Robotics* (2017), Ch. 3; Murray, Li, Sastry (1994).
-- *Reuses / builds on:* upstream `Geometry3D`, `Quaternion`.
 
 **M28. Composite Rigid Body Algorithm.** `O(n²)` joint-space mass matrix, sharing the spatial algebra of ABA.
 - *Algorithm / paper:* Walker & Orin (1982); Featherstone (2008), Ch. 6.

@@ -34,6 +34,6 @@ J.-P. Merlet, *Parallel Robots*, 2nd ed. (2006); R. Clavel, "Delta, a Fast Robot
 Geometry," *Int. Symp. on Industrial Robots*, 1988.
 
 ## See also
-`SE3Transform` (M6, platform pose and retraction), `LuDecomposition`
+`math::SE3Transform` (NT53, platform pose and retraction), `LuDecomposition`
 ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp), the Newton step),
 `ManipulabilityIndex` (M11, singularity monitoring).

@@ -3,7 +3,7 @@
 > Roadmap ref: #M8 (Tier 2) · Target: `robotics/kinematics` · Namespace `kinematics` · Type: `float` (templated on `T`, instantiated for `float` only)
 
 The **geometric** Jacobian maps joint rates to the tool's linear velocity (of the tool point) and
-angular velocity, both in the base frame, ordered `(v; ω)` (M6 convention). It is *not* the
+angular velocity, both in the base frame, ordered `(v; ω)` (NT53 convention). It is *not* the
 Lynch–Park "space Jacobian" (whose linear part is the velocity of the point at the base origin);
 M15 provides that one. The routine is model-agnostic: it consumes a `FrameChain` (M30), which the
 link model (M30), DH (M7) and PoE (M15) all produce, so FK, IK, dynamics and controllers share a
@@ -101,6 +101,6 @@ function JointTorques(J, w):                    # statics: τ = Jᵀ·w, w = (f;
 - Coverage: `robotics/kinematics/GeometricJacobian.cpp` → the same instantiations.
 - Test: `robotics/kinematics/test/TestGeometricJacobian.cpp`
 - Doc: `doc/kinematics/GeometricJacobian.md` (per `doc/TEMPLATE.md`)
-- Depends on: M6 (`SE3Transform`), M30 (`FrameChain`, `ChainPoseKinematics`).
+- Depends on: NT53 (`math::SE3Transform`), M30 (`FrameChain`, `ChainPoseKinematics`).
 - After deployment, the shipped `InverseKinematics` should build its 3×N Jacobian from this routine.
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

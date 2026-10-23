@@ -4,7 +4,7 @@
 
 ## Data structures
 
-Poses are `kinematics::SE3Transform<T>` (M6); twists are `kinematics::Vector6<T>` ordered linear-first
+Poses are `math::SE3Transform<T>` (NT53); twists are `math::Vector6<T>` ordered linear-first
 `(v; ω)`. Orientation is interpolated with the upstream `math::Quaternion<T>`
 (`numerical/math/Quaternion.hpp`, [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp):
 `FromRotationMatrix`, `Slerp`, `ToRotationMatrix`, `Conjugate`). `TrajectoryState<T>` comes from
@@ -13,8 +13,8 @@ Poses are `kinematics::SE3Transform<T>` (M6); twists are `kinematics::Vector6<T>
 ```cpp
 template<typename T>               # static_assert(std::is_floating_point_v<T>); instantiated for float
 struct CartesianState:
-    kinematics::SE3Transform<T> pose
-    kinematics::Vector6<T>      twist          # (v; ω), base frame — feed-forward for task-space control
+    math::SE3Transform<T> pose
+    math::Vector6<T>      twist          # (v; ω), base frame — feed-forward for task-space control
 
 # TimeLaw requirement (static polymorphism, no virtual call on the hot path):
 #   TrajectoryState<T> Sample(T t) const  — position = progress s ∈ [0, 1], velocity = ṡ
@@ -32,8 +32,8 @@ class CartesianSlerpInterpolation:
 ## Interface
 
 ```text
-CartesianSlerpInterpolation(const kinematics::SE3Transform<T>& start,
-                            const kinematics::SE3Transform<T>& goal, const TimeLaw& timeLaw)
+CartesianSlerpInterpolation(const math::SE3Transform<T>& start,
+                            const math::SE3Transform<T>& goal, const TimeLaw& timeLaw)
 CartesianState<T> Sample(T t)       # hot path
 T                 Duration()        # = timeLaw.Duration()
 ```
@@ -91,7 +91,7 @@ including the sign-flipped (obtuse) case.
   `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class CartesianSlerpInterpolation<float, PolynomialTrajectory<float>>;` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
-- Uses `robotics/trajectory/TrajectoryTypes.hpp`, `robotics/kinematics/SE3Transform.hpp` (M6) and
+- Uses `robotics/trajectory/TrajectoryTypes.hpp`, `numerical/math/SE3Transform.hpp` (NT53) and
   `numerical/math/Quaternion.hpp`; `robotics.trajectory` links `robotics.kinematics`.
 - Coverage: `robotics/trajectory/CartesianSlerpInterpolation.cpp` →
   `template class CartesianSlerpInterpolation<float, PolynomialTrajectory<float>>;`
@@ -103,5 +103,5 @@ including the sign-flipped (obtuse) case.
 - New module (first trajectory item only): `robotics/trajectory/CMakeLists.txt` with
   `robotics_add_header_library(robotics.trajectory)`, `TrajectoryTypes.hpp` in `target_sources`, a
   `test/` subdir, `add_subdirectory(trajectory)` in `robotics/CMakeLists.txt`, and a `doc/trajectory/` folder.
-- Depends on: M6, M2 (any other `TimeLaw`, e.g. M3/M9, works without extra code).
+- Depends on: NT53, M2 (any other `TimeLaw`, e.g. M3/M9, works without extra code).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

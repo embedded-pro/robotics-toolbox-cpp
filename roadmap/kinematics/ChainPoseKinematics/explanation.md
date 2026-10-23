@@ -26,4 +26,4 @@ B. Siciliano, L. Sciavicco, L. Villani, G. Oriolo, *Robotics: Modelling, Plannin
 Ch. 2 (direct kinematics).
 
 ## See also
-`ForwardKinematics` (shipped, position-only), `SE3Transform` (M6), `GeometricJacobian` (M8).
+`ForwardKinematics` (shipped, position-only), `math::SE3Transform` (NT53), `GeometricJacobian` (M8).

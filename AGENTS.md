@@ -60,7 +60,7 @@ primitives keep their upstream namespaces (`math`, `solvers`, …) from numerica
 ## Kinematics & dynamics conventions
 
 - 6-vectors are ordered **linear part first**: twists `(v; ω)`, wrenches `(f; n)`; the geometric
-  Jacobian has linear rows first (roadmap M6/M8). Featherstone `(ω; v)` ordering stays internal to the
+  Jacobian has linear rows first (upstream `math::SE3Transform`, roadmap NT53/M8). Featherstone `(ω; v)` ordering stays internal to the
   recursive dynamics algorithms.
 - Orientation errors use the SE(3) logarithm (`PoseError`), never angle subtraction.
 - The tool frame and the base mounting offset are explicit kinematic parameters — never derived from a

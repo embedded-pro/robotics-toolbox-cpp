@@ -12,7 +12,7 @@ struct BaseState:                               # planar pose of the axle midpoi
 template<typename T, std::size_t ArmDof>
 class MobileManipulatorKinematics:
     const JacobianProvider<T, 6, ArmDof>& arm   # M8: J and ToolPose in the arm-base frame
-    SE3Transform<T>                       mount # arm base in the mobile-base frame (M6)
+    SE3Transform<T>                       mount # arm base in the mobile-base frame (NT53)
     T                                     wheelBase    # L, axle length
 ```
 
@@ -27,7 +27,7 @@ std::array<T, 2>          WheelSpeeds(T v, T omega) const        # (left, right)
 ```
 
 Columns of `Compute` act on `u = (v, ω, q̇)`: base forward speed, base yaw rate, arm joint rates.
-Rows are the tool-point twist `(v; ω)` in the world frame (M6/M8 ordering).
+Rows are the tool-point twist `(v; ω)` in the world frame (NT53/M8 ordering).
 
 ## Algorithm (pseudocode)
 
@@ -80,5 +80,5 @@ function WheelSpeeds(v, ω):
 - Doc: `doc/kinematics/MobileManipulatorKinematics.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestMobileManipulatorKinematics.cpp` → the `_test` target.
-- Depends on: M6 (`SE3Transform`), M8 (`JacobianProvider`).
+- Depends on: NT53 (`math::SE3Transform`), M8 (`JacobianProvider`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.
