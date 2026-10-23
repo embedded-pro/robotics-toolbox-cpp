@@ -1,6 +1,6 @@
 # Cable Tension Distribution — Unit Test Plan (Pseudocode)
 
-> GoogleTest · `TEST_F` (`float`) · `StrictMock` only · no heap. No mocks needed: pure geometry + closed form.
+> GoogleTest · `TEST_F` (`float`) · `StrictMock` only · no heap. No mocks needed: pure geometry, closed form and QP.
 
 ## Fixture
 
@@ -20,6 +20,12 @@ class TestCableTensionDistributionSquare : public ::testing::Test:   # 2 cables,
 class TestCableTensionDistributionSpatial : public ::testing::Test:  # 8 cables, WrenchDim = 6
     base[0] = (2, 2, 2), platform[0] = (0.2, 0, 0); remaining anchors: cube / box corners
     CableTensionDistribution<float,8,6> distributor{ base, platform, tMin, tMax }
+
+class TestCableTensionDistributionCrossed : public ::testing::Test:  # 8 cables, WrenchDim = 6, crossed
+    base     = (±2, ±2, {0, 3}) in the order (−,−,0) (−,−,3) (−,+,0) (−,+,3) (+,−,0) (+,−,3) (+,+,0) (+,+,3)
+    platform = same order with x negated: (0.2,−0.2,−0.1) (0.2,−0.2,0.1) (0.2,0.2,−0.1) (0.2,0.2,0.1)
+               (−0.2,−0.2,−0.1) (−0.2,−0.2,0.1) (−0.2,0.2,−0.1) (−0.2,0.2,0.1)
+    pose = { I, p = (0.3, −0.2, 1.4) }, tMin = 10, tMax = 200      # rank(A) = 6
 # each case below is a TEST_F(<fixture>, <name>); default fixture TestCableTensionDistribution
 ```
 
@@ -65,6 +71,19 @@ square_case_unique_solution (TestCableTensionDistributionSquare):
 collinear_cables_return_nullopt (TestCableTensionDistributionSquare):
     Arrange: pose.p = (0, 1, 0)    (both cables horizontal and opposite ⇒ rank(A) = 1)
     Assert:  Distribute(w, pose) == nullopt
+
+exact_distribution_matches_closed_form_with_active_bound:
+    Arrange: w = (0, 150)
+    Assert:  DistributeExact(w, pose) ≈ (200, 50, 50) == Distribute(w, pose)
+
+exact_distribution_succeeds_where_closed_form_fails (TestCableTensionDistributionCrossed):
+    Arrange: w = (56.8, −183.5, −35.3, −2.0, 41.7, −2.7)
+    Assert:  Distribute(w, pose) == nullopt;
+             DistributeExact(w, pose) ≈ (200, 21.0187, 23.9864, 10, 88.1208, 197.9432, 76.4249, 23.7712), A·t ≈ w
+
+exact_distribution_reports_infeasible_wrench:
+    Arrange: w = (0, 300)
+    Assert:  DistributeExact(w, pose) == nullopt
 ```
 
 ## Reference vectors
@@ -73,6 +92,11 @@ collinear_cables_return_nullopt (TestCableTensionDistributionSquare):
   `t = 105 + (2W/3)·(1, −½, −½)` — symmetric tensions on cables 1 and 2.
 - Upper-bound pass: fix `t₀ = 200` ⇒ `w' = (0, −50)` ⇒ square pair gives `t₁ = t₂ = 50`.
 - Square fixture: `u = (∓1, 1)/√2`, vertical `w = (0, W)` ⇒ `t₀ = t₁ = W/√2`.
+- Planar `w = (0, 150)`: null line `t = (100, −50, −50) + β·(1, 1, 1)`, bounds ⇒ `β ∈ [60, 100]`, unconstrained
+  `β* = 105` ⇒ `β = 100` ⇒ `(200, 50, 50)` — the closed form is exact here.
+- Crossed fixture: the exact optimum has cables 0 (`tMax`) and 3 (`tMin`) at bounds; found by enumerating
+  the `3⁸` bound patterns (python3/numpy). The improved closed form fixes cable 3 at `tMin`, then cable 5 at
+  `tMax` (the optimum keeps it at 197.9432) and cable 0, and runs out of free cables (6 < WrenchDim + 1).
 
 ## Edge cases
 

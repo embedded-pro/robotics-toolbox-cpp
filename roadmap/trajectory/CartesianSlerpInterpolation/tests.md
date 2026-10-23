@@ -6,10 +6,10 @@
 
 ```cpp
 class TestCartesianSlerp : public ::testing::Test:
-    using Law = PolynomialTrajectory<float>
+    using Law = motion_profiles::PolynomialProfile<float>      # upstream NT55
     Law linearLaw{ { .q0 = 0, .qf = 1, .v0 = 1, .vf = 1 }, 1.0f, Degree::Cubic }   # s(t) = t, ṡ = 1
-    kinematics::SE3Transform<float> start{ .R = I,        .p = {0,0,0} }
-    kinematics::SE3Transform<float> goal { .R = Rz(90°),  .p = {1,0,0} }
+    math::SE3Transform<float> start{ .R = I,        .p = {0,0,0} }
+    math::SE3Transform<float> goal { .R = Rz(90°),  .p = {1,0,0} }
     CartesianSlerpInterpolation<float, Law> path{ start, goal, linearLaw }
 # each case below is a TEST_F(TestCartesianSlerp, <name>)
 ```

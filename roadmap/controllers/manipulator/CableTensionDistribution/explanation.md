@@ -22,7 +22,9 @@ to the mid-range value `(tMin + tMax)/2` that still reproduces the wrench, which
 comfortably away from slack and overload. If some cable still falls outside its range, the improved
 method pins the worst one at its limit, subtracts its pull from the wrench, and re-solves with the
 remaining cables — repeating at most once per cable, and reporting "not feasible" if too few cables are
-left.
+left. Pinning the worst cable is a greedy choice that can be wrong near the edge of the feasible
+workspace; there, the exact variant solves the same "closest to mid-range" problem as a small quadratic
+program, which finds a solution whenever one exists.
 
 ## Key parameters
 - **baseAnchors, platformAnchors** — winch exit points (world) and attachment points (platform frame).
@@ -35,6 +37,7 @@ A. Pott, T. Bruckmann, L. Mikelsons, "Closed-form Force Distribution for Paralle
 Over-Constrained Cable-Driven Parallel Robots," *Computational Kinematics*, 2014.
 
 ## See also
-`SE3Transform` (M6, platform pose and wrench convention); `ParallelManipulatorKinematics` (M23,
-platform pose from actuator lengths); `solvers::TrySolveSystem` (the small wrench-space solve, from
-[numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)).
+`math::SE3Transform` (NT53, platform pose and wrench convention); `ParallelManipulatorKinematics` (M23,
+platform pose from actuator lengths); `solvers::TrySolveSystem` (the small wrench-space solve) and
+`solvers::ActiveSetQp` (NT65, the exact fallback), from
+[numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp).

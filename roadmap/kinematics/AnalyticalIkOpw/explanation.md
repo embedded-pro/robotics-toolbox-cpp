@@ -36,6 +36,6 @@ Robotics Workshop*, 2014; D. L. Pieper, "The Kinematics of Manipulators Under Co
 thesis, Stanford University, 1968.
 
 ## See also
-`SE3Transform` (M6, the flange pose), `PoseInverseKinematics` (M13, the iterative fallback for other
+`math::SE3Transform` (NT53, the flange pose), `PoseInverseKinematics` (M13, the iterative fallback for other
 layouts), `DenavitHartenberg` (M7), `Cordic` ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp),
 fixed-cost trig).

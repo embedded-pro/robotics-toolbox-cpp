@@ -24,5 +24,5 @@ E. Hairer, C. Lubich, G. Wanner, *Geometric Numerical Integration* (2006), Ch. I
 R. Featherstone, *Rigid Body Dynamics Algorithms* (2008), Ch. 7.
 
 ## See also
-`ArticulatedBodyAlgorithm`, upstream Runge-Kutta integrators (numerical-toolbox-cpp), the Robot Arm
-simulator.
+`ArticulatedBodyAlgorithm`, upstream `SymplecticIntegrators` (NT58) and Runge-Kutta integrators
+(numerical-toolbox-cpp), the Robot Arm simulator.

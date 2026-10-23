@@ -47,7 +47,7 @@ function Update(q, q̇, τ, dt):                     # OPTIMIZE_FOR_SPEED
 
 ## Numerical / embedded notes
 
-- Subtract a friction model (M4) from `τ` if friction is not part of `M, C, g`; otherwise friction
+- Subtract a friction model (NT57) from `τ` if friction is not part of `M, C, g`; otherwise friction
   shows up as a (false) external torque.
 - The residual is a first-order low-pass of `τ_ext` with bandwidth `K_O`; larger gains detect faster
   but amplify model error and velocity noise. Thresholds are set above the residual seen in
@@ -57,7 +57,7 @@ function Update(q, q̇, τ, dt):                     # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/dynamics/MomentumObserver.hpp` — `#pragma once` → `#pragma GCC optimize("O3","fast-math")`,
+- Header: `robotics/dynamics/MomentumObserver.hpp` — `#pragma once`,
   `OPTIMIZE_FOR_SPEED` on `Update`, `extern template class MomentumObserver<float, 2>;` / `<float, 3>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/dynamics/MomentumObserver.cpp` → the same instantiations.

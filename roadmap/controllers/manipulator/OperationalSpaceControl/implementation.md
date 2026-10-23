@@ -22,7 +22,7 @@ OperationalSpaceControl(const dynamics::EulerLagrangeDynamics<T,Dof>& model,
                         const SquareMatrix& Kp, const SquareMatrix& Kd, T sigma)
 
 JointVector ComputeTorque(const JointVector& q, const JointVector& qDot,
-                          const kinematics::SE3Transform<T>& desiredPose,
+                          const math::SE3Transform<T>& desiredPose,
                           const TaskVector& xdDot, const TaskVector& xdDdot,
                           const JointVector& tauSecondary)       # hot path
 ```
@@ -80,8 +80,8 @@ function ComputeTorque(q, qDot, desiredPose, xdDot, xdDdot, tauSecondary):   # O
 
 ## Deployment
 
-- Header: `robotics/controllers/manipulator/OperationalSpaceControl.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `ComputeTorque`, and
+- Header: `robotics/controllers/manipulator/OperationalSpaceControl.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `ComputeTorque`, and
   `extern template class OperationalSpaceControl<float, 2, 2>;` / `<float, 3, 2>` / `<float, 7, 6>`
   under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/controllers/manipulator/OperationalSpaceControl.cpp` →
@@ -93,7 +93,7 @@ function ComputeTorque(q, qDot, desiredPose, xdDot, xdDdot, tauSecondary):   # O
 - New module: create `robotics/controllers/manipulator/CMakeLists.txt` via `robotics_add_header_library(...)`,
   add a `test/` subdir, register it in `robotics/CMakeLists.txt`, and add a
   `doc/controllers/manipulator/` folder.
-- Depends on: M6 (`SE3Transform`), M8 (`JacobianProvider`), M29 (`ChainDynamicsModel`); `TaskError.hpp`
+- Depends on: NT53 (`math::SE3Transform`), M8 (`JacobianProvider`), M29 (`ChainDynamicsModel`); `TaskError.hpp`
   (specified in M17, deployed with whichever of M17/M18/M19 lands first); `solvers::SolveSystem` from
   [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

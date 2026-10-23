@@ -35,6 +35,6 @@ J. Denavit, R. S. Hartenberg, "A Kinematic Notation for Lower-Pair Mechanisms Ba
 4th ed., Ch. 3 (modified convention).
 
 ## See also
-`SE3Transform` (M6, the per-link transform), `ChainPoseKinematics` (M30, the `FrameChain` it emits),
+`math::SE3Transform` (NT53, the per-link transform), `ChainPoseKinematics` (M30, the `FrameChain` it emits),
 `GeometricJacobian` (M8, consumes the frame chain), `ProductOfExponentials` (M15, the screw-theory
 alternative).

@@ -4,14 +4,16 @@
 
 Closed-form force distribution for cable-driven parallel robots (Pott, Bruckmann, Mikelsons 2009) with
 Pott's improved iteration (2014). The structure matrix comes from the **cable geometry** — never from a
-serial-arm Jacobian — and no QP solver is needed.
+serial-arm Jacobian. The closed form is the deterministic fast path; near the boundary of the
+wrench-feasible workspace, where it can fail, `DistributeExact` solves the same least-distance problem as a
+QP with upstream `solvers::ActiveSetQp` (NT65).
 
 ## Data structures
 
 ```cpp
 template<typename T, std::size_t NumCables, std::size_t WrenchDim>   # static_assert(std::is_floating_point_v<T>); instantiated for float
 class CableTensionDistribution:            # static_assert(WrenchDim == 6 || WrenchDim <= 3); NumCables ≥ WrenchDim
-    # WrenchDim = 6: spatial platform, wrench (f; n) about the platform origin, world frame (M6 order)
+    # WrenchDim = 6: spatial platform, wrench (f; n) about the platform origin, world frame (NT53 order)
     # WrenchDim ≤ 3: point-mass platform, force rows only (2 = planar xy); platform anchors ignored
     std::array<math::Vector<T,3>, NumCables> baseAnchors       # aᵢ, world frame
     std::array<math::Vector<T,3>, NumCables> platformAnchors   # bᵢ, platform frame
@@ -28,11 +30,15 @@ using WrenchVector    = math::Vector<T, WrenchDim>              # wrench the cab
 ```cpp
 CableTensionDistribution(const AnchorArray& baseAnchors, const AnchorArray& platformAnchors, T tMin, T tMax)
 
-std::optional<StructureMatrix> ComputeStructureMatrix(const kinematics::SE3Transform<T>& platformPose) const
+std::optional<StructureMatrix> ComputeStructureMatrix(const math::SE3Transform<T>& platformPose) const
 
 # nullopt when the wrench is not reachable with tMin ≤ t ≤ tMax (or the geometry is degenerate):
 std::optional<TensionVector> Distribute(const WrenchVector& wrench,
-                                        const kinematics::SE3Transform<T>& platformPose) const   # hot path
+                                        const math::SE3Transform<T>& platformPose) const   # hot path
+
+# exact minimum of ‖t − tm·1‖ subject to A·t = w, tMin ≤ t ≤ tMax; nullopt iff infeasible:
+std::optional<TensionVector> DistributeExact(const WrenchVector& wrench,
+                                             const math::SE3Transform<T>& platformPose) const
 ```
 
 ## Algorithm (pseudocode)
@@ -64,12 +70,23 @@ function Distribute(w, pose):                           # OPTIMIZE_FOR_SPEED
         t[k] = clamp(t[k], tMin, tMax);  fixed[k] = true;  free −= 1
         wFree = wFree − A[:, k]·t[k]                    # fixed cable's contribution moves to the wrench side
     return nullopt                                      # fewer than WrenchDim free cables remain
+
+function DistributeExact(w, pose):                      # QP, NT65: ActiveSetQp<T, NumCables, WrenchDim, 2·NumCables>
+    A = ComputeStructureMatrix(pose);  if not A: return nullopt
+    qp = { hessian = I, gradient = −tm·1,
+           equalityMatrix = A, equalityVector = w,
+           inequalityMatrix = [I; −I], inequalityVector = (tMin·1; −tMax·1) }   # t ≥ tMin, −t ≥ −tMax
+    r = ActiveSetQp.Solve(qp)
+    return r.status == Optimal ? r.x : nullopt          # Infeasible: w outside the wrench-feasible set
 ```
 
 ## Complexity & memory
 
 - Time: per pass `O(WrenchDim²·NumCables)` for `Af·Afᵀ` plus an `O(WrenchDim³)` solve; at most
   `NumCables − WrenchDim + 1` passes — deterministic, bounded, no iterative optimiser.
+- `DistributeExact`: one Cholesky of the `NumCables×NumCables` identity (trivial) plus at most the QP's
+  iteration cap of `O(NumCables²)` steps; bounded but slower than the closed form — call it when
+  `Distribute` returns `nullopt`, not every cycle.
 - Memory: one `WrenchDim×NumCables` matrix, one `WrenchDim×WrenchDim` system, a `NumCables` flag array;
   stack only, no heap.
 
@@ -82,8 +99,9 @@ function Distribute(w, pose):                           # OPTIMIZE_FOR_SPEED
   `NumCables = WrenchDim` it reduces to the unique `A⁻¹w` (`tm` cancels).
 - **Improved closed form (Pott 2014).** Fixing the worst-violating cable at its bound and re-solving the
   reduced system enlarges the usable workspace over the plain closed form. It can still return `nullopt`
-  close to the wrench-feasible workspace boundary where an exact LP/QP would succeed — treat `nullopt` as a
-  workspace-boundary event (no exceptions).
+  close to the wrench-feasible workspace boundary where the exact QP succeeds (spatial 8-cable fixture:
+  90 of 4000 boundary-biased feasible wrenches); fall back to `DistributeExact` there, and treat its
+  `nullopt` as a true workspace-boundary event (no exceptions).
 - `TrySolveSystem` (upstream, pivot-threshold Gaussian elimination) reports rank deficiency — near-parallel
   cables or a degenerate pose — as `nullopt`; `Af·Afᵀ` is SPD otherwise, so `math::CholeskyDecomposition`
   (`numerical/math/CholeskyDecomposition.hpp`) is an equivalent choice.
@@ -94,8 +112,8 @@ function Distribute(w, pose):                           # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/controllers/manipulator/CableTensionDistribution.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Distribute`, and
+- Header: `robotics/controllers/manipulator/CableTensionDistribution.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Distribute`, and
   `extern template class CableTensionDistribution<float, 3, 2>;` / `<float, 2, 2>` / `<float, 8, 6>`
   under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/controllers/manipulator/CableTensionDistribution.cpp` →
@@ -107,6 +125,6 @@ function Distribute(w, pose):                           # OPTIMIZE_FOR_SPEED
 - New module: create `robotics/controllers/manipulator/CMakeLists.txt` via `robotics_add_header_library(...)`,
   add a `test/` subdir, register it in `robotics/CMakeLists.txt`, and add a
   `doc/controllers/manipulator/` folder.
-- Depends on: M6 (`SE3Transform`); `solvers::TrySolveSystem` from
+- Depends on: NT53 (`math::SE3Transform`), NT65 (`solvers::ActiveSetQp`); `solvers::TrySolveSystem` from
   [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

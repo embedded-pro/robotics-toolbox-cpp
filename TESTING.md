@@ -79,7 +79,7 @@ manipulability, redundancy resolution, PoE, analytical IK, parallel/mobile/conti
 
 ### 2. Dynamics — `dynamics/`
 `RecursiveNewtonEuler`, `ArticulatedBodyAlgorithm`, `EulerLagrangeSolver`, `NewtonEulerSolver`;
-planned: CRBA, chain-dynamics model, regressor, friction, generic joints.
+planned: CRBA, chain-dynamics model, regressor, generic joints (friction compensation is upstream, NT57).
 
 - **M1 analytic references** — single rod: holding torque `−mgl/2`, `τ = (ml²/3)·q̈`, free fall
   `q̈ = 3g/2l`; 2-link uniform rods: closed-form `M(q)`, `C(q,q̇)q̇`, `g(q)` and the horizontal
@@ -94,7 +94,8 @@ planned: CRBA, chain-dynamics model, regressor, friction, generic joints.
   motion up to the integrator's error; `Ṁ − 2C` skew-symmetric for the Christoffel form.
 
 ### 3. Trajectory generation — `trajectory/` (planned)
-Polynomial, trapezoidal, S-curve, Cartesian SLERP, TOPP.
+Joint-space spline, Cartesian SLERP, TOPP (the scalar polynomial, trapezoidal and S-curve profiles are
+upstream, NT55/NT56/NT60, and tested there with the same metrics).
 
 - **M1 boundary conditions** — endpoint position/velocity/acceleration matched exactly.
 - **M6 limits** — velocity, acceleration and jerk never exceed their bounds; degenerate short moves

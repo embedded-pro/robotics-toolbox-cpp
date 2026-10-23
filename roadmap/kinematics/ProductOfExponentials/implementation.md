@@ -2,7 +2,7 @@
 
 > Roadmap ref: #M15 (Tier 3) · Target: `robotics/kinematics` · Namespace `kinematics` · Type: `float` (templated on `T`, instantiated for `float` only)
 
-Screws follow the library convention (M6): `S = (v; ω)`, linear part first.
+Screws follow the library convention (NT53): `S = (v; ω)`, linear part first.
 
 ## Data structures
 
@@ -32,7 +32,7 @@ static Matrix<T, 6, N> SpaceToGeometric(const Matrix<T, 6, N>& Js, const Vector3
 ```text
 function Compute(q):                            # OPTIMIZE_FOR_SPEED
     A = Identity
-    for i in 0..N-1: A = A * SE3Transform::Exp(screws[i], q[i])      # M6
+    for i in 0..N-1: A = A * SE3Transform::Exp(screws[i], q[i])      # NT53
     return A * home                             # e^{[S₁]q₁}···e^{[Sₙ]qₙ}·M
 
 function SpaceJacobian(q):
@@ -70,7 +70,7 @@ function SpaceToGeometric(Js, pTool):           # J_geo = [[I, −Skew(pTool)], 
   velocity, used by M11/M13/M14 and the controllers — is `J_geo = [[I, −Skew(p_tool)],[0, I]]·J_space`,
   equal column by column to `GeometricJacobian::Compute(Frames(q))`.
 - No per-link frames: every screw is written once in the base frame (the main advantage over DH).
-- `SE3Transform::Exp` handles the prismatic (`ω = 0`) branch and folds a non-unit `ω` into the angle;
+- `math::SE3Transform::Exp` handles the prismatic (`ω = 0`) branch and folds a non-unit `ω` into the angle;
   still author unit `ω` so `qᵢ` is a true angle. Pitched screws (`ω·v ≠ 0`) cannot be expressed as a
   `FrameChain` and are rejected at construction.
 - Body form (`T = M·e^{[B₁]q₁}···`, `Bᵢ = Ad(M⁻¹)·Sᵢ`) is not needed: `J_body = Ad(T⁻¹)·J_space`.
@@ -80,8 +80,8 @@ function SpaceToGeometric(Js, pTool):           # J_geo = [[I, −Skew(pTool)], 
 
 ## Deployment
 
-- Header: `robotics/kinematics/ProductOfExponentials.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Compute`, and
+- Header: `robotics/kinematics/ProductOfExponentials.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Compute`, and
   `extern template class ProductOfExponentials<float, 1>;` / `<float, 2>` / `<float, 6>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/ProductOfExponentials.cpp` → the same instantiations.
@@ -89,5 +89,5 @@ function SpaceToGeometric(Js, pTool):           # J_geo = [[I, −Skew(pTool)], 
 - Doc: `doc/kinematics/ProductOfExponentials.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestProductOfExponentials.cpp` → the `_test` target.
-- Depends on: M6 (`SE3Transform::Exp`, `Adjoint`), M30 (`FrameChain`), M8 (`GeometricJacobian`).
+- Depends on: NT53 (`math::SE3Transform::Exp`, `Adjoint`), M30 (`FrameChain`), M8 (`GeometricJacobian`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

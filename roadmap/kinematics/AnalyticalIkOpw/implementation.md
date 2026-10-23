@@ -86,7 +86,7 @@ function Solve(flange):                         # OPTIMIZE_FOR_SPEED — closed 
     return slot
 
 function acosV(c):  zero denominator or |c| > 1 + tol ⇒ invalid (branch unreachable);  else acos(clamp(c, −1, 1))
-function Emit(arm, w, singular):  q = signs ⊙ ((arm, w) + offsets), each wrapped to (−π, π]
+function Emit(arm, w, singular):  q = signs ⊙ ((arm, w) + offsets), each through math::WrapToPi (NT54, (−π, π])
 ```
 
 ## Complexity & memory
@@ -113,13 +113,13 @@ function Emit(arm, w, singular):  q = signs ⊙ ((arm, w) + offsets), each wrapp
 
 ## Deployment
 
-- Header: `robotics/kinematics/AnalyticalIkOpw.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Solve`, and
+- Header: `robotics/kinematics/AnalyticalIkOpw.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Solve`, and
   `extern template class AnalyticalIkOpw<float>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/AnalyticalIkOpw.cpp` → `template class AnalyticalIkOpw<float>;`
 - Test: `robotics/kinematics/test/TestAnalyticalIkOpw.cpp`
 - Doc: `doc/kinematics/AnalyticalIkOpw.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestAnalyticalIkOpw.cpp` → the `_test` target.
-- Depends on: M6 (`SE3Transform`).
+- Depends on: NT53 (`math::SE3Transform`), NT54 (`math::WrapToPi`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

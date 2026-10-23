@@ -7,8 +7,8 @@
 ```cpp
 class TestForwardDynamicsIntegrator : public ::testing::Test:
     # single uniform rod about ŷ (pendulum) and a 2-link rod chain, gravity (0, 0, −9.81)
-    ForwardDynamicsIntegrator<float, 1, IntegrationMethod::RungeKutta4> pendulum{ rod, gravity }
-    ForwardDynamicsIntegrator<float, 2, IntegrationMethod::SemiImplicitEuler> doubleRod{ rods, gravity }
+    ForwardDynamicsIntegrator<float, 1, IntegrationMethod::RungeKutta4> pendulum{ rod, gravity, 1e-3f }
+    ForwardDynamicsIntegrator<float, 2, IntegrationMethod::SemiImplicitEuler> doubleRod{ rods, gravity, 1e-3f }
 # each case below is a TEST_F(TestForwardDynamicsIntegrator, <name>)
 ```
 
@@ -23,7 +23,7 @@ rk4_energy_drift_is_small:
 semi_implicit_euler_energy_stays_bounded:
     Assert: energy error over 10 s never exceeds its maximum over the first second by more than 2×
 step_acceleration_equals_articulated_body_algorithm:
-    Assert: Step(x, τ, dt).qDDot == ABA(links, x.q, x.q̇, τ, gravity)
+    Assert: Step(x, τ).qDDot == ABA(links, x.q, x.q̇, τ, gravity)
 constant_torque_on_free_link_gives_quadratic_angle:
     Arrange: z-axis rod (gravity ⟂ motion), τ constant
     Assert:  q(t) ≈ ½·(τ / (mL²/3))·t²
@@ -35,5 +35,5 @@ constant_torque_on_free_link_gives_quadratic_angle:
 
 ## Edge cases
 
-- `dt = 0` ⇒ state unchanged.
+- `dt` is fixed at construction (the upstream integrators take `h` there); `dt ≤ 0` is a precondition violation.
 - Zero gravity, zero torque ⇒ constant velocity.

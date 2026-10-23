@@ -78,8 +78,8 @@ function ComputeTorque(q, qDot, qd, qdDot, qdDdot):    # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/controllers/manipulator/SlotineLiAdaptiveControl.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `ComputeTorque`, and
+- Header: `robotics/controllers/manipulator/SlotineLiAdaptiveControl.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `ComputeTorque`, and
   `extern template class SlotineLiAdaptiveControl<float, 2, 3>;` / `<float, 2, 20>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD` (`20 = 10·N` matches `ChainInertialRegressor<float, 2>`).
 - Coverage: `robotics/controllers/manipulator/SlotineLiAdaptiveControl.cpp` →

@@ -33,5 +33,5 @@ Y. Yamamoto, X. Yun, "Coordinating Locomotion and Manipulation of a Mobile Manip
 Automatic Control*, 39(6), 1994.
 
 ## See also
-`JacobianProvider` (M8, the arm block), `SE3Transform` (M6, pose composition), `RedundancyResolution`
+`JacobianProvider` (M8, the arm block), `math::SE3Transform` (NT53, pose composition), `RedundancyResolution`
 (M14, splitting base vs arm).

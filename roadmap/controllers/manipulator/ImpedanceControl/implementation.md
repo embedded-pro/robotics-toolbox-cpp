@@ -3,7 +3,7 @@
 > Roadmap ref: #M17 (Tier 3) · Target: `robotics/controllers/manipulator` · Namespace `controllers` · Type: `float` (templated on `T`, instantiated for `float` only)
 
 Sign convention: `fExternal` is the wrench exerted **by the environment on the tool**, base frame,
-`(f; n)` about the tool point (M6 ordering), so the arm obeys `M q̈ + C q̇ + g = τ + Jᵀ·fExternal`.
+`(f; n)` about the tool point (NT53 ordering), so the arm obeys `M q̈ + C q̇ + g = τ + Jᵀ·fExternal`.
 Task error `e = xd ⊖ x` (`TaskError`, below); `x̃ = x − xd = −e`.
 
 ## Data structures
@@ -19,8 +19,8 @@ class ImpedanceControl:                                       # TaskDim = 6 (pos
 
 # shared by M17/M18/M19 — robotics/controllers/manipulator/TaskError.hpp
 template<typename T, std::size_t TaskDim>
-math::Vector<T, TaskDim> TaskError(const kinematics::SE3Transform<T>& desired,
-                                   const kinematics::SE3Transform<T>& current)
+math::Vector<T, TaskDim> TaskError(const math::SE3Transform<T>& desired,
+                                   const math::SE3Transform<T>& current)
 ```
 
 ## Interface
@@ -32,12 +32,12 @@ ImpedanceControl(const dynamics::EulerLagrangeDynamics<T,Dof>& model,
 
 # (a) stiffness/damping impedance — no force sensor, no mass matrix:
 JointVector ComputeTorque(const JointVector& q, const JointVector& qDot,
-                          const kinematics::SE3Transform<T>& desiredPose,
+                          const math::SE3Transform<T>& desiredPose,
                           const TaskVector& xdDot)                               # hot path
 
 # (b) full impedance with inertia shaping — needs M, J̇q̇ and the measured fExternal:
 JointVector ComputeTorqueWithInertiaShaping(const JointVector& q, const JointVector& qDot,
-                          const kinematics::SE3Transform<T>& desiredPose,
+                          const math::SE3Transform<T>& desiredPose,
                           const TaskVector& xdDot, const TaskVector& xdDdot,
                           const TaskVector& fExternal)                           # hot path
 ```
@@ -46,7 +46,7 @@ JointVector ComputeTorqueWithInertiaShaping(const JointVector& q, const JointVec
 
 ```text
 function TaskError(desired, current):                    # never subtracts orientations
-    if TaskDim == 6: return kinematics::SE3Transform<T>::PoseError(desired, current)   # (Δp; rotation vector)
+    if TaskDim == 6: return math::SE3Transform<T>::PoseError(desired, current)   # (Δp; rotation vector)
     return first TaskDim entries of (desired.p − current.p)
 
 function ComputeTorque(q, qDot, desiredPose, xdDot):     # (a) OPTIMIZE_FOR_SPEED
@@ -106,7 +106,7 @@ function ComputeTorqueWithInertiaShaping(q, qDot, desiredPose, xdDot, xdDdot, fE
 ## Deployment
 
 - Header: `robotics/controllers/manipulator/ImpedanceControl.hpp` (+ `TaskError.hpp`, shared with M18/M19;
-  deploy it with whichever lands first) — `#pragma once` → `#pragma GCC optimize("O3","fast-math")`,
+  deploy it with whichever lands first) — `#pragma once`,
   `OPTIMIZE_FOR_SPEED` on both torque methods, and `extern template class ImpedanceControl<float, 2, 2>;` /
   `<float, 6, 6>` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/controllers/manipulator/ImpedanceControl.cpp` →
@@ -118,5 +118,5 @@ function ComputeTorqueWithInertiaShaping(q, qDot, desiredPose, xdDot, xdDdot, fE
 - New module: create `robotics/controllers/manipulator/CMakeLists.txt` via `robotics_add_header_library(...)`,
   add a `test/` subdir, register it in `robotics/CMakeLists.txt`, and add a
   `doc/controllers/manipulator/` folder.
-- Depends on: M6 (`SE3Transform`), M8 (`JacobianProvider`), M29 (`ChainDynamicsModel`).
+- Depends on: NT53 (`math::SE3Transform`), M8 (`JacobianProvider`), M29 (`ChainDynamicsModel`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

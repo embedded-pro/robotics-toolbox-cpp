@@ -90,8 +90,8 @@ function ChainInertialRegressor.Compute(q, q̇, q̇r, q̈r):         # O(N²)
 ## Deployment
 
 - Headers: `robotics/dynamics/ModifiedRecursiveNewtonEuler.hpp`, `CoriolisMatrix.hpp`,
-  `InertialRegressor.hpp` (interface), `ChainInertialRegressor.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on the passes, and `extern template`
+  `InertialRegressor.hpp` (interface), `ChainInertialRegressor.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on the passes, and `extern template`
   declarations for `<float, 2>` and `<float, 3>` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: matching `.cpp` files with the same instantiations.
 - Tests: `robotics/dynamics/test/TestCoriolisMatrix.cpp`, `TestChainInertialRegressor.cpp`

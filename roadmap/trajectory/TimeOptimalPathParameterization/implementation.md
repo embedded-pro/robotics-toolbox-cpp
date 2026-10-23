@@ -8,7 +8,7 @@ is streamed with `Sample`.
 ## Data structures
 
 `JointTrajectoryState<T, Dof>` comes from `robotics/trajectory/TrajectoryTypes.hpp` (canonical
-definition: PolynomialTrajectory spec → Data structures).
+definition: CubicSplineTrajectory spec → Data structures).
 
 ```cpp
 template<typename T, std::size_t Dof> using JointVector = math::Vector<T, Dof>
@@ -156,6 +156,9 @@ optima `min x` / `max x` without an iterative solver.
 
 - **Planning-time only**, never in an ISR. For a hard real-time loop, pre-sample the result into a
   joint-space `CubicSplineTrajectory` (M33) instead of calling the virtual path geometry per tick.
+- The two-variable stage LPs stay local on purpose: they are linear (upstream `ActiveSetQp`, NT65, needs a
+  strictly convex cost) and the Fourier–Motzkin projection solves them exactly in `O(m²)` with no
+  iteration.
 - Stage time `Δt_i = 2Δ_i / (sqrt(x_i) + sqrt(x_{i+1}))` is exact for constant `u_i` and finite at the rest
   endpoints; never integrate `ds / sqrt(x)` (singular at `x = 0`).
 - Zero-inertia points (`a_ij = 0`) and `q'_j = 0` need no special case: the row becomes a pure `x` bound or
@@ -173,8 +176,8 @@ optima `min x` / `max x` without an iterative solver.
 ## Deployment
 
 - Header: `robotics/trajectory/TimeOptimalPathParameterization.hpp` (interfaces `PathGeometry`,
-  `JointLimits`, the `InverseDynamicsJointLimits` adapter and the planner) — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Sample`, and
+  `JointLimits`, the `InverseDynamicsJointLimits` adapter and the planner) — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class TimeOptimalPathParameterization<float, 2, 64>;` /
   `extern template class InverseDynamicsJointLimits<float, 2>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Uses `robotics/trajectory/TrajectoryTypes.hpp` and `robotics/dynamics/InverseDynamicsModel.hpp` (M29);

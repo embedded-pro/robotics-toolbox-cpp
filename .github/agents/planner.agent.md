@@ -30,7 +30,7 @@ Canonical rules: `AGENTS.md`. Produce plans only — no code edits.
    - [ ] No heap; no recursion; tests too
    - [ ] `template<typename T>` + `static_assert(std::is_floating_point_v<T>)`; `float` only
    - [ ] `TEST_F` on `float` — no `TYPED_TEST`; `StrictMock` only; never plain `TEST()`
-   - [ ] `#pragma GCC optimize` + `OPTIMIZE_FOR_SPEED` on hot paths
+   - [ ] no `#pragma GCC optimize`/`optimize` attribute; `OPTIMIZE_FOR_SPEED` on hot paths
    - [ ] `doc/` update planned
 
 **Terse**: no preamble/postamble, no plan restatement; don't re-read files; batch reads.

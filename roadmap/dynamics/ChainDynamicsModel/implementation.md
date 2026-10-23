@@ -44,7 +44,7 @@ ComputeMassMatrix(q)          = crba.Compute(links, q)
 ComputeCoriolisTerms(q, q̇)    = rnea.InverseDynamics(links, q, q̇, 0, 0)        # no gravity, no q̈
 ComputeGravityTerms(q)        = rnea.InverseDynamics(links, q, 0, 0, gravity)
 ComputeInverseDynamics(q,q̇,q̈) = rnea.InverseDynamics(links, q, q̇, q̈, gravity) # one O(n) pass
-# with M1/M4 fields present: + armature ⊙ q̈ + friction(q̇) in ComputeInverseDynamics,
+# with M1 fields and an NT57 friction model present: + armature ⊙ q̈ + friction(q̇) in ComputeInverseDynamics,
 # + diag(armature) in ComputeMassMatrix, friction reported separately (it is not part of C q̇)
 ```
 
@@ -68,7 +68,7 @@ ComputeInverseDynamics(q,q̇,q̈) = rnea.InverseDynamics(links, q, q̇, q̈, gra
 ## Deployment
 
 - Headers: `robotics/dynamics/InverseDynamicsModel.hpp` (pure interface) and
-  `robotics/dynamics/ChainDynamicsModel.hpp` — `#pragma once` → `#pragma GCC optimize("O3","fast-math")`,
+  `robotics/dynamics/ChainDynamicsModel.hpp` — `#pragma once`,
   `OPTIMIZE_FOR_SPEED` on `ComputeInverseDynamics`, and `extern template class ChainDynamicsModel<float, 2>;`
   / `<float, 3>` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/dynamics/ChainDynamicsModel.cpp` → the same instantiations.

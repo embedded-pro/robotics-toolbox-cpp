@@ -33,6 +33,5 @@ Mechanisms," *IEEE Trans. Systems, Man, and Cybernetics*, 7(12), 1977; S. Chiave
 Task-Priority Redundancy Resolution," *IEEE Trans. Robotics and Automation*, 13(3), 1997.
 
 ## See also
-`JacobianProvider` (M8, supplies `J`), `SingularValueDecomposition`
-([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)), `ManipulabilityIndex`
-(M11, a common secondary objective), `PoseInverseKinematics` (M13).
+`JacobianProvider` (M8, supplies `J`), upstream `DampedPseudoInverse` (NT62, the damped inverse and
+projector), `ManipulabilityIndex` (M11, a common secondary objective), `PoseInverseKinematics` (M13).

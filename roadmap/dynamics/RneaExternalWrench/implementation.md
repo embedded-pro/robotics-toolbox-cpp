@@ -51,7 +51,7 @@ function InverseDynamics(links, q, q̇, q̈, g, w):       # OPTIMIZE_FOR_SPEED
   0.5 kg payload with gravity `(0, 0, −9.81)` is `w.force = (0, 0, −4.905)`.
 - Equivalence to the Jacobian-transpose form: `τ(w) − τ(0) = −Jᵀ·(f; n)` with the geometric
   Jacobian (M8) at the same tool point — the key test.
-- Orders `(f; n)` linear first, as everywhere (M6).
+- Orders `(f; n)` linear first, as everywhere (NT53).
 - Float-only: `static_assert(std::is_floating_point_v<T>)`.
 
 ## Deployment

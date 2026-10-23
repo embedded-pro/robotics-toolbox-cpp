@@ -40,7 +40,7 @@ function SectionTransform(arc):                 # OPTIMIZE_FOR_SPEED, robot-inde
 
 function Forward():                             # OPTIMIZE_FOR_SPEED
     A = Identity
-    for i in 0..NumSections-1: A = A * SectionTransform(sections[i])   # M6 compose
+    for i in 0..NumSections-1: A = A * SectionTransform(sections[i])   # NT53 compose
     return A
 
 function InverseSection(tip):                   # tip position in the section base frame, κs < 2π
@@ -73,13 +73,13 @@ function InverseSection(tip):                   # tip position in the section ba
 
 ## Deployment
 
-- Header: `robotics/kinematics/ContinuumKinematics.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `SectionTransform`/`Forward`, and
+- Header: `robotics/kinematics/ContinuumKinematics.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `SectionTransform`/`Forward`, and
   `extern template class ContinuumKinematics<float, 1>;` / `<float, 2>` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/ContinuumKinematics.cpp` → the same instantiations.
 - Test: `robotics/kinematics/test/TestContinuumKinematics.cpp`
 - Doc: `doc/kinematics/ContinuumKinematics.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestContinuumKinematics.cpp` → the `_test` target.
-- Depends on: M6 (`SE3Transform`).
+- Depends on: NT53 (`math::SE3Transform`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

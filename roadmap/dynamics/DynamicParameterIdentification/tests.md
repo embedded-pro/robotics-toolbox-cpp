@@ -15,6 +15,9 @@ class TestDynamicParameterIdentification : public ::testing::Test:
 
 ## Test cases (Arrange / Act / Assert)
 
+The streaming least-squares mechanics (order independence, block rows, minimum norm) are tested upstream
+with `estimators::IncrementalQrLeastSquares` (NT63); these cases cover the robot model.
+
 ```cpp
 base_parameter_count_with_gravity_is_six:
     Arrange: joint axes horizontal (gravity acts)
@@ -26,8 +29,6 @@ noiseless_data_reproduces_torques:
     Assert: Predict(result, q, q̇, q̈) ≈ τ on held-out samples (≈ 1e-3 relative)
 identifiable_combinations_match_the_true_parameters:
     Assert: baseDirections·π̂ ≈ baseDirections·π_true
-streaming_is_order_independent:
-    Assert: shuffling the sample order gives the same result
 no_samples_returns_nullopt:
     Assert: Solve(tol) == std::nullopt after Reset()
 ```

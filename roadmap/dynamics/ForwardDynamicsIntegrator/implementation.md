@@ -4,7 +4,8 @@
 
 A fixed-step simulator for a link chain: state `(q, q̇)`, dynamics `q̈ = ABA(q, q̇, τ)`. The simulator
 application currently hand-rolls this; a library version makes model-in-the-loop tests of the
-controllers (M5, M12, M16–M20) reproducible.
+controllers (M5, M12, M16–M20) reproducible. The integrators are upstream — `solvers::SemiImplicitEuler`
+(NT58) and `solvers::RungeKutta4` — and this item is the adapter that exposes ABA as their system.
 
 ## Data structures
 
@@ -15,45 +16,50 @@ template<typename T, std::size_t NumLinks>        # static_assert(std::is_floati
 struct ChainState:
     JointVector q, qDot, qDDot                    # qDDot of the last evaluation (for logging / RNEA checks)
 
-template<typename T, std::size_t NumLinks, IntegrationMethod Method>
-class ForwardDynamicsIntegrator:
+template<typename T, std::size_t NumLinks>   # implements solvers::SecondOrderSystem<T, NumLinks, NumLinks> (NT58)
+class ChainAccelerationSystem:                 # and solvers::OdeSystem<T, 2·NumLinks, NumLinks> for RK4
     const LinkArray& links
     Vector3 gravity
     ArticulatedBodyAlgorithm<T, NumLinks> aba
+    Acceleration(q, q̇, τ) = aba.ForwardDynamics(links, q, q̇, τ, gravity)
+    Derivative(x = (q; q̇), τ, t) = (q̇; Acceleration(q, q̇, τ))
+
+template<typename T, std::size_t NumLinks, IntegrationMethod Method>
+class ForwardDynamicsIntegrator:
+    ChainAccelerationSystem<T, NumLinks> system
+    solvers::SemiImplicitEuler<T, NumLinks, NumLinks>  or  solvers::RungeKutta4<T, 2·NumLinks, NumLinks>   # by Method
 ```
 
 ## Interface
 
 ```text
-ForwardDynamicsIntegrator(const LinkArray& links, const Vector3& gravity)
-ChainState Step(const ChainState& state, const JointVector& tau, T dt) const     # hot path, τ held over dt
+ForwardDynamicsIntegrator(const LinkArray& links, const Vector3& gravity, T dt)
+ChainState Step(const ChainState& state, const JointVector& tau)     # hot path, τ held over dt
 ```
 
 ## Algorithm (pseudocode)
 
 ```cpp
-function Step(x, τ, dt):                         # OPTIMIZE_FOR_SPEED
-    if Method == SemiImplicitEuler:              # symplectic: bounded energy error
-        a = aba.ForwardDynamics(links, x.q, x.q̇, τ, gravity)
-        q̇ = x.q̇ + a·dt
-        q  = x.q + q̇·dt
-    else:  # RungeKutta4 on (q, q̇), zero-order-hold τ
-        f(q, q̇) = (q̇, aba.ForwardDynamics(links, q, q̇, τ, gravity))
-        k1 = f(x);  k2 = f(x + k1·dt/2);  k3 = f(x + k2·dt/2);  k4 = f(x + k3·dt)
-        (q, q̇) = x + (k1 + 2k2 + 2k3 + k4)·dt/6
-        a = k1.acceleration                      # acceleration at the step start
+function Step(x, τ):                             # OPTIMIZE_FOR_SPEED
+    a = system.Acceleration(x.q, x.q̇, τ)         # acceleration at the step start (logged)
+    if Method == SemiImplicitEuler:              # symplectic (NT58): bounded energy error
+        (q, q̇) = semiImplicitEuler.Step({ x.q, x.q̇ }, τ)
+    else:                                        # RungeKutta4 on (q; q̇), zero-order-hold τ
+        (q, q̇) = rungeKutta4.Step((x.q; x.q̇), τ, 0)     # time-invariant system
     return { q, q̇, a }
 ```
 
 ## Complexity & memory
 
-- Semi-implicit Euler: one ABA pass (`O(N)`) per step; RK4: four.
+- Semi-implicit Euler: one ABA pass (`O(N)`) per step plus the logged one; RK4: four plus one.
 - Memory: two state copies; no heap.
 
 ## Numerical / embedded notes
 
-- RK4 can reuse the upstream `solvers::RungeKutta4<T, 2N, N>` with an `OdeSystem` adapter whose
-  `Derivative` evaluates ABA (numerical-toolbox-cpp); the virtual call is acceptable off the real-time path.
+- Both integrators call the system through a virtual interface; acceptable off the real-time path
+  (simulation, MIL tests).
+- The logged `qDDot` costs one extra ABA pass; drop it (or reuse the integrator's first evaluation) where
+  cycles matter.
 - Semi-implicit Euler keeps energy error bounded (no secular drift) at first-order accuracy; RK4 is
   fourth-order but slowly dissipative/drifting over long runs — choose by use case.
 - Joint friction or damping belongs in `τ` (e.g. `τ − b·q̇`), not as ad-hoc velocity scaling.
@@ -61,11 +67,12 @@ function Step(x, τ, dt):                         # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/dynamics/ForwardDynamicsIntegrator.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Step`, `extern template` for
+- Header: `robotics/dynamics/ForwardDynamicsIntegrator.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Step`, `extern template` for
   `<float, 2, IntegrationMethod::SemiImplicitEuler>` and `<float, 2, IntegrationMethod::RungeKutta4>`
   under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/dynamics/ForwardDynamicsIntegrator.cpp` → the same instantiations.
+- Depends on: NT58 (`solvers::SemiImplicitEuler`, `SecondOrderSystem`); upstream `solvers::RungeKutta4`.
 - Test: `robotics/dynamics/test/TestForwardDynamicsIntegrator.cpp`
 - Doc: `doc/dynamics/ForwardDynamicsIntegrator.md` (per `doc/TEMPLATE.md`)
 - The simulator's `RobotArmSimulator::StepChain` should switch to this integrator once it exists.

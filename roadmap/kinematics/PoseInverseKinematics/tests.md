@@ -64,10 +64,10 @@ unreachable_target_fails_gracefully:
   on that scale. Wrist-singular case above converges in 8 iterations (double).
 - Stale-error scenario on the real arm: initial `‖W e‖ = 0.136739`, after one step `0.011815` — the
   result must report the latter.
-- `+190°` about `ẑ` ⇒ rotation vector `−2.967060·ẑ` (short way, via M6).
+- `+190°` about `ẑ` ⇒ rotation vector `−2.967060·ẑ` (short way, via NT53).
 
 ## Edge cases
 
-- Antipodal orientation (180°) ⇒ `PoseError` axis ambiguous (either sign valid, M6).
+- Antipodal orientation (180°) ⇒ `PoseError` axis ambiguous (either sign valid, NT53).
 - Target at the reach boundary ⇒ slow but bounded convergence (adaptive damping engages).
 - `Dof = 7` ⇒ same code; the minimum-norm step drifts in the null space — use M14 to steer it.

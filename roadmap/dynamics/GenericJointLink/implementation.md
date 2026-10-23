@@ -55,7 +55,7 @@ RNEA backward pass:               child offset is r_{i+1} (= parentToJoint + z·
 ABA (Featherstone, S = (0; z) for prismatic): U = I^A·S, D = SᵀU + armature, u = τ − Sᵀp^A,
                                   c_i = v_i × S·q̇_i, transforms use r_i(q)
 CRBA (M28):                       S as above; M_ii += armature_i
-Limits:                           consumed by IK clamping (M13), trajectory planners (M2/M3/M9/M33), TOPP (M27)
+Limits:                           consumed by IK clamping (M13), trajectory planners (NT55/NT56/NT60, M33), TOPP (M27)
 ```
 
 ## Complexity & memory
@@ -78,7 +78,7 @@ Limits:                           consumed by IK clamping (M13), trajectory plan
 ## Deployment
 
 - Header: `robotics/dynamics/JointLink.hpp` (and `RevoluteJointLink.hpp` becomes the alias) —
-  `#pragma once` → `#pragma GCC optimize("O3","fast-math")`, `extern template struct JointLink<float>;`
+  `#pragma once`, `extern template struct JointLink<float>;`
   under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/dynamics/JointLink.cpp` → `template struct JointLink<float>;`
 - Tests: `robotics/dynamics/test/TestJointLink.cpp` plus prismatic cases in the RNEA/ABA/FK tests.

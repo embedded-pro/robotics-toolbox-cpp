@@ -19,7 +19,7 @@ struct FrameChain:
     std::array<Vector3<T>, N>  jointOrigins                  # base frame
     std::array<Vector3<T>, N>  jointAxes                     # unit, base frame
     std::array<JointType, N>   jointTypes
-    SE3Transform<T>            tool                          # tool pose in the base frame (M6)
+    SE3Transform<T>            tool                          # tool pose in the base frame (NT53)
 
 template<typename T, std::size_t N>
 class ChainPoseKinematics:
@@ -64,12 +64,12 @@ function Compute(links, q):                     # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/kinematics/ChainPoseKinematics.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Compute`, and
+- Header: `robotics/kinematics/ChainPoseKinematics.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Compute`, and
   `extern template class ChainPoseKinematics<float, 2>;` / `<float, 3>` / `<float, 6>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/ChainPoseKinematics.cpp` → the same three instantiations.
 - Test: `robotics/kinematics/test/TestChainPoseKinematics.cpp`
 - Doc: `doc/kinematics/ChainPoseKinematics.md` (or extend `ForwardKinematics.md`)
-- Depends on: M6 (`SE3Transform`).
+- Depends on: NT53 (`math::SE3Transform`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

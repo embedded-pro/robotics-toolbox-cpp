@@ -15,8 +15,9 @@ every model-based controller more accurate.
 For each recorded sample the dynamics give one linear equation per joint in the unknown parameters.
 Stacking many samples gives an over-determined least-squares problem. Some parameters never affect
 the torques (or only in fixed combinations), so the problem is rank-deficient; a rank-revealing
-solution keeps only the identifiable combinations, the "base parameters". Processing samples one at a
-time with orthogonal rotations keeps memory fixed and numerics well-conditioned.
+solution keeps only the identifiable combinations, the "base parameters". The numerical toolbox's
+incremental QR least squares processes samples one at a time with orthogonal rotations, which keeps memory
+fixed and numerics well-conditioned; this item supplies the regressor rows.
 
 ## Key parameters
 - **Excitation trajectory** — decides how well-conditioned the problem is.
@@ -28,5 +29,5 @@ C. Atkeson, C. An, J. Hollerbach, "Estimation of Inertial Parameters of Manipula
 Inertial Parameters of Serial Robots," *IEEE Trans. Robotics and Automation*, 6(3), 1990.
 
 ## See also
-`CoriolisMatrixAndRegressor` (M31), `SlotineLiAdaptiveControl` (M20, on-line counterpart),
-`FrictionCompensation` (M4).
+`CoriolisMatrixAndRegressor` (M31), `SlotineLiAdaptiveControl` (M20, on-line counterpart), upstream
+`IncrementalQrLeastSquares` (NT63, the solver) and `FrictionCompensation` (NT57).

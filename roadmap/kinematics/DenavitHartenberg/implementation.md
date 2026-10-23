@@ -23,7 +23,7 @@ template<typename T, std::size_t N>
 class DenavitHartenberg:
     std::array<DhLink<T>, N>  links
     DhConvention              convention
-    SE3Transform<T>           tool              # constant tool pose in the last DH frame (M6)
+    SE3Transform<T>           tool              # constant tool pose in the last DH frame (NT53)
     std::array<T, N>          cosAlpha, sinAlpha   # precomputed at construction
 
 template<typename T, std::size_t TaskDim, std::size_t N>     # TaskDim ∈ {3, 6}
@@ -105,8 +105,8 @@ function Frames(q):
 
 ## Deployment
 
-- Header: `robotics/kinematics/DenavitHartenberg.hpp` (+ `DhTaskJacobian.hpp`) — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `LinkTransform`/`Forward`, and
+- Header: `robotics/kinematics/DenavitHartenberg.hpp` (+ `DhTaskJacobian.hpp`) — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `LinkTransform`/`Forward`, and
   `extern template class DenavitHartenberg<float, 1>;` / `<float, 2>` / `<float, 6>` plus
   `extern template class DhTaskJacobian<float, 6, 6>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/DenavitHartenberg.cpp` → the same instantiations.
@@ -114,5 +114,5 @@ function Frames(q):
 - Doc: `doc/kinematics/DenavitHartenberg.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestDenavitHartenberg.cpp` → the `_test` target.
-- Depends on: M6 (`SE3Transform`), M30 (`FrameChain`), M8 (`GeometricJacobian`, `JacobianProvider`).
+- Depends on: NT53 (`math::SE3Transform`), M30 (`FrameChain`), M8 (`GeometricJacobian`, `JacobianProvider`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.
