@@ -10,7 +10,7 @@ class RedundancyResolution:                                    # instantiated fo
     const JacobianProvider<T, TaskDim, Dof>& jacobian         # M8 seam; TaskDim 3 (position) or 6 (pose)
     T  damping                                                 # λ — primary term only
     T  rankTolerance                                           # relative: σᵢ > rankTolerance·σ₀ counts toward rank
-    solvers::SingularValueDecomposition<T, Dof, TaskDim> svd   # of Jᵀ (upstream needs Rows ≥ Cols)
+    solvers::SingularValueDecomposition<T, TaskDim, Dof> svd   # of J (wide: U TaskDim×TaskDim, V Dof×TaskDim)
 ```
 
 ## Interface
@@ -28,8 +28,8 @@ Matrix<T, Dof, Dof>      NullSpaceProjector(const JointVector& q)          # P =
 ```cpp
 function Factor(q):
     J = jacobian.Jacobian(q)                    # TaskDim × Dof
-    svd.Decompose(Jᵀ)                           # Jᵀ = U·Σ·Vᵀ ⇒ J = V·Σ·Uᵀ
-    # uᵢ = column i of U (Dof): right singular vectors of J;  vᵢ = column i of V (TaskDim)
+    svd.Decompose(J)                            # J = U·Σ·Vᵀ
+    # uᵢ = column i of U (TaskDim): left singular vectors;  vᵢ = column i of V (Dof): right singular vectors
     τ = rankTolerance · σ₀;  r = #{ σᵢ > τ }
 
 function Gain(σ):                               # damped inverse of one singular value
@@ -37,28 +37,29 @@ function Gain(σ):                               # damped inverse of one singula
 
 function Resolve(q, ẋ, q̇₀):                    # OPTIMIZE_FOR_SPEED
     Factor(q)
-    q̇ = Σᵢ Gain(σᵢ)·(vᵢ·ẋ)·uᵢ                  # primary: J⁺_λ·ẋ, lies in the row space of J
-    q̇ = q̇ + q̇₀ − Σ_{i<r} (uᵢ·q̇₀)·uᵢ           # secondary: P·q̇₀ without forming P, O(Dof·r)
+    q̇ = Σᵢ Gain(σᵢ)·(uᵢ·ẋ)·vᵢ                  # primary: J⁺_λ·ẋ, lies in the row space of J
+    q̇ = q̇ + q̇₀ − Σ_{i<r} (vᵢ·q̇₀)·vᵢ           # secondary: P·q̇₀ without forming P, O(Dof·r)
     return q̇
 
-function DampedPseudoInverse(q):   Factor(q);  return Σᵢ Gain(σᵢ)·uᵢ·vᵢᵀ
-function NullSpaceProjector(q):    Factor(q);  return I_Dof − Σ_{i<r} uᵢ·uᵢᵀ
-                                   # = I − J⁺J with J⁺ = Transpose(svd.PseudoInverse(τ))
+function DampedPseudoInverse(q):   Factor(q);  return Σᵢ Gain(σᵢ)·vᵢ·uᵢᵀ
+function NullSpaceProjector(q):    Factor(q);  return I_Dof − Σ_{i<r} vᵢ·vᵢᵀ
+                                   # = I − J⁺J with J⁺ = svd.PseudoInverse(τ)
 ```
 
 ## Complexity & memory
 
-- One Golub–Kahan SVD of the `Dof × TaskDim` matrix `Jᵀ` per call, then `O(Dof·TaskDim)`.
+- One Golub–Kahan SVD of the `TaskDim × Dof` Jacobian per call (factored through `Jᵀ` upstream), then
+  `O(Dof·TaskDim)`.
 - `NullSpaceProjector` (diagnostics/tests) adds `O(Dof²·r)`; `Resolve` never forms it.
-- Memory: SVD factors (`Dof×TaskDim`, `TaskDim×TaskDim`) + vectors; stack only.
+- Memory: SVD factors (`TaskDim×TaskDim`, `Dof×TaskDim`) + vectors; stack only.
 
 ## Numerical / embedded notes
 
 - **Why the projector is undamped:** with the damped inverse, `J·(I − J⁺_λJ) = λ²(JJᵀ + λ²I)⁻¹J ≠ 0`, so
   `I − J⁺_λJ` is neither idempotent nor task-invisible (7-DOF fixture, `λ = 0.01`: `‖J·P_λ·q̇₀‖ = 2.8e-4`,
   `‖P_λ² − P_λ‖ = 2.0e-3`). Built from the thresholded SVD, `P` is an exact orthogonal projector:
-  `P² = P`, `Pᵀ = P`, `J·P = Σ_{σᵢ ≤ τ} σᵢvᵢuᵢᵀ` (zero for exact rank loss, rounding-level at full rank).
-- **What the tool sees:** `J·q̇ = Σᵢ σᵢ·Gain(σᵢ)·vᵢvᵢᵀ·ẋ`. With `λ > 0` the primary task is met only
+  `P² = P`, `Pᵀ = P`, `J·P = Σ_{σᵢ ≤ τ} σᵢuᵢvᵢᵀ` (zero for exact rank loss, rounding-level at full rank).
+- **What the tool sees:** `J·q̇ = Σᵢ σᵢ·Gain(σᵢ)·uᵢuᵢᵀ·ẋ`. With `λ > 0` the primary task is met only
   approximately: `‖J·q̇ − ẋ‖ ≤ λ²/(σ_min² + λ²)·‖ẋ‖` for `ẋ` in the range of `J`. The secondary term
   adds nothing to the task velocity regardless of `λ` or `‖q̇₀‖`.
 - The primary term lies in the row space (`P·J⁺_λ·ẋ = 0`), so it is the minimum-norm solution.
@@ -80,5 +81,6 @@ function NullSpaceProjector(q):    Factor(q);  return I_Dof − Σ_{i<r} uᵢ·u
 - Doc: `doc/kinematics/RedundancyResolution.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestRedundancyResolution.cpp` → the `_test` target.
-- Depends on: M8 (`JacobianProvider`); upstream `solvers::SingularValueDecomposition`.
+- Depends on: M8 (`JacobianProvider`); upstream `solvers::SingularValueDecomposition` (wide-matrix
+  support; needs a numerical-toolbox pin that includes it).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

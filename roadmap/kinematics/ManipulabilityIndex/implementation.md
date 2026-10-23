@@ -43,8 +43,8 @@ function ComputeRotational(q):                  # TaskDim = 6
 
 function EllipsoidAxes(q):
     B = jacobian.Jacobian(q).rows(0 .. Rows−1)
-    svd = solvers::SingularValueDecomposition<T, max(Rows, Dof), min(Rows, Dof)>
-    svd.Decompose(Rows ≥ Dof ? B : Bᵀ)           # upstream requires Rows ≥ Cols; σ(Bᵀ) = σ(B)
+    svd = solvers::SingularValueDecomposition<T, Rows, Dof>   # tall or wide; Axes = SingularValueCount
+    svd.Decompose(B)
     return svd.SingularValues()                  # descending; ∏ σᵢ = GramRoot(B)
 
 function ConditionNumber(q):
@@ -58,7 +58,8 @@ function NearSingular(q, eps):
 ## Complexity & memory
 
 - `Compute`: `O(Rows·Dof·min(Rows, Dof))` for the Gram product + `O(min(Rows, Dof)³)` LU.
-- `EllipsoidAxes` / `ConditionNumber`: one Golub–Kahan SVD of a `max × min` matrix.
+- `EllipsoidAxes` / `ConditionNumber`: one Golub–Kahan SVD of the `Rows × Dof` block (a wide block is
+  factored through its transpose upstream, at the same cost).
 - Memory: one `TaskDim×Dof` Jacobian, one Gram matrix or SVD factors; stack only.
 
 ## Numerical / embedded notes
@@ -91,5 +92,6 @@ function NearSingular(q, eps):
 - Doc: `doc/kinematics/ManipulabilityIndex.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestManipulabilityIndex.cpp` → the `_test` target.
-- Depends on: M8 (`JacobianProvider`); upstream `solvers::SingularValueDecomposition`, `solvers::LuDecomposition`.
+- Depends on: M8 (`JacobianProvider`); upstream `solvers::SingularValueDecomposition` (wide-matrix
+  support; needs a numerical-toolbox pin that includes it), `solvers::LuDecomposition`.
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.
