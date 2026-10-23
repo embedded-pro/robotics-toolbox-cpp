@@ -47,7 +47,7 @@ function Update(q, q̇, τ, dt):                     # OPTIMIZE_FOR_SPEED
 
 ## Numerical / embedded notes
 
-- Subtract a friction model (M4) from `τ` if friction is not part of `M, C, g`; otherwise friction
+- Subtract a friction model (NT57) from `τ` if friction is not part of `M, C, g`; otherwise friction
   shows up as a (false) external torque.
 - The residual is a first-order low-pass of `τ_ext` with bandwidth `K_O`; larger gains detect faster
   but amplify model error and velocity noise. Thresholds are set above the residual seen in

@@ -33,4 +33,4 @@ K. Shoemake, "Animating rotation with quaternion curves," *SIGGRAPH* 1985 (SLERP
 ## See also
 `Quaternion` from [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)
 (provides `Slerp`), `math::SE3Transform` (NT53, pose and twist conventions),
-`TrapezoidalProfile` / `PolynomialTrajectory` / `SCurveProfile` (the `s(t)` drivers).
+upstream `TrapezoidalProfile` / `PolynomialProfile` / `SCurveProfile` (NT56/NT55/NT60, the `s(t)` drivers).

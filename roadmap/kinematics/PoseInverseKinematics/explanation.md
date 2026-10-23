@@ -38,5 +38,4 @@ Least Squares methods," 2004.
 ## See also
 `JacobianProvider` / `GeometricJacobian` (M8, the linearization), `math::SE3Transform::PoseError` (NT53, the
 orientation error), `ManipulabilityIndex` (M11), `AnalyticalIkOpw` (M21, the closed-form alternative
-for ortho-parallel 6R arms), `LuDecomposition`
-([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp), the 6×6 solve).
+for ortho-parallel 6R arms), upstream `LevenbergMarquardt` (NT64, the damped iteration).

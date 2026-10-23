@@ -27,5 +27,5 @@ A. Albu-Schäffer, "Robot Collisions: A Survey on Detection, Isolation, and Iden
 Trans. Robotics*, 33(6), 2017.
 
 ## See also
-`ChainDynamicsModel` (M29), `CoriolisMatrixAndRegressor` (M31), `FrictionCompensation` (M4),
+`ChainDynamicsModel` (M29), `CoriolisMatrixAndRegressor` (M31), upstream `FrictionCompensation` (NT57),
 `RneaExternalWrench` (M32).

@@ -22,6 +22,10 @@ template<typename T>
 struct StewartForwardResult:
     SE3Transform<T> pose;  std::size_t iterations;  bool converged
 
+template<typename T>                            # implements optimization::LeastSquaresProblem<T, SE3Transform<T>, 6, 6>
+class StewartLegResidual:                       # used by Forward with upstream LevenbergMarquardt (NT64)
+    const StewartGoughKinematics<T>& kinematics;  std::array<T, 6> lengths
+
 template<typename T>
 class StewartGoughKinematics:
     StewartGoughGeometry<T>  geometry
@@ -66,16 +70,16 @@ function LegJacobian(pose):                      # row i = (nᵢᵀ, (R·pᵢ ×
     for i: a = pose.R·pᵢ;  n = Normalize(a + pose.p − bᵢ);  row i = (n ; CrossProduct(a, n))
     # (v; ω): platform-origin velocity and angular velocity, base frame (NT53 order); statics: wrench (f; n) = Jᵀ·legForces
 
-function Forward(L, guess):                      # Newton on SE(3)
-    x = guess
-    for iter in 0..maxIterations-1:
-        f = Inverse(x) − L
-        if ‖f‖ < tolerance: return { x, iter, true }
-        J = LegJacobian(x)
-        δ = −Jᵀ·LuDecomposition(J·Jᵀ + λ²·I₆).Solve(f)          # λ = 0: δ = −J⁻¹f
-        x.p = x.p + δ.linear
-        x.R = SE3Transform::Exp((0; δ.angular), 1).R · x.R       # left (base-frame) retraction
-    return { x, maxIterations, ‖Inverse(x) − L‖ < tolerance }
+# Newton on SE(3) through upstream optimization::LevenbergMarquardt (NT64):
+function StewartLegResidual::Residual(x):  return kinematics.Inverse(x) − lengths
+function StewartLegResidual::Jacobian(x):  return kinematics.LegJacobian(x)          # (v; ω) increments
+function StewartLegResidual::Retract(x, δ):                                           # left (base-frame) retraction
+    return { math::SE3Transform<T>::Exp((0; δ.angular), 1).R · x.R,  x.p + δ.linear }
+
+function Forward(L, guess):
+    r = optimization::LevenbergMarquardt{ StewartLegResidual{ *this, L }, ConstantDamping{ λ² },
+                                          { tolerance, +∞, maxIterations } }.Solve(guess)
+    return { r.x, r.iterations, r.converged }                 # λ = 0: δ = −J⁻¹f (plain Newton)
 
 # ---- Delta ----
 function ArmAngle(i, P):                         # circle (elbow) ∩ sphere (forearm) in arm i's plane
@@ -113,8 +117,7 @@ function Forward(θ):                             # three-sphere intersection, c
   the leg residual still converges but the pose along the singular direction is ill-determined.
 - Delta branch choice: `atan2(b, a) ± acos(·)` are elbow-out / elbow-in; for `z < 0`, `b > 0` so the
   minus root has the larger `cos θ` (elbow out). The lower sphere intersection is the physical effector.
-- Upstream `solvers::LuDecomposition` ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp))
-  for the 6×6 solve.
+- The 6×6 step solve (`LuDecomposition`) happens inside the upstream solver (NT64).
 - Float-only: `static_assert(std::is_floating_point_v<T>)`.
 
 ## Deployment
@@ -128,5 +131,5 @@ function Forward(θ):                             # three-sphere intersection, c
 - Tests: `robotics/kinematics/test/TestStewartGoughKinematics.cpp`, `robotics/kinematics/test/TestDeltaKinematics.cpp`
 - Doc: `doc/kinematics/ParallelManipulatorKinematics.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`; both tests → the `_test` target.
-- Depends on: NT53 (`math::SE3Transform`).
+- Depends on: NT53 (`math::SE3Transform`), NT64 (`optimization::LevenbergMarquardt`, `ConstantDamping`).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

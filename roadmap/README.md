@@ -21,7 +21,7 @@ All pseudocode respects the library constraints: **no heap**, bounded containers
 (no `Q15`/`Q31`). The generic signature keeps a future fixed-point specialisation cheap to add.
 
 The canonical worked example is
-[trajectory/PolynomialTrajectory](trajectory/PolynomialTrajectory/implementation.md).
+[controllers/manipulator/PdGravityCompensation](controllers/manipulator/PdGravityCompensation/implementation.md).
 
 Conventions shared by every spec: 6-vectors are ordered linear part first — twists `(v; ω)`, wrenches
 `(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE3Transform/implementation.md) (NT53); dynamics
@@ -89,10 +89,10 @@ prerequisites.
 `DenavitHartenberg` (M7) · `GeometricJacobian` (M8) · `ManipulabilityIndex` (M11) · `PoseInverseKinematics` (M13) · `RedundancyResolution` (M14) · `ProductOfExponentials` (M15) · `AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26) · `ChainPoseKinematics` (M30)
 
 ### `dynamics`
-`GenericJointLink` (M1) · `FrictionCompensation` (M4) · `MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CompositeRigidBodyAlgorithm` (M28) · `ChainDynamicsModel` (M29) · `CoriolisMatrixAndRegressor` (M31) · `RneaExternalWrench` (M32) · `ForwardDynamicsIntegrator` (M34)
+`GenericJointLink` (M1) · `MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CompositeRigidBodyAlgorithm` (M28) · `ChainDynamicsModel` (M29) · `CoriolisMatrixAndRegressor` (M31) · `RneaExternalWrench` (M32) · `ForwardDynamicsIntegrator` (M34)
 
 ### `trajectory`
-`PolynomialTrajectory` (M2) · `TrapezoidalProfile` (M3) · `SCurveProfile` (M9) · `CartesianSlerpInterpolation` (M10) · `TimeOptimalPathParameterization` (M27) · `CubicSplineTrajectory` (M33)
+`CartesianSlerpInterpolation` (M10) · `TimeOptimalPathParameterization` (M27) · `CubicSplineTrajectory` (M33)
 
 ### `controllers/manipulator`
 `PdGravityCompensation` (M5) · `ComputedTorqueControl` (M12) · `ImpedanceControl` (M17) · `OperationalSpaceControl` (M18) · `HybridPositionForceControl` (M19) · `SlotineLiAdaptiveControl` (M20) · `CableTensionDistribution` (M25)

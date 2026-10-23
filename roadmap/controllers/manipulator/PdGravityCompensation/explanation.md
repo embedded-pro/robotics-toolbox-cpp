@@ -28,5 +28,5 @@ M. Takegaki, S. Arimoto, "A New Feedback Method for Dynamic Control of Manipulat
 
 ## See also
 `ComputedTorqueControl` (full inverse-dynamics tracking); `ImpedanceControl` (compliant contact);
-`FrictionCompensation` (adds a friction feedforward); `dynamics/EulerLagrangeDynamics` (the injected
+upstream `controllers::FrictionCompensation` (NT57, adds a friction feedforward); `dynamics/EulerLagrangeDynamics` (the injected
 interface); `ChainDynamicsModel` (M29, its link-chain implementation).

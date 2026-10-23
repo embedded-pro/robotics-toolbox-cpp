@@ -48,5 +48,5 @@ Implementation of the Time-Optimal Path Parameterization Algorithm," *IEEE Trans
 ## See also
 `CartesianSlerpInterpolation` (task-space path, mapped to `q(s)` through IK),
 `ChainDynamicsModel` / `InverseDynamicsModel` (M29, torque coefficients),
-`CubicSplineTrajectory` (resample the result for the servo loop), `SCurveProfile` (heuristic
+`CubicSplineTrajectory` (resample the result for the servo loop), upstream `SCurveProfile` (NT60, heuristic
 limit-respecting alternative).
