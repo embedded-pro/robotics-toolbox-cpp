@@ -101,8 +101,8 @@ function PoseError(target, current):        # base-frame error, matches the geom
 
 ## Deployment
 
-- Header: `robotics/kinematics/SE3Transform.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Exp`/`operator*`, and
+- Header: `robotics/kinematics/SE3Transform.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Exp`/`operator*`, and
   `extern template struct SE3Transform<float>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/SE3Transform.cpp` → `template struct SE3Transform<float>;`
 - Test: `robotics/kinematics/test/TestSE3Transform.cpp`

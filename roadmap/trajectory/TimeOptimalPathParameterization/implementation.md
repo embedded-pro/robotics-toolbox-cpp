@@ -173,8 +173,8 @@ optima `min x` / `max x` without an iterative solver.
 ## Deployment
 
 - Header: `robotics/trajectory/TimeOptimalPathParameterization.hpp` (interfaces `PathGeometry`,
-  `JointLimits`, the `InverseDynamicsJointLimits` adapter and the planner) — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Sample`, and
+  `JointLimits`, the `InverseDynamicsJointLimits` adapter and the planner) — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class TimeOptimalPathParameterization<float, 2, 64>;` /
   `extern template class InverseDynamicsJointLimits<float, 2>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Uses `robotics/trajectory/TrajectoryTypes.hpp` and `robotics/dynamics/InverseDynamicsModel.hpp` (M29);

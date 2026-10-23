@@ -82,8 +82,8 @@ function NearSingular(q, eps):
 
 ## Deployment
 
-- Header: `robotics/kinematics/ManipulabilityIndex.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Compute`, and
+- Header: `robotics/kinematics/ManipulabilityIndex.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Compute`, and
   `extern template class ManipulabilityIndex<float, 3, 2>;` / `<float, 2, 3>` / `<float, 6, 2>` /
   `<float, 6, 6>` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/ManipulabilityIndex.cpp` → the same instantiations.

@@ -113,8 +113,8 @@ function Emit(arm, w, singular):  q = signs ⊙ ((arm, w) + offsets), each wrapp
 
 ## Deployment
 
-- Header: `robotics/kinematics/AnalyticalIkOpw.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Solve`, and
+- Header: `robotics/kinematics/AnalyticalIkOpw.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Solve`, and
   `extern template class AnalyticalIkOpw<float>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/AnalyticalIkOpw.cpp` → `template class AnalyticalIkOpw<float>;`
 - Test: `robotics/kinematics/test/TestAnalyticalIkOpw.cpp`

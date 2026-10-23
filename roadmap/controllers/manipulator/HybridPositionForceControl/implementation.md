@@ -84,8 +84,8 @@ function ComputeTorque(q, qDot, desiredPose, xdDot, fMeasured, fd):   # OPTIMIZE
 
 ## Deployment
 
-- Header: `robotics/controllers/manipulator/HybridPositionForceControl.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `ComputeTorque`, and
+- Header: `robotics/controllers/manipulator/HybridPositionForceControl.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `ComputeTorque`, and
   `extern template class HybridPositionForceControl<float, 2, 2>;` / `<float, 6, 6>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/controllers/manipulator/HybridPositionForceControl.cpp` →

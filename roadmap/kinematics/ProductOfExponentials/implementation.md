@@ -80,8 +80,8 @@ function SpaceToGeometric(Js, pTool):           # J_geo = [[I, −Skew(pTool)], 
 
 ## Deployment
 
-- Header: `robotics/kinematics/ProductOfExponentials.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Compute`, and
+- Header: `robotics/kinematics/ProductOfExponentials.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Compute`, and
   `extern template class ProductOfExponentials<float, 1>;` / `<float, 2>` / `<float, 6>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/ProductOfExponentials.cpp` → the same instantiations.

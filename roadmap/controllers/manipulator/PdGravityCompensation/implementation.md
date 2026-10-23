@@ -59,8 +59,8 @@ function ComputeTorque(q, qDot, qd):              # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/controllers/manipulator/PdGravityCompensation.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `ComputeTorque`, and
+- Header: `robotics/controllers/manipulator/PdGravityCompensation.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `ComputeTorque`, and
   `extern template class PdGravityCompensation<float, 2>;` / `<float, 3>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/controllers/manipulator/PdGravityCompensation.cpp` →

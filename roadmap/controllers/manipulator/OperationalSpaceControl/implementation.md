@@ -80,8 +80,8 @@ function ComputeTorque(q, qDot, desiredPose, xdDot, xdDdot, tauSecondary):   # O
 
 ## Deployment
 
-- Header: `robotics/controllers/manipulator/OperationalSpaceControl.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `ComputeTorque`, and
+- Header: `robotics/controllers/manipulator/OperationalSpaceControl.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `ComputeTorque`, and
   `extern template class OperationalSpaceControl<float, 2, 2>;` / `<float, 3, 2>` / `<float, 7, 6>`
   under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/controllers/manipulator/OperationalSpaceControl.cpp` →

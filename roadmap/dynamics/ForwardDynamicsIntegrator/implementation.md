@@ -61,8 +61,8 @@ function Step(x, τ, dt):                         # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/dynamics/ForwardDynamicsIntegrator.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Step`, `extern template` for
+- Header: `robotics/dynamics/ForwardDynamicsIntegrator.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Step`, `extern template` for
   `<float, 2, IntegrationMethod::SemiImplicitEuler>` and `<float, 2, IntegrationMethod::RungeKutta4>`
   under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/dynamics/ForwardDynamicsIntegrator.cpp` → the same instantiations.

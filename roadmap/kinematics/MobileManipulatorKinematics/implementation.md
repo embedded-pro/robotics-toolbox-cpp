@@ -71,8 +71,8 @@ function WheelSpeeds(v, ω):
 
 ## Deployment
 
-- Header: `robotics/kinematics/MobileManipulatorKinematics.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Compute`, and
+- Header: `robotics/kinematics/MobileManipulatorKinematics.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Compute`, and
   `extern template class MobileManipulatorKinematics<float, 3>;` / `<float, 6>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/MobileManipulatorKinematics.cpp` → the same instantiations.

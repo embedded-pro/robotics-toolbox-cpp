@@ -64,8 +64,8 @@ function Compute(links, q):                     # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/kinematics/ChainPoseKinematics.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Compute`, and
+- Header: `robotics/kinematics/ChainPoseKinematics.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Compute`, and
   `extern template class ChainPoseKinematics<float, 2>;` / `<float, 3>` / `<float, 6>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/ChainPoseKinematics.cpp` → the same three instantiations.

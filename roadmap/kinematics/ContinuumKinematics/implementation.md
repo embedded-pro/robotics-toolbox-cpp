@@ -73,8 +73,8 @@ function InverseSection(tip):                   # tip position in the section ba
 
 ## Deployment
 
-- Header: `robotics/kinematics/ContinuumKinematics.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `SectionTransform`/`Forward`, and
+- Header: `robotics/kinematics/ContinuumKinematics.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `SectionTransform`/`Forward`, and
   `extern template class ContinuumKinematics<float, 1>;` / `<float, 2>` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/ContinuumKinematics.cpp` → the same instantiations.
 - Test: `robotics/kinematics/test/TestContinuumKinematics.cpp`

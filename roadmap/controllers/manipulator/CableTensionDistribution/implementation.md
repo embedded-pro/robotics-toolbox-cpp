@@ -94,8 +94,8 @@ function Distribute(w, pose):                           # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/controllers/manipulator/CableTensionDistribution.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Distribute`, and
+- Header: `robotics/controllers/manipulator/CableTensionDistribution.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Distribute`, and
   `extern template class CableTensionDistribution<float, 3, 2>;` / `<float, 2, 2>` / `<float, 8, 6>`
   under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/controllers/manipulator/CableTensionDistribution.cpp` →

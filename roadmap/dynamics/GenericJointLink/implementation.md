@@ -78,7 +78,7 @@ Limits:                           consumed by IK clamping (M13), trajectory plan
 ## Deployment
 
 - Header: `robotics/dynamics/JointLink.hpp` (and `RevoluteJointLink.hpp` becomes the alias) —
-  `#pragma once` → `#pragma GCC optimize("O3","fast-math")`, `extern template struct JointLink<float>;`
+  `#pragma once`, `extern template struct JointLink<float>;`
   under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/dynamics/JointLink.cpp` → `template struct JointLink<float>;`
 - Tests: `robotics/dynamics/test/TestJointLink.cpp` plus prismatic cases in the RNEA/ABA/FK tests.

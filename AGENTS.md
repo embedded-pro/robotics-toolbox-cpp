@@ -25,17 +25,19 @@ and included as `numerical/<domain>/…`.
   `infra::BoundedDeque<T>::WithMaxSize<N>`, `infra::BoundedList<T>::WithMaxSize<N>`,
   `std::array<T,N>`, `std::optional<T>`. Stack/static only. No recursion. **Tests too.**
 
-## Embedded optimizations (algorithm headers)
+## Embedded optimizations
 
-```cpp
-#pragma once
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC optimize("O3", "fast-math")
-#endif
-#include "numerical/math/CompilerOptimizations.hpp"
-```
-
-`OPTIMIZE_FOR_SPEED` on hot paths (`Filter/Compute/Update/Solve/Step`). Pure interfaces exempt.
+- **No `#pragma GCC optimize` and no `optimize` attribute**, in headers or sources. GCC does not
+  inline a callee whose optimization options differ from its caller's, so options set per header or
+  per function turn every small helper on a hot path into an out-of-line call; an unscoped pragma in
+  a header also leaks fast-math into every including translation unit.
+- The optimization level and floating-point model belong to the consumer and apply to whole
+  translation units. For embedded targets: `-O2` or `-O3` with `-ffast-math -fno-finite-math-only`.
+- `OPTIMIZE_FOR_SPEED` (from `numerical/math/CompilerOptimizations.hpp`) on hot paths
+  (`Filter/Compute/Update/Solve/Step`). Pure interfaces exempt. With
+  `NumericalToolbox_ENABLE_OPTIMIZATIONS` it forces inlining (`always_inline`, `hot`, `inline`);
+  without it, it expands to nothing.
+- Use `math::IsFinite` for finiteness checks: a consumer may still build with `-ffinite-math-only`.
 
 ## Style
 

@@ -57,7 +57,7 @@ function Update(q, q̇, τ, dt):                     # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/dynamics/MomentumObserver.hpp` — `#pragma once` → `#pragma GCC optimize("O3","fast-math")`,
+- Header: `robotics/dynamics/MomentumObserver.hpp` — `#pragma once`,
   `OPTIMIZE_FOR_SPEED` on `Update`, `extern template class MomentumObserver<float, 2>;` / `<float, 3>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/dynamics/MomentumObserver.cpp` → the same instantiations.

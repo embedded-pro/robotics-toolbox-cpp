@@ -87,8 +87,8 @@ including the sign-flipped (obtuse) case.
 
 ## Deployment
 
-- Header: `robotics/trajectory/CartesianSlerpInterpolation.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Sample`, and
+- Header: `robotics/trajectory/CartesianSlerpInterpolation.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class CartesianSlerpInterpolation<float, PolynomialTrajectory<float>>;` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Uses `robotics/trajectory/TrajectoryTypes.hpp`, `robotics/kinematics/SE3Transform.hpp` (M6) and

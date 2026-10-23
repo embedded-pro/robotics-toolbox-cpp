@@ -72,8 +72,8 @@ function Compute(qDot):                              # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/dynamics/FrictionCompensation.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Compute`/`JointTorque`, and
+- Header: `robotics/dynamics/FrictionCompensation.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Compute`/`JointTorque`, and
   `extern template class FrictionCompensation<float, 1>;` / `<float, 3>` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/dynamics/FrictionCompensation.cpp` →
   `template class FrictionCompensation<float, 1>;` and `<float, 3>`.

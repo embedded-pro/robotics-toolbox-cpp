@@ -71,8 +71,8 @@ function NullSpaceProjector(q):    Factor(q);  return I_Dof − Σ_{i<r} uᵢ·u
 
 ## Deployment
 
-- Header: `robotics/kinematics/RedundancyResolution.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Resolve`, and
+- Header: `robotics/kinematics/RedundancyResolution.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Resolve`, and
   `extern template class RedundancyResolution<float, 6, 7>;` / `<float, 3, 7>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/RedundancyResolution.cpp` → the same instantiations.

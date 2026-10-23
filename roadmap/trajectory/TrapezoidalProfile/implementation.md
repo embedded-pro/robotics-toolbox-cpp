@@ -92,8 +92,8 @@ function Sample(t):                             # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/trajectory/TrapezoidalProfile.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Sample`, and
+- Header: `robotics/trajectory/TrapezoidalProfile.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class TrapezoidalProfile<float>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Uses `robotics/trajectory/TrajectoryTypes.hpp` (create it if this is the first trajectory item).
 - Coverage: `robotics/trajectory/TrapezoidalProfile.cpp` → `template class TrapezoidalProfile<float>;`

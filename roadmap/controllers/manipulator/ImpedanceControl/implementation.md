@@ -106,7 +106,7 @@ function ComputeTorqueWithInertiaShaping(q, qDot, desiredPose, xdDot, xdDdot, fE
 ## Deployment
 
 - Header: `robotics/controllers/manipulator/ImpedanceControl.hpp` (+ `TaskError.hpp`, shared with M18/M19;
-  deploy it with whichever lands first) — `#pragma once` → `#pragma GCC optimize("O3","fast-math")`,
+  deploy it with whichever lands first) — `#pragma once`,
   `OPTIMIZE_FOR_SPEED` on both torque methods, and `extern template class ImpedanceControl<float, 2, 2>;` /
   `<float, 6, 6>` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/controllers/manipulator/ImpedanceControl.cpp` →

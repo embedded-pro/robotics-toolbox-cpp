@@ -68,7 +68,7 @@ ComputeInverseDynamics(q,q̇,q̈) = rnea.InverseDynamics(links, q, q̇, q̈, gra
 ## Deployment
 
 - Headers: `robotics/dynamics/InverseDynamicsModel.hpp` (pure interface) and
-  `robotics/dynamics/ChainDynamicsModel.hpp` — `#pragma once` → `#pragma GCC optimize("O3","fast-math")`,
+  `robotics/dynamics/ChainDynamicsModel.hpp` — `#pragma once`,
   `OPTIMIZE_FOR_SPEED` on `ComputeInverseDynamics`, and `extern template class ChainDynamicsModel<float, 2>;`
   / `<float, 3>` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/dynamics/ChainDynamicsModel.cpp` → the same instantiations.

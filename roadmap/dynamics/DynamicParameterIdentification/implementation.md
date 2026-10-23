@@ -79,8 +79,8 @@ function Solve(tol):
 
 ## Deployment
 
-- Header: `robotics/dynamics/DynamicParameterIdentification.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `extern template class DynamicParameterIdentification<float, 2>;`
+- Header: `robotics/dynamics/DynamicParameterIdentification.hpp` — `#pragma once`,
+  `extern template class DynamicParameterIdentification<float, 2>;`
   under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/dynamics/DynamicParameterIdentification.cpp` → the same instantiation.
 - Test: `robotics/dynamics/test/TestDynamicParameterIdentification.cpp`

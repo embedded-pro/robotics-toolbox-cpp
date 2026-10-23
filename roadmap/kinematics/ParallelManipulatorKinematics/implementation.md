@@ -120,7 +120,7 @@ function Forward(θ):                             # three-sphere intersection, c
 ## Deployment
 
 - Headers: `robotics/kinematics/StewartGoughKinematics.hpp`, `robotics/kinematics/DeltaKinematics.hpp` —
-  `#pragma once` → `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Inverse`, and
+  `#pragma once`, `OPTIMIZE_FOR_SPEED` on `Inverse`, and
   `extern template class StewartGoughKinematics<float>;` / `extern template class DeltaKinematics<float>;`
   under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/StewartGoughKinematics.cpp`, `robotics/kinematics/DeltaKinematics.cpp`

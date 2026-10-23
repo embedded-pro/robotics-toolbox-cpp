@@ -95,7 +95,7 @@ function JointTorques(J, w):                    # statics: τ = Jᵀ·w, w = (f;
 ## Deployment
 
 - Header: `robotics/kinematics/GeometricJacobian.hpp` (+ `JacobianProvider.hpp`, `ChainTaskJacobian.hpp`) —
-  `#pragma once` → `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on
+  `#pragma once`, `OPTIMIZE_FOR_SPEED` on
   `Compute`/`BiasAcceleration`, and `extern template class GeometricJacobian<float, 2>;` / `<float, 3>` /
   `<float, 6>` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/GeometricJacobian.cpp` → the same instantiations.

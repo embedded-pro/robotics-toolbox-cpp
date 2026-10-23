@@ -108,8 +108,8 @@ knots ⇒ exactly the `PolynomialTrajectory` cubic.
 
 ## Deployment
 
-- Header: `robotics/trajectory/CubicSplineTrajectory.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Sample`, and
+- Header: `robotics/trajectory/CubicSplineTrajectory.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class CubicSplineTrajectory<float, 3, 8>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Uses `robotics/trajectory/TrajectoryTypes.hpp` (create it if this is the first trajectory item).
 - Coverage: `robotics/trajectory/CubicSplineTrajectory.cpp` → `template class CubicSplineTrajectory<float, 3, 8>;`

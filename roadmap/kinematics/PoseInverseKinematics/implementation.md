@@ -96,8 +96,8 @@ function Damping(A0):                           # Nakamura–Hanafusa / Chiaveri
 
 ## Deployment
 
-- Header: `robotics/kinematics/PoseInverseKinematics.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Solve`, and
+- Header: `robotics/kinematics/PoseInverseKinematics.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Solve`, and
   `extern template class PoseInverseKinematics<float, 6>;` / `<float, 7>` under
   `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Coverage: `robotics/kinematics/PoseInverseKinematics.cpp` → the same instantiations.

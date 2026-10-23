@@ -98,8 +98,8 @@ function Sample(t):                     # OPTIMIZE_FOR_SPEED
 
 ## Deployment
 
-- Header: `robotics/trajectory/PolynomialTrajectory.hpp` — `#pragma once` →
-  `#pragma GCC optimize("O3","fast-math")`, `OPTIMIZE_FOR_SPEED` on `Sample`, and
+- Header: `robotics/trajectory/PolynomialTrajectory.hpp` — `#pragma once`,
+  `OPTIMIZE_FOR_SPEED` on `Sample`, and
   `extern template class PolynomialTrajectory<float>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
 - Uses `robotics/trajectory/TrajectoryTypes.hpp` (create it from the block above if this is the first
   trajectory item; header-only aggregates, no coverage `.cpp`).
