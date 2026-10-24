@@ -9,8 +9,8 @@ class TestMobileManipulatorKinematics : public ::testing::Test:
     # 3-link arm (M30 link model): z-axis joint at (0,0,0.1); y-axis joint +(0,0,0.2); y-axis joint +(0.3,0,0)
     std::array<RevoluteJointLink<float>, 3>  links{ ... }
     ChainTaskJacobian<float, 6, 3>           arm{ links, SE3Transform{ I, (0.25, 0, 0) } }
-    MobileManipulatorKinematics<float, 3>    mm{ arm, SE3Transform{ Rz(π/2), (0.1, 0, 0.3) }, 0.3 }
-    BaseState<float> base{ 1, 2, π/6 };  JointVector q{ 0.4, −0.6, 0.9 }
+    MobileManipulatorKinematics<float, 3>    mm{ arm, SE3Transform{ Rz(π/2), (0.1, 0, 0.3) } }
+    SE2Transform<float> base{ FromPose(1, 2, π/6) };  JointVector q{ 0.4, −0.6, 0.9 }
     u = (v, ω, q̇) = (0.3, −0.5, 0.2, −0.1, 0.4)
 # each case below is a TEST_F(TestMobileManipulatorKinematics, <name>)
 ```
@@ -35,8 +35,6 @@ yaw_moves_tool_by_lever_arm:
     Assert:  linear = ẑ × r, ‖linear‖ = ‖r_xy‖ = 0.456874; angular = ẑ
 base_constraint_blocks_sideslip:
     Assert: (−sin φ, cos φ, 0)·BaseConstraint(φ)·(v, ω) = 0 for φ ∈ {0, π/6, π}
-wheel_speeds_from_unicycle_command:
-    Assert: WheelSpeeds(1, 2) = (0.7, 1.3)  (L = 0.3)
 ```
 
 ## Reference vectors
