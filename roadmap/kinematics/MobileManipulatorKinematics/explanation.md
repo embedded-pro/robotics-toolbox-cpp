@@ -26,7 +26,6 @@ resolution decides how much each contributes.
 - **base pose `(x, y, φ)`** and **controls `(v, ω)`** — axle-midpoint pose, drive speed and turn rate.
 - **arm joints `q`** and the arm's Jacobian provider.
 - **mount transform** — arm base in the mobile-base frame.
-- **wheel base** — converts `(v, ω)` to wheel speeds.
 
 ## Reference
 Y. Yamamoto, X. Yun, "Coordinating Locomotion and Manipulation of a Mobile Manipulator," *IEEE Trans.
@@ -34,4 +33,4 @@ Automatic Control*, 39(6), 1994.
 
 ## See also
 `JacobianProvider` (M8, the arm block), `math::SE3Transform` (NT53, pose composition), `RedundancyResolution`
-(M14, splitting base vs arm).
+(M14, splitting base vs arm), `DifferentialDrive` (W1, wheel speeds from `(v, ω)`).

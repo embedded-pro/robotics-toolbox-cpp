@@ -3,8 +3,8 @@
 Design-level pseudocode for proposed components in [../ROADMAP.md](../ROADMAP.md).
 These are **specifications, not compilable code** — they describe *what* to build and *how*
 the algorithm works, so an implementer can produce the real templated C++ afterwards. Every manipulator
-(M) item has a spec; the other families (F, W, A, L, S, G, P, E, C, H) are ROADMAP entries only, and their
-specs are added here family by family.
+(M) and wheeled-robot (W) item has a spec, as does F1; the other families (F, A, L, S, G, P, E, C, H) are
+ROADMAP entries only, and their specs are added here family by family.
 
 ## Convention
 
@@ -26,7 +26,8 @@ The canonical worked example is
 [controllers/manipulator/PdGravityCompensation](controllers/manipulator/PdGravityCompensation/implementation.md).
 
 Conventions shared by every spec: 6-vectors are ordered linear part first — twists `(v; ω)`, wrenches
-`(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE3Transform/implementation.md) (NT53); dynamics
+`(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md) (NT53), and planar
+3-vectors `(vx, vy, ω)` by [math/SE2Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE2Transform/implementation.md) (NT66); dynamics
 and Jacobians reach controllers through interfaces implemented by
 [dynamics/ChainDynamicsModel](dynamics/ChainDynamicsModel/implementation.md) and
 [kinematics/GeometricJacobian](kinematics/GeometricJacobian/implementation.md).
@@ -95,6 +96,12 @@ prerequisites.
 
 ### `trajectory`
 `CartesianSlerpInterpolation` (M10) · `TimeOptimalPathParameterization` (M27) · `CubicSplineTrajectory` (M33)
+
+### `mobile`
+`PlanarOdometry` (F1) · `DifferentialDrive` (W1) · `CarLikeKinematics` (W2) · `OmnidirectionalKinematics` (W3) · `SkidSteerKinematics` (W4) · `PurePursuit` (W5) · `StanleyController` (W6) · `KanayamaController` (W7)
+
+### `planning`
+`DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
 
 ### `controllers/manipulator`
 `PdGravityCompensation` (M5) · `ComputedTorqueControl` (M12) · `ImpedanceControl` (M17) · `OperationalSpaceControl` (M18) · `HybridPositionForceControl` (M19) · `SlotineLiAdaptiveControl` (M20) · `CableTensionDistribution` (M25)

@@ -1,7 +1,8 @@
 # Robotics Toolbox — Roadmap
 
-Prioritized backlog by robot family. Manipulators (**M**) are the most developed; the other families are
-entries only so far — their specs (`roadmap/<domain>/<Name>/`) come family by family:
+Prioritized backlog by robot family. Manipulators (**M**) and wheeled robots (**W**, with **F1**) have specs
+(`roadmap/<domain>/<Name>/`); the other families are entries only so far, and their specs come family by
+family:
 
 | Prefix | Family                                                        | Section                                                                   |
 |--------|---------------------------------------------------------------|---------------------------------------------------------------------------|
@@ -39,12 +40,13 @@ this roadmap needs that upstream does not ship yet are specified and built upstr
 
 Generic algorithms live in numerical-toolbox-cpp and are referenced here as **NT** plus its
 master-list item number (NT53 is upstream item 53). A robotics item that depends on one needs a
-numerical-toolbox pin that ships it.
+numerical-toolbox pin that ships it. NT53–NT65 have shipped upstream, and their links point to the upstream
+docs; using them needs a pin at or after `1f6d717` (the current pin, `adfc10d`, predates them).
 
-| #    | Component                                             | Upstream module      | Spec                              | Needed by                                                                  |
+| #    | Component                                             | Upstream module      | Spec / doc                        | Needed by                                                                  |
 |------|-------------------------------------------------------|----------------------|-----------------------------------|----------------------------------------------------------------------------|
 | NT53 | SE(3) transform, twists, wrenches, exp/log, PoseError | `math`               | [SE3Transform][nt53]              | M7, M8, M10, M13, M15, M21, M23, M25, M26, M30, F3, A1, A6, L3, S2, G1, C1 |
-| NT54 | Angle utilities (wrap, shortest difference, unwrap)   | `math`               | [AngleUtilities][nt54]            | M21, S1                                                                    |
+| NT54 | Angle utilities (wrap, shortest difference, unwrap)   | `math`               | [AngleUtilities][nt54]            | M21, W6, W9, W10, S1                                                       |
 | NT55 | Polynomial point-to-point profile (+ profile types)   | `motion_profiles`    | [PolynomialProfile][nt55]         | M10, F4, L2                                                                |
 | NT56 | Trapezoidal (LSPB) profile + duration sync            | `motion_profiles`    | [TrapezoidalProfile][nt56]        | M10 (time law, optional), F4                                               |
 | NT57 | Friction compensation (Coulomb + viscous + Stribeck)  | `controllers`        | [FrictionCompensation][nt57]      | M5, M12, M29 (optional feedforward)                                        |
@@ -56,7 +58,7 @@ numerical-toolbox pin that ships it.
 | NT63 | Incremental QR least squares (rank-revealing)         | `estimators/offline` | [IncrementalQrLeastSquares][nt63] | M22                                                                        |
 | NT64 | Levenberg–Marquardt (retraction, pluggable damping)   | `optimization`       | [LevenbergMarquardt][nt64]        | M13, M23, E5, C2                                                           |
 | NT65 | Dense convex QP (Goldfarb–Idnani)                     | `solvers`            | [ActiveSetQp][nt65]               | M25 (exact path), L6, G2, G3                                               |
-| NT66 | SE(2) transform, twists, exp/log, pose error          | `math`               | [master list][ntrm], no spec yet  | F1, W1, W2, W3, W5, W7, W8, E1, E2, E3, E5                                 |
+| NT66 | SE(2) transform, twists, exp/log, pose error          | `math`               | [SE2Transform][nt66] (spec)       | F1, W1–W10, M24, E1, E2, E3, E5                                            |
 | NT67 | Kabsch / Umeyama point-set alignment                  | `solvers`            | [master list][ntrm], no spec yet  | E5, C1                                                                     |
 | NT68 | Lie-group Jacobians and ⊕/⊖ (SO(3), SE(3), SE(2))     | `math`               | [master list][ntrm], no spec yet  | C1 (and NT71)                                                              |
 | NT69 | Control allocation (redistributed pseudo-inverse, QP) | `controllers`        | [master list][ntrm], no spec yet  | A2, S3                                                                     |
@@ -66,19 +68,20 @@ numerical-toolbox pin that ships it.
 | NT73 | Online jerk-limited trajectory from arbitrary state   | `motion_profiles`    | [master list][ntrm], no spec yet  | F2                                                                         |
 
 [ntrm]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/ROADMAP.md#master-list-by-priority
-[nt53]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE3Transform/implementation.md
-[nt54]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/AngleUtilities/implementation.md
-[nt55]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/motion_profiles/PolynomialProfile/implementation.md
-[nt56]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/motion_profiles/TrapezoidalProfile/implementation.md
-[nt57]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/controllers/FrictionCompensation/implementation.md
-[nt58]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/solvers/SymplecticIntegrators/implementation.md
-[nt59]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/TridiagonalSolver/implementation.md
-[nt60]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/motion_profiles/SCurveProfile/implementation.md
-[nt61]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/CubicSpline/implementation.md
-[nt62]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/solvers/DampedPseudoInverse/implementation.md
-[nt63]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/estimators/offline/IncrementalQrLeastSquares/implementation.md
-[nt64]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/optimization/LevenbergMarquardt/implementation.md
-[nt65]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/solvers/ActiveSetQp/implementation.md
+[nt53]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md
+[nt54]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/AngleUtilities.md
+[nt55]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/motion_profiles/PolynomialProfile.md
+[nt56]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/motion_profiles/TrapezoidalProfile.md
+[nt57]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/controllers/FrictionCompensation.md
+[nt58]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/solvers/SymplecticIntegrators.md
+[nt59]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/TridiagonalSolver.md
+[nt60]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/motion_profiles/SCurveProfile.md
+[nt61]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/CubicSpline.md
+[nt62]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/solvers/DampedPseudoInverse.md
+[nt63]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/estimators/IncrementalQrLeastSquares.md
+[nt64]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/optimization/LevenbergMarquardt.md
+[nt65]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/solvers/ActiveSetQp.md
+[nt66]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE2Transform/implementation.md
 
 ## Robot manipulators & other manipulator types
 
@@ -286,17 +289,18 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Wheeled mobile robots
 
-| #  | Component                                            | Target module | Depends on | Difficulty |
-|----|------------------------------------------------------|---------------|------------|------------|
-| W1 | Differential-drive kinematics                        | `mobile`      | NT66       | ★☆☆☆☆      |
-| W2 | Car-like (Ackermann / kinematic bicycle) kinematics  | `mobile`      | NT66       | ★☆☆☆☆      |
-| W3 | Omnidirectional (mecanum / Swedish-wheel) kinematics | `mobile`      | NT66       | ★☆☆☆☆      |
-| W4 | Skid-steer kinematics with slip (ICR model)          | `mobile`      | W1         | ★★☆☆☆      |
-| W5 | Pure-pursuit path tracking                           | `mobile`      | W1, NT66   | ★★☆☆☆      |
-| W6 | Stanley path tracking                                | `mobile`      | W2         | ★★☆☆☆      |
-| W7 | Kanayama Lyapunov trajectory tracking                | `mobile`      | W1, NT66   | ★★☆☆☆      |
-| W8 | Dubins and Reeds–Shepp shortest paths                | `planning`    | NT66       | ★★★☆☆      |
-| W9 | Dynamic window approach (local obstacle avoidance)   | `planning`    | W1, P1     | ★★★☆☆      |
+| #   | Component                                            | Target module | Depends on | Difficulty |
+|-----|------------------------------------------------------|---------------|------------|------------|
+| W1  | Differential-drive kinematics                        | `mobile`      | NT66       | ★☆☆☆☆      |
+| W2  | Car-like (Ackermann / kinematic bicycle) kinematics  | `mobile`      | NT66       | ★☆☆☆☆      |
+| W3  | Omnidirectional (mecanum / Swedish-wheel) kinematics | `mobile`      | NT66       | ★☆☆☆☆      |
+| W4  | Skid-steer kinematics with slip (ICR model)          | `mobile`      | W1         | ★★☆☆☆      |
+| W5  | Pure-pursuit path tracking (+ planar polyline path)  | `mobile`      | W1, NT66   | ★★☆☆☆      |
+| W6  | Stanley path tracking                                | `mobile`      | W2, W5     | ★★☆☆☆      |
+| W7  | Kanayama Lyapunov trajectory tracking                | `mobile`      | W1, NT66   | ★★☆☆☆      |
+| W8  | Dubins shortest paths (+ car path type)              | `planning`    | NT66       | ★★☆☆☆      |
+| W9  | Dynamic window approach (local obstacle avoidance)   | `planning`    | W1, NT66   | ★★★☆☆      |
+| W10 | Reeds–Shepp shortest paths (forward and reverse)     | `planning`    | W8, NT54   | ★★★☆☆      |
 
 **W1. Differential-drive kinematics.** Body twist from wheel speeds and back, wheel-speed limits mapped to `(v, ω)` limits; the base model of M24.
 - *Algorithm / paper:* Siegwart et al. (2011), Ch. 3.
@@ -311,28 +315,32 @@ Cross-family building blocks that several of the families below depend on.
 - *Reuses / builds on:* NT66.
 
 **W4. Skid-steer kinematics.** Instantaneous-centre-of-rotation model with identified ICR offsets for tracked and skid-steered vehicles.
-- *Algorithm / paper:* J. Martínez, J. Morales, A. Mandow, A. García-Cerezo, *IJRR*, 24(10), 2005.
+- *Algorithm / paper:* J. L. Martínez, A. Mandow, J. Morales, S. Pedraza, A. García-Cerezo, *IJRR*, 24(10), 2005.
 - *Reuses / builds on:* W1.
 
-**W5. Pure pursuit.** Curvature command towards a look-ahead point on the path, with speed-scheduled look-ahead distance.
+**W5. Pure pursuit.** Curvature command towards a look-ahead point on the path, with speed-scheduled look-ahead distance and monotone progress; defines the bounded polyline `PlanarPath` that W6 and the planners share.
 - *Algorithm / paper:* R. C. Coulter, "Implementation of the pure pursuit path tracking algorithm," CMU-RI-TR-92-01, 1992.
 - *Reuses / builds on:* W1 (or W2), NT66.
 
 **W6. Stanley controller.** Front-axle cross-track and heading-error steering law for car-like vehicles.
 - *Algorithm / paper:* S. Thrun et al., "Stanley: The robot that won the DARPA Grand Challenge," *J. Field Robotics*, 23(9), 2006.
-- *Reuses / builds on:* W2.
+- *Reuses / builds on:* W2, W5 (path).
 
 **W7. Kanayama tracking controller.** Lyapunov-stable tracking of a reference pose and twist for unicycle-type bases, error expressed in the robot frame.
 - *Algorithm / paper:* Y. Kanayama, Y. Kimura, F. Miyazaki, T. Noguchi, *ICRA* 1990.
 - *Reuses / builds on:* W1, NT66.
 
-**W8. Dubins and Reeds–Shepp paths.** Closed-form shortest paths for a bounded-curvature car, forward only (Dubins, 6 words) or with reversing (Reeds–Shepp, 48 words).
-- *Algorithm / paper:* L. E. Dubins, *Am. J. Math.*, 79(3), 1957; J. A. Reeds, L. A. Shepp, *Pacific J. Math.*, 145(2), 1990.
+**W8. Dubins paths.** Closed-form shortest forward-only paths for a bounded-curvature car (6 words), with float-safe existence tests; defines the `CarPath` type W10 reuses.
+- *Algorithm / paper:* L. E. Dubins, *Am. J. Math.*, 79(3), 1957; A. Shkel, V. Lumelsky, *Robotics and Autonomous Systems*, 34(4), 2001.
 - *Reuses / builds on:* NT66.
 
-**W9. Dynamic window approach.** Samples the reachable `(v, ω)` window per cycle and scores heading, clearance and speed against obstacle distances.
+**W9. Dynamic window approach.** Samples the reachable `(v, ω)` window per cycle and scores heading, clearance and speed; clearance is the closed-form arc distance to the points of a laser scan, so no collision library (P1) is needed.
 - *Algorithm / paper:* D. Fox, W. Burgard, S. Thrun, *IEEE Robotics & Automation Magazine*, 4(1), 1997.
-- *Reuses / builds on:* W1, P1.
+- *Reuses / builds on:* W1, NT66.
+
+**W10. Reeds–Shepp paths.** Closed-form shortest paths for a bounded-curvature car that may reverse (48 words from 8 base formulas and their symmetries); continuous in the goal, the metric for parking and car-like planners.
+- *Algorithm / paper:* J. A. Reeds, L. A. Shepp, *Pacific J. Math.*, 145(2), 1990; corrected formulas as in OMPL.
+- *Reuses / builds on:* W8 (`CarPath`), NT54.
 
 ## Aerial robots
 

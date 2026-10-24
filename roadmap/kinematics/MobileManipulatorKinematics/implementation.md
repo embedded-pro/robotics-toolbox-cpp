@@ -5,41 +5,37 @@
 ## Data structures
 
 ```cpp
-template<typename T>                            # static_assert(std::is_floating_point_v<T>); instantiated for float
-struct BaseState:                               # planar pose of the axle midpoint in the world frame
-    T x, y, phi
-
-template<typename T, std::size_t ArmDof>
+template<typename T, std::size_t ArmDof>     # static_assert(std::is_floating_point_v<T>); instantiated for float
 class MobileManipulatorKinematics:
     const JacobianProvider<T, 6, ArmDof>& arm   # M8: J and ToolPose in the arm-base frame
     SE3Transform<T>                       mount # arm base in the mobile-base frame (NT53)
-    T                                     wheelBase    # L, axle length
+# base pose: math::SE2Transform<T> of the axle midpoint in the world frame (NT66)
 ```
 
 ## Interface
 
 ```cpp
-MobileManipulatorKinematics(const JacobianProvider<T, 6, ArmDof>& arm, const SE3Transform<T>& mount, T wheelBase)
-Matrix<T, 6, 2 + ArmDof>  Compute(const BaseState<T>& base, const JointVector& q) const   # hot path
-SE3Transform<T>           ToolPose(const BaseState<T>& base, const JointVector& q) const
+MobileManipulatorKinematics(const JacobianProvider<T, 6, ArmDof>& arm, const SE3Transform<T>& mount)
+Matrix<T, 6, 2 + ArmDof>  Compute(const SE2Transform<T>& base, const JointVector& q) const   # hot path
+SE3Transform<T>           ToolPose(const SE2Transform<T>& base, const JointVector& q) const
 static Matrix<T, 3, 2>    BaseConstraint(T phi)                  # (ẋ, ẏ, φ̇) = S(φ)·(v, ω)
-std::array<T, 2>          WheelSpeeds(T v, T omega) const        # (left, right) rim speeds
 ```
 
 Columns of `Compute` act on `u = (v, ω, q̇)`: base forward speed, base yaw rate, arm joint rates.
-Rows are the tool-point twist `(v; ω)` in the world frame (NT53/M8 ordering).
+Rows are the tool-point twist `(v; ω)` in the world frame (NT53/M8 ordering). Wheel speeds for the
+`(v, ω)` part come from W1's `DifferentialDrive::Inverse`.
 
 ## Algorithm (pseudocode)
 
 ```cpp
 function ToolPose(base, q):
-    T_wb = { Rz(base.phi), (base.x, base.y, 0) }
+    T_wb = base.ToSE3()                          # NT66: Rz(φ), (x, y, 0)
     return T_wb * mount * arm.ToolPose(q)
 
 function Compute(base, q):                       # OPTIMIZE_FOR_SPEED
-    R_wa = Rz(base.phi) · mount.R                # arm-base orientation in the world
+    R_wa = base.ToSE3().R · mount.R              # arm-base orientation in the world
     J_arm = arm.Jacobian(q)                      # 6×ArmDof, arm-base frame
-    r = ToolPose(base, q).p − (base.x, base.y, 0)                # lever arm, world frame
+    r = ToolPose(base, q).p − (base.translation, 0)              # lever arm, world frame
     column 0 (v) = ( (cos φ, sin φ, 0) ; 0 )
     column 1 (ω) = ( CrossProduct(ẑ, r) ; ẑ )
     columns 2.. = ( R_wa · J_arm.linear ; R_wa · J_arm.angular )  # blockdiag(R_wa, R_wa)·J_arm
@@ -47,9 +43,6 @@ function Compute(base, q):                       # OPTIMIZE_FOR_SPEED
 
 function BaseConstraint(φ):                      # no side-slip: [−sin φ, cos φ, 0]·(ẋ, ẏ, φ̇) = 0
     return [[cos φ, 0], [sin φ, 0], [0, 1]]
-
-function WheelSpeeds(v, ω):
-    return (v − ω·L/2, v + ω·L/2)
 ```
 
 ## Complexity & memory
@@ -80,5 +73,6 @@ function WheelSpeeds(v, ω):
 - Doc: `doc/kinematics/MobileManipulatorKinematics.md` (per `doc/TEMPLATE.md`)
 - CMake: `.hpp` → `target_sources`; `.cpp` → `robotics_add_coverage_sources`;
   `TestMobileManipulatorKinematics.cpp` → the `_test` target.
-- Depends on: NT53 (`math::SE3Transform`), M8 (`JacobianProvider`).
+- Depends on: NT53 (`math::SE3Transform`), NT66 (`math::SE2Transform`), M8 (`JacobianProvider`); W1 supplies
+  the wheel speeds.
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.
