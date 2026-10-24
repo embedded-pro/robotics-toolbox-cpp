@@ -30,6 +30,10 @@ increment_recovers_the_integrated_twist:
 reset_replaces_the_pose:
     Act:    Integrate(arc, 1); Reset(FromPose(−1, 3, 2))
     Assert: Pose().Pose() ≈ (−1, 3, 2)
+increment_deviation_grows_with_distance_and_rotation:
+    Arrange: α = (0.05, 0.01, 0.05, 0.01)
+    Assert:  IncrementDeviation(FromPose(0.5, 0, 0.1), α) ≈ (0.112250, 0.112250, 0.054772)
+             IncrementDeviation(FromPose(−0.5, 0, 0), α) == IncrementDeviation(FromPose(0.5, 0, 0), α)
 long_runs_keep_a_unit_rotation:
     Act:    10⁵ × Integrate(arc, 1e-3)
     Assert: cosine² + sine² ≈ 1 (tol 1e-6)

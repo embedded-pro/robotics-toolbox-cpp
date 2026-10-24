@@ -1,8 +1,8 @@
 # Robotics Toolbox — Roadmap
 
-Prioritized backlog by robot family. Manipulators (**M**) and wheeled robots (**W**, with **F1**) have specs
-(`roadmap/<domain>/<Name>/`); the other families are entries only so far, and their specs come family by
-family:
+Prioritized backlog by robot family. Manipulators (**M**), wheeled robots (**W**, with **F1**) and
+localization (**E**) have specs (`roadmap/<domain>/<Name>/`); the other families are entries only so far, and
+their specs come family by family:
 
 | Prefix | Family                                                        | Section                                                                   |
 |--------|---------------------------------------------------------------|---------------------------------------------------------------------------|
@@ -43,29 +43,30 @@ master-list item number (NT53 is upstream item 53). A robotics item that depends
 numerical-toolbox pin that ships it. NT53–NT65 have shipped upstream, and their links point to the upstream
 docs; the current pin (`63c9b91`) includes them.
 
-| #    | Component                                             | Upstream module      | Spec / doc                        | Needed by                                                                  |
-|------|-------------------------------------------------------|----------------------|-----------------------------------|----------------------------------------------------------------------------|
-| NT53 | SE(3) transform, twists, wrenches, exp/log, PoseError | `math`               | [SE3Transform][nt53]              | M7, M8, M10, M13, M15, M21, M23, M25, M26, M30, F3, A1, A6, L3, S2, G1, C1 |
-| NT54 | Angle utilities (wrap, shortest difference, unwrap)   | `math`               | [AngleUtilities][nt54]            | M21, W6, W9, W10, S1                                                       |
-| NT55 | Polynomial point-to-point profile (+ profile types)   | `motion_profiles`    | [PolynomialProfile][nt55]         | M10, F4, L2                                                                |
-| NT56 | Trapezoidal (LSPB) profile + duration sync            | `motion_profiles`    | [TrapezoidalProfile][nt56]        | M10 (time law, optional), F4                                               |
-| NT57 | Friction compensation (Coulomb + viscous + Stribeck)  | `controllers`        | [FrictionCompensation][nt57]      | M5, M12, M29 (optional feedforward)                                        |
-| NT58 | Symplectic integrators (semi-implicit Euler, Verlet)  | `solvers`            | [SymplecticIntegrators][nt58]     | M34                                                                        |
-| NT59 | Tridiagonal (Thomas) solver                           | `math`               | [TridiagonalSolver][nt59]         | NT61                                                                       |
-| NT60 | S-curve (jerk-limited) profile                        | `motion_profiles`    | [SCurveProfile][nt60]             | M10 (time law, optional)                                                   |
-| NT61 | Cubic spline interpolation (vector-valued)            | `math`               | [CubicSpline][nt61]               | M33                                                                        |
-| NT62 | Damped pseudo-inverse + null-space projector          | `solvers`            | [DampedPseudoInverse][nt62]       | M14, H5                                                                    |
-| NT63 | Incremental QR least squares (rank-revealing)         | `estimators/offline` | [IncrementalQrLeastSquares][nt63] | M22                                                                        |
-| NT64 | Levenberg–Marquardt (retraction, pluggable damping)   | `optimization`       | [LevenbergMarquardt][nt64]        | M13, M23, E5, C2                                                           |
-| NT65 | Dense convex QP (Goldfarb–Idnani)                     | `solvers`            | [ActiveSetQp][nt65]               | M25 (exact path), L6, G2, G3                                               |
-| NT66 | SE(2) transform, twists, exp/log, pose error          | `math`               | [SE2Transform][nt66] (spec)       | F1, W1–W10, M24, E1, E2, E3, E5                                            |
-| NT67 | Kabsch / Umeyama point-set alignment                  | `solvers`            | [master list][ntrm], no spec yet  | E5, C1                                                                     |
-| NT68 | Lie-group Jacobians and ⊕/⊖ (SO(3), SE(3), SE(2))     | `math`               | [master list][ntrm], no spec yet  | C1 (and NT71)                                                              |
-| NT69 | Control allocation (redistributed pseudo-inverse, QP) | `controllers`        | [master list][ntrm], no spec yet  | A2, S3                                                                     |
-| NT70 | Particle filter (bounded, systematic resampling)      | `filters/active`     | [master list][ntrm], no spec yet  | E4                                                                         |
-| NT71 | Error-state EKF on Lie groups                         | `filters/active`     | [master list][ntrm], no spec yet  | L5                                                                         |
-| NT72 | Minimum-derivative (min-snap) piecewise polynomials   | `motion_profiles`    | [master list][ntrm], no spec yet  | A7                                                                         |
-| NT73 | Online jerk-limited trajectory from arbitrary state   | `motion_profiles`    | [master list][ntrm], no spec yet  | F2                                                                         |
+| #    | Component                                             | Upstream module      | Spec / doc                          | Needed by                                                                  |
+|------|-------------------------------------------------------|----------------------|-------------------------------------|----------------------------------------------------------------------------|
+| NT53 | SE(3) transform, twists, wrenches, exp/log, PoseError | `math`               | [SE3Transform][nt53]                | M7, M8, M10, M13, M15, M21, M23, M25, M26, M30, F3, A1, A6, L3, S2, G1, C1 |
+| NT54 | Angle utilities (wrap, shortest difference, unwrap)   | `math`               | [AngleUtilities][nt54]              | M21, W6, W9, W10, E1, E3, S1                                               |
+| NT55 | Polynomial point-to-point profile (+ profile types)   | `motion_profiles`    | [PolynomialProfile][nt55]           | M10, F4, L2                                                                |
+| NT56 | Trapezoidal (LSPB) profile + duration sync            | `motion_profiles`    | [TrapezoidalProfile][nt56]          | M10 (time law, optional), F4                                               |
+| NT57 | Friction compensation (Coulomb + viscous + Stribeck)  | `controllers`        | [FrictionCompensation][nt57]        | M5, M12, M29 (optional feedforward)                                        |
+| NT58 | Symplectic integrators (semi-implicit Euler, Verlet)  | `solvers`            | [SymplecticIntegrators][nt58]       | M34                                                                        |
+| NT59 | Tridiagonal (Thomas) solver                           | `math`               | [TridiagonalSolver][nt59]           | NT61                                                                       |
+| NT60 | S-curve (jerk-limited) profile                        | `motion_profiles`    | [SCurveProfile][nt60]               | M10 (time law, optional)                                                   |
+| NT61 | Cubic spline interpolation (vector-valued)            | `math`               | [CubicSpline][nt61]                 | M33                                                                        |
+| NT62 | Damped pseudo-inverse + null-space projector          | `solvers`            | [DampedPseudoInverse][nt62]         | M14, H5                                                                    |
+| NT63 | Incremental QR least squares (rank-revealing)         | `estimators/offline` | [IncrementalQrLeastSquares][nt63]   | M22                                                                        |
+| NT64 | Levenberg–Marquardt (retraction, pluggable damping)   | `optimization`       | [LevenbergMarquardt][nt64]          | M13, M23, E5, C2                                                           |
+| NT65 | Dense convex QP (Goldfarb–Idnani)                     | `solvers`            | [ActiveSetQp][nt65]                 | M25 (exact path), L6, G2, G3                                               |
+| NT66 | SE(2) transform, twists, exp/log, pose error          | `math`               | [SE2Transform][nt66] (spec)         | F1, W1–W10, M24, E1, E2, E3, E5                                            |
+| NT67 | Kabsch / Umeyama point-set alignment                  | `solvers`            | [PointSetAlignment][nt67] (spec)    | E5, C1                                                                     |
+| NT68 | Lie-group Jacobians and ⊕/⊖ (SO(3), SE(3), SE(2))     | `math`               | [master list][ntrm], no spec yet    | C1 (and NT71)                                                              |
+| NT69 | Control allocation (redistributed pseudo-inverse, QP) | `controllers`        | [master list][ntrm], no spec yet    | A2, S3                                                                     |
+| NT70 | Particle filter (bounded, systematic resampling)      | `filters/active`     | [ParticleFilter][nt70] (spec)       | E4                                                                         |
+| NT71 | Error-state EKF on Lie groups                         | `filters/active`     | [master list][ntrm], no spec yet    | L5                                                                         |
+| NT72 | Minimum-derivative (min-snap) piecewise polynomials   | `motion_profiles`    | [master list][ntrm], no spec yet    | A7                                                                         |
+| NT73 | Online jerk-limited trajectory from arbitrary state   | `motion_profiles`    | [master list][ntrm], no spec yet    | F2                                                                         |
+| NT74 | Residual-form Kalman update with χ² gating            | `filters/active`     | [ResidualKalmanUpdate][nt74] (spec) | E1, E3                                                                     |
 
 [ntrm]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/ROADMAP.md#master-list-by-priority
 [nt53]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md
@@ -82,6 +83,9 @@ docs; the current pin (`63c9b91`) includes them.
 [nt64]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/optimization/LevenbergMarquardt.md
 [nt65]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/solvers/ActiveSetQp.md
 [nt66]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE2Transform/implementation.md
+[nt67]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/solvers/PointSetAlignment/implementation.md
+[nt70]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/filters/active/ParticleFilter/implementation.md
+[nt74]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/filters/active/ResidualKalmanUpdate/implementation.md
 
 ## Robot manipulators & other manipulator types
 
@@ -490,15 +494,15 @@ Cross-family building blocks that several of the families below depend on.
 
 | #  | Component                                              | Target module  | Depends on       | Difficulty |
 |----|--------------------------------------------------------|----------------|------------------|------------|
-| E1 | Wheel + IMU odometry fusion (EKF on SE(2))             | `localization` | F1, NT66         | ★★★☆☆      |
+| E1 | Wheel + gyro odometry fusion (EKF on SE(2))            | `localization` | F1, NT66, NT74   | ★★★☆☆      |
 | E2 | Occupancy-grid mapping (log-odds, ray casting)         | `localization` | NT66             | ★★★☆☆      |
-| E3 | EKF landmark localization (known map, range–bearing)   | `localization` | NT66             | ★★★☆☆      |
+| E3 | EKF landmark localization (known map, range–bearing)   | `localization` | F1, NT66, NT74   | ★★★☆☆      |
 | E4 | Monte Carlo localization                               | `localization` | NT70, E2, F1     | ★★★★☆      |
 | E5 | 2-D scan matching (point-to-point / point-to-line ICP) | `localization` | NT67, NT64, NT66 | ★★★★☆      |
 
-**E1. Odometry fusion.** EKF combining wheel odometry with gyro (and optionally accelerometer) on SE(2), with slip-aware process noise.
-- *Algorithm / paper:* S. Thrun, W. Burgard, D. Fox, *Probabilistic Robotics* (2005), Ch. 5 and 7.
-- *Reuses / builds on:* F1, NT66; upstream `ExtendedKalmanFilter`.
+**E1. Odometry fusion.** EKF on `(x, y, θ, gyro bias)`: wheel speed and gyro rate drive the prediction, the wheel yaw rate is a χ²-gated bias measurement (a rejected update flags slip), and optional heading and position fixes share the same update.
+- *Algorithm / paper:* S. Thrun, W. Burgard, D. Fox, *Probabilistic Robotics* (2005), Ch. 5 and 7; J. Borenstein, L. Feng, "Gyrodometry," *ICRA* 1996.
+- *Reuses / builds on:* F1, NT66, NT74 (upstream `ExtendedKalmanFilter` cannot wrap residuals or gate).
 
 **E2. Occupancy-grid mapping.** Log-odds cell updates from range scans along Bresenham rays on a bounded grid.
 - *Algorithm / paper:* A. Elfes, *Computer*, 22(6), 1989; Thrun et al. (2005), Ch. 9.
@@ -506,13 +510,13 @@ Cross-family building blocks that several of the families below depend on.
 
 **E3. EKF landmark localization.** Pose tracking against a known landmark map with range–bearing measurements and gated data association.
 - *Algorithm / paper:* Thrun et al. (2005), Ch. 7.
-- *Reuses / builds on:* NT66; upstream `ExtendedKalmanFilter`.
+- *Reuses / builds on:* F1 (odometry noise), NT66, NT74.
 
-**E4. Monte Carlo localization.** Particle-filter localization in an occupancy grid with the odometry motion model and a likelihood-field sensor model.
+**E4. Monte Carlo localization.** Particle-filter localization in an occupancy grid with the odometry motion model and a likelihood-field sensor model (two-pass chamfer distance map); samplers injected by the caller.
 - *Algorithm / paper:* F. Dellaert, D. Fox, W. Burgard, S. Thrun, *ICRA* 1999.
 - *Reuses / builds on:* NT70, E2, F1.
 
-**E5. Scan matching.** Iterative closest point between consecutive laser scans or against a map, with point-to-line error and outlier rejection.
+**E5. Scan matching.** Iterative closest point between consecutive laser scans or against a map: point-to-point (Kabsch) or point-to-line (Levenberg–Marquardt), outlier rejection and degeneracy detection.
 - *Algorithm / paper:* P. Besl, N. McKay, *IEEE T-PAMI*, 14(2), 1992; A. Censi, *ICRA* 2008.
 - *Reuses / builds on:* NT67, NT64, NT66.
 

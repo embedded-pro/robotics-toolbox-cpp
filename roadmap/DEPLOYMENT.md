@@ -21,7 +21,7 @@ Read the spec's three files first (`implementation.md`, `tests.md`, `explanation
 4. **CMake**
    - Add `.hpp` to `target_sources(...)`, `.cpp` to `robotics_add_coverage_sources(...)`,
      `Test<Name>.cpp` to the `_test` target's `target_sources`.
-   - New module (`trajectory`, `controllers/manipulator`, `mobile`, `planning`):
+   - New module (`trajectory`, `controllers/manipulator`, `mobile`, `planning`, `localization`):
      create `robotics/<module>/CMakeLists.txt` via `robotics_add_header_library(...)`, add a
      `test/` subdir, register it in the parent `CMakeLists.txt`, and add a `doc/<module>/` folder.
 

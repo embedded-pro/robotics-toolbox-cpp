@@ -13,6 +13,11 @@ position, as they do with Euler or Runge-Kutta integration of `(ẋ, ẏ, θ̇)`
 template<typename T>                            # static_assert(std::is_floating_point_v<T>); instantiated for float
 class PlanarOdometry:
     math::SE2Transform<T> pose                  # body frame in the odometry frame (NT66)
+
+template<typename T>
+struct OdometryNoise:                           # increment noise shared by the localization filters (E3, E4)
+    T rotationFromRotation, rotationFromTranslation        # α₁, α₂: σ_θ² = α₁Δθ² + α₂Δs²
+    T translationFromTranslation, translationFromRotation  # α₃, α₄: σ_xy² = α₃Δs² + α₄Δθ²
 ```
 
 ## Interface
@@ -24,6 +29,10 @@ void Integrate(const math::Vector3<T>& twist, T dt)           # body twist (vx, 
 void Reset(const math::SE2Transform<T>& pose)
 const math::SE2Transform<T>& Pose() const
 static math::Vector3<T> Increment(const math::SE2Transform<T>& from, const math::SE2Transform<T>& to)
+
+template<typename T>
+math::Vector3<T> IncrementDeviation(const math::SE2Transform<T>& increment, const OdometryNoise<T>& noise)
+                                                              # (σ_xy, σ_xy, σ_θ) of the body-frame increment
 ```
 
 ## Algorithm (pseudocode)
@@ -34,6 +43,11 @@ function Integrate(ξ, dt):                      # OPTIMIZE_FOR_SPEED
 
 function Increment(from, to):                   # body-frame motion between two odometry readings
     return (from.Inverse() * to).Log()          # (Δx, Δy, Δθ) as a twist held for unit time
+
+function IncrementDeviation(Δ, α):              # noise grows with distance and rotation; same for reverse
+    (dx, dy, dθ) = Δ.Pose();  Δs² = dx² + dy²
+    σ_xy = √(α₃Δs² + α₄dθ²);  σ_θ = √(α₁dθ² + α₂Δs²)
+    return (σ_xy, σ_xy, σ_θ)
 ```
 
 ## Complexity & memory
@@ -53,13 +67,16 @@ function Increment(from, to):                   # body-frame motion between two 
   heading change between the two readings to stay below `π`; sample faster than half a turn.
 - Odometry error grows without bound. Wheel-radius and track-width errors dominate it, which is the
   wheel models' job to calibrate (UMBmark), not this integrator's.
+- `IncrementDeviation` is Thrun's odometry noise model applied to the body-frame increment instead of
+  the rotate–translate–rotate split, whose first rotation jumps by π when the robot reverses.
 - Float-only: `static_assert(std::is_floating_point_v<T>)`.
 
 ## Deployment
 
 - Header: `robotics/mobile/PlanarOdometry.hpp` — `#pragma once`, `OPTIMIZE_FOR_SPEED` on `Integrate`, and
   `extern template class PlanarOdometry<float>;` under `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
-- Coverage: `robotics/mobile/PlanarOdometry.cpp` → `template class PlanarOdometry<float>;`
+- Coverage: `robotics/mobile/PlanarOdometry.cpp` → `template class PlanarOdometry<float>;` and
+  `template math::Vector3<float> IncrementDeviation<float>(...);`
 - Test: `robotics/mobile/test/TestPlanarOdometry.cpp`
 - Doc: `doc/mobile/PlanarOdometry.md` (per `doc/TEMPLATE.md`)
 - CMake: new module `robotics/mobile` (`robotics.mobile`, test target `robotics.mobile_test`), created by
