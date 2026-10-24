@@ -14,9 +14,10 @@ namespace dynamics
         using Vector3 = math::Vector<T, 3>;
         using InertiaMatrix = math::SquareMatrix<T, 3>;
 
-        virtual ~NewtonEulerBody() = default;
-
         virtual T ComputeMass() const = 0;
         virtual InertiaMatrix ComputeInertia() const = 0;
+
+    protected:
+        ~NewtonEulerBody() = default;
     };
 }

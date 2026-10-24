@@ -24,7 +24,7 @@ class CoriolisMatrix:                             # stateless
     JointVector              TransposeTimesVelocity(links, q, q̇) const # Cᵀ(q, q̇) q̇
 
 template<typename T, std::size_t Dof, std::size_t NumParams>
-class InertialRegressor:                          # interface, virtual ~InertialRegressor() = default
+class InertialRegressor:                          # interface, protected ~InertialRegressor() = default
     virtual Matrix<T, Dof, NumParams> Compute(q, q̇, q̇r, q̈r) const = 0  # Y with Y·π = M q̈r + C q̇r + g
 
 template<typename T, std::size_t NumLinks>

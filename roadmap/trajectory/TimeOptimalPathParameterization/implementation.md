@@ -14,7 +14,7 @@ definition: CubicSplineTrajectory spec → Data structures).
 template<typename T, std::size_t Dof> using JointVector = math::Vector<T, Dof>
 
 template<typename T, std::size_t Dof>        # static_assert(std::is_floating_point_v<T>); instantiated for float
-class PathGeometry:                          # DI, virtual ~PathGeometry() = default — fixed path q(s), s ∈ [0, 1]
+class PathGeometry:                          # DI, protected ~PathGeometry() = default — fixed path q(s), s ∈ [0, 1]
     virtual JointVector Position(T s) const = 0           # q(s)
     virtual JointVector FirstDerivative(T s) const = 0    # q'(s)
     virtual JointVector SecondDerivative(T s) const = 0   # q''(s)
@@ -29,7 +29,7 @@ struct JointBounds:
     JointVector velocityMax                  # q̇max > 0
 
 template<typename T, std::size_t Dof>
-class JointLimits:                           # DI, virtual ~JointLimits() = default
+class JointLimits:                           # DI, protected ~JointLimits() = default
     virtual PathCoefficients<T, Dof> Coefficients(T s) const = 0
     virtual const JointBounds<T, Dof>& Bounds() const = 0
 
