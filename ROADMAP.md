@@ -1,8 +1,8 @@
 # Robotics Toolbox — Roadmap
 
-Prioritized backlog by robot family. Manipulators (**M**), wheeled robots (**W**, with **F1**) and
-localization (**E**) have specs (`roadmap/<domain>/<Name>/`); the other families are entries only so far, and
-their specs come family by family:
+Prioritized backlog by robot family. Manipulators (**M**), wheeled robots (**W**, with **F1**), localization
+(**E**) and planning (**P**) have specs (`roadmap/<domain>/<Name>/`); the other families are entries only so
+far, and their specs come family by family:
 
 | Prefix | Family                                                        | Section                                                                   |
 |--------|---------------------------------------------------------------|---------------------------------------------------------------------------|
@@ -469,26 +469,26 @@ Cross-family building blocks that several of the families below depend on.
 | P5 | GJK + EPA convex distance and penetration                         | `planning`    | —          | ★★★★☆      |
 | P6 | RRT-Connect in joint space with a fixed node pool                 | `planning`    | P4         | ★★★★☆      |
 
-**P1. Primitive distances.** Closest points and distances between the convex primitives robots are usually wrapped in.
+**P1. Primitive distances.** Closed-form closest points and signed distances (negative = penetration) between points, segments, spheres, capsules and oriented boxes, as core geometry plus radius.
 - *Algorithm / paper:* C. Ericson, *Real-Time Collision Detection* (2004), Ch. 5.
 
-**P2. Potential fields.** Attractive goal and repulsive obstacle potentials as a reactive velocity/torque term, with the known local-minimum caveat.
+**P2. Potential fields.** Quadratic-then-conic attraction and Khatib repulsion from obstacle proximity readings as a clamped task-space velocity; local minima are detected and reported.
 - *Algorithm / paper:* O. Khatib, *IJRR*, 5(1), 1986.
 - *Reuses / builds on:* P1.
 
-**P3. Grid search.** A* and Dijkstra on 2-D/3-D occupancy grids with a bounded binary heap and closed set (no heap allocation).
+**P3. Grid search.** A* and Dijkstra on 2-D/3-D grids with per-cell costs from a callable, an indexed binary heap with decrease-key, 16-bit indices on small grids and the octile heuristic (no heap allocation).
 - *Algorithm / paper:* P. Hart, N. Nilsson, B. Raphael, *IEEE Trans. Systems Science and Cybernetics*, 4(2), 1968.
 
-**P4. Self-collision checking.** Capsule model per link, pairwise distances with an allowed-collision matrix, from the M30 frame chain.
+**P4. Self-collision checking.** Joint-to-joint capsule per link from the M30 frame chain, pairwise P1 distances with an allowed-collision matrix (adjacent links by default), minimum distance and pair.
 - *Algorithm / paper:* Ericson (2004), Ch. 4–5.
 - *Reuses / builds on:* P1, M30.
 
-**P5. GJK + EPA.** Distance between convex shapes from support functions, and penetration depth/normal when they overlap.
+**P5. GJK + EPA.** Distance between convex shapes (sphere, capsule, box, bounded hull) from support functions, run on cores plus margins; penetration depth and normal by a bounded EPA, robust to tied supports.
 - *Algorithm / paper:* E. Gilbert, D. Johnson, S. Keerthi, *IEEE J. Robotics and Automation*, 4(2), 1988; G. van den Bergen, *Collision Detection in Interactive 3D Environments* (2003).
 
-**P6. RRT-Connect.** Bidirectional rapidly-exploring random trees in joint space with a compile-time node pool and a deterministic, injected sampler.
+**P6. RRT-Connect.** Bidirectional rapidly-exploring random trees in joint space with compile-time node pools, an injected sampler and validity test, and random shortcutting.
 - *Algorithm / paper:* J. Kuffner, S. LaValle, *ICRA* 2000.
-- *Reuses / builds on:* P4.
+- *Reuses / builds on:* P4 (and P1/P5) as the validity test, supplied by the caller.
 
 ## Localization and mapping
 
