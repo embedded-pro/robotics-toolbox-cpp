@@ -3,8 +3,8 @@
 Design-level pseudocode for proposed components in [../ROADMAP.md](../ROADMAP.md).
 These are **specifications, not compilable code** — they describe *what* to build and *how*
 the algorithm works, so an implementer can produce the real templated C++ afterwards. Every manipulator
-(M), wheeled-robot (W) and localization (E) item has a spec, as does F1; the other families (F, A, L, S, G,
-P, C, H) are ROADMAP entries only, and their specs are added here family by family.
+(M), wheeled-robot (W), localization (E) and planning (P) item has a spec, as does F1; the other families
+(F, A, L, S, G, C, H) are ROADMAP entries only, and their specs are added here family by family.
 
 ## Convention
 
@@ -101,7 +101,7 @@ prerequisites.
 `PlanarOdometry` (F1) · `DifferentialDrive` (W1) · `CarLikeKinematics` (W2) · `OmnidirectionalKinematics` (W3) · `SkidSteerKinematics` (W4) · `PurePursuit` (W5) · `StanleyController` (W6) · `KanayamaController` (W7)
 
 ### `planning`
-`DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
+`PrimitiveDistance` (P1) · `PotentialField` (P2) · `GridSearch` (P3) · `SelfCollision` (P4) · `ConvexCollision` (P5) · `RrtConnect` (P6) · `DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
 
 ### `localization`
 `OdometryFusion` (E1) · `OccupancyGridMap` (E2) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
