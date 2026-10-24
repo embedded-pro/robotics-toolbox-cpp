@@ -15,10 +15,11 @@ namespace dynamics
         using StateVector = math::Vector<T, Dof>;
         using MassMatrix = math::SquareMatrix<T, Dof>;
 
-        virtual ~EulerLagrangeDynamics() = default;
-
         virtual MassMatrix ComputeMassMatrix(const StateVector& q) const = 0;
         virtual StateVector ComputeCoriolisTerms(const StateVector& q, const StateVector& qDot) const = 0;
         virtual StateVector ComputeGravityTerms(const StateVector& q) const = 0;
+
+    protected:
+        ~EulerLagrangeDynamics() = default;
     };
 }

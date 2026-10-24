@@ -11,7 +11,7 @@ library turns a link description into those interfaces. This adapter does: it im
 
 ```cpp
 template<typename T, std::size_t Dof>                 # static_assert(std::is_floating_point_v<T>); instantiated for float
-class InverseDynamicsModel:                           # new interface, virtual ~InverseDynamicsModel() = default
+class InverseDynamicsModel:                           # new interface, protected ~InverseDynamicsModel() = default
     virtual StateVector ComputeInverseDynamics(const StateVector& q, const StateVector& qDot,
                                                const StateVector& qDDot) const = 0
 

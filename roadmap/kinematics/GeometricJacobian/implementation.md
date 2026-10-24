@@ -18,7 +18,7 @@ class GeometricJacobian:                        # stateless
 
 template<typename T, std::size_t TaskDim, std::size_t Dof>   # DI seam used by all task-space controllers
 class JacobianProvider:
-    virtual ~JacobianProvider() = default
+    protected ~JacobianProvider() = default                 # non-virtual; never deleted through the interface
     virtual math::Matrix<T, TaskDim, Dof> Jacobian(const JointVector& q) const = 0
     virtual math::Vector<T, TaskDim> BiasAcceleration(const JointVector& q, const JointVector& qDot) const = 0   # J̇·q̇
     virtual SE3Transform<T> ToolPose(const JointVector& q) const = 0
