@@ -3,8 +3,8 @@
 Design-level pseudocode for proposed components in [../ROADMAP.md](../ROADMAP.md).
 These are **specifications, not compilable code** — they describe *what* to build and *how*
 the algorithm works, so an implementer can produce the real templated C++ afterwards. Every manipulator
-(M) and wheeled-robot (W) item has a spec, as does F1; the other families (F, A, L, S, G, P, E, C, H) are
-ROADMAP entries only, and their specs are added here family by family.
+(M), wheeled-robot (W) and localization (E) item has a spec, as does F1; the other families (F, A, L, S, G,
+P, C, H) are ROADMAP entries only, and their specs are added here family by family.
 
 ## Convention
 
@@ -102,6 +102,9 @@ prerequisites.
 
 ### `planning`
 `DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
+
+### `localization`
+`OdometryFusion` (E1) · `OccupancyGridMap` (E2) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
 
 ### `controllers/manipulator`
 `PdGravityCompensation` (M5) · `ComputedTorqueControl` (M12) · `ImpedanceControl` (M17) · `OperationalSpaceControl` (M18) · `HybridPositionForceControl` (M19) · `SlotineLiAdaptiveControl` (M20) · `CableTensionDistribution` (M25)
