@@ -65,7 +65,7 @@ function ComputeTorque(q, qDot, qd, qdDot, qdDdot):    # OPTIMIZE_FOR_SPEED
 - **The proof needs `Ṁ − 2C` skew-symmetric**, so `Y` must use the *Christoffel-consistent* `C(q,q̇)`
   applied to the reference velocity, `C(q,q̇)q̇r`. Plain RNEA (`ChainDynamicsModel`, M29) only returns the
   vector `C(q,q̇)q̇` for a single velocity and cannot provide it; use the regressor of
-  `roadmap/dynamics/CoriolisMatrixAndRegressor` (M31).
+  the shipped `robotics/dynamics/ChainInertialRegressor.hpp` and `CoriolisMatrix.hpp` (M31).
 - Add a **projection** (or dead-zone) so `aHat` stays in a physically valid set (positive masses)
   and does not drift under sensor noise or unmodelled dynamics.
 - `Λ` sets the error-manifold bandwidth, `Kd` damps `s`, `Γ` sets adaptation speed — too large `Γ`

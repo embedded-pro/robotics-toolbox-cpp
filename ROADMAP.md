@@ -122,7 +122,6 @@ existing `dynamics/` convention.
 | M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, NT64, M8 | ★★★☆☆      |
 | M16 | Momentum-based collision-detection observer                     | `dynamics`                | M29, M31       | ★★★☆☆      |
 | M17 | Impedance control                                               | `controllers/manipulator` | M8, M29        | ★★★☆☆      |
-| M31 | Coriolis matrix and inertial-parameter regressor                | `dynamics`                | M28            | ★★★☆☆      |
 | M22 | Dynamic (base-parameter) identification                         | `dynamics`                | M31, NT63      | ★★★☆☆      |
 | M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29        | ★★★★☆      |
 | M19 | Hybrid position/force control                                   | `controllers/manipulator` | M8, M29        | ★★★★☆      |
@@ -151,9 +150,6 @@ retired here.
 
 **M17. Impedance control.** Stiffness/damping impedance via `Jᵀ` (no force sensor), and inertia-shaping impedance with measured contact wrench via the task-space inertia.
 - *Algorithm / paper:* N. Hogan, *ASME J. Dyn. Sys. Meas. Control*, 1985.
-
-**M31. Coriolis matrix and inertial regressor.** Modified RNEA giving the Christoffel `C(q,q̇)q̇_r` (skew-symmetric `Ṁ − 2C`), `Cᵀq̇`, and the 10-parameter-per-link regressor.
-- *Algorithm / paper:* Echeandia & Wensing (2021); Niemeyer & Slotine (1991); Atkeson, An, Hollerbach (1986).
 
 **M22. Dynamic (base-parameter) identification.** Regressor rows streamed into a rank-revealing least-squares solve; the kept directions are the base parameters.
 - *Algorithm / paper:* Atkeson, An, Hollerbach (1986); Gautier & Khalil (1990).
