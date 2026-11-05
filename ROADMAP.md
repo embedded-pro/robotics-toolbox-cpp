@@ -120,7 +120,6 @@ existing `dynamics/` convention.
 | #   | Component                                                       | Target module             | Depends on     | Difficulty |
 |-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
 | M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | NT53, NT55     | ★★☆☆☆      |
-| M14 | Redundancy resolution / null-space projection                   | `kinematics`              | M8, NT62       | ★★☆☆☆      |
 | M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, NT64, M8 | ★★★☆☆      |
 | M15 | Product-of-Exponentials forward kinematics                      | `kinematics`              | NT53           | ★★★☆☆      |
 | M16 | Momentum-based collision-detection observer                     | `dynamics`                | M29, M31       | ★★★☆☆      |
@@ -146,10 +145,6 @@ retired here.
 **M10. Cartesian path + orientation interpolation.** Straight-line position with SLERP orientation, one shared time law, twist feed-forward.
 - *Algorithm / paper:* Lynch & Park, Ch. 9; K. Shoemake, *SIGGRAPH* 1985.
 - *Reuses / builds on:* NT53 poses; any upstream motion profile (NT55, NT56, NT60) as the time law.
-
-**M14. Redundancy resolution / null-space projection.** `q̇ = J⁺_λ ẋ + (I − J⁺J)·q̇₀` with an exact (undamped, rank-thresholded) projector, bound to the arm's task Jacobian.
-- *Algorithm / paper:* A. Liégeois, *IEEE Trans. SMC*, 7(12), 1977.
-- *Reuses / builds on:* upstream `solvers::DampedPseudoInverse` (NT62).
 
 ### Tier 3 — Moderate ★★★☆☆
 
