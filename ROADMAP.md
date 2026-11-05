@@ -377,12 +377,8 @@ Cross-family building blocks that several of the families below depend on.
 
 | #  | Component                                         | Target module | Depends on | Difficulty |
 |----|---------------------------------------------------|---------------|------------|------------|
-| P3 | A* / Dijkstra on bounded occupancy grids          | `planning`    | —          | ★★★☆☆      |
 | P5 | GJK + EPA convex distance and penetration         | `planning`    | —          | ★★★★☆      |
 | P6 | RRT-Connect in joint space with a fixed node pool | `planning`    | P4         | ★★★★☆      |
-
-**P3. Grid search.** A* and Dijkstra on 2-D/3-D grids with per-cell costs from a callable, an indexed binary heap with decrease-key, 16-bit indices on small grids and the octile heuristic (no heap allocation).
-- *Algorithm / paper:* P. Hart, N. Nilsson, B. Raphael, *IEEE Trans. Systems Science and Cybernetics*, 4(2), 1968.
 
 **P5. GJK + EPA.** Distance between convex shapes (sphere, capsule, box, bounded hull) from support functions, run on cores plus margins; penetration depth and normal by a bounded EPA, robust to tied supports.
 - *Algorithm / paper:* E. Gilbert, D. Johnson, S. Keerthi, *IEEE J. Robotics and Automation*, 4(2), 1988; G. van den Bergen, *Collision Detection in Interactive 3D Environments* (2003).
