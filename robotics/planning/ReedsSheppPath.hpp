@@ -48,9 +48,6 @@ namespace planning
             T phi;
         };
 
-        using Formula = std::optional<Triple> (*)(T, T, T);
-        using Builder = Lengths (*)(const Triple&);
-
         static constexpr T pi{ std::numbers::pi_v<T> };
         static constexpr T halfPi{ std::numbers::pi_v<T> / T{ 2 } };
         static constexpr T tolerance{ T{ 1e-5f } };
@@ -62,6 +59,7 @@ namespace planning
         static constexpr Word lrsr{ Steering::Left, Steering::Right, Steering::Straight, Steering::Right, Steering::Straight };
         static constexpr Word lrslr{ Steering::Left, Steering::Right, Steering::Straight, Steering::Left, Steering::Right };
 
+        template<typename Formula, typename Builder>
         static void Consider(Best& best, Formula formula, Builder builder, const Word& word, const Pose& pose, bool backwards);
         static Steering Mirror(Steering steering);
         static Triple TauOmega(T u, T v, T xi, T eta, T phi);
@@ -115,12 +113,13 @@ namespace planning
 
         auto path{ best.path };
         path.turningRadius = turningRadius;
-        for (std::size_t k = 0; k < path.count; ++k)
-            path.segments[k].length *= turningRadius;
+        for (auto& segment : path.segments)
+            segment.length *= turningRadius;
         return path;
     }
 
     template<typename T>
+    template<typename Formula, typename Builder>
     void ReedsSheppPlanner<T>::Consider(Best& best, Formula formula, Builder builder, const Word& word, const Pose& pose, bool backwards)
     {
         for (std::size_t symmetry = 0; symmetry < 4; ++symmetry)
@@ -149,11 +148,13 @@ namespace planning
     template<typename T>
     Steering ReedsSheppPlanner<T>::Mirror(Steering steering)
     {
-        if (steering == Steering::Left)
-            return Steering::Right;
-        if (steering == Steering::Right)
-            return Steering::Left;
-        return Steering::Straight;
+        using enum Steering;
+
+        if (steering == Left)
+            return Right;
+        if (steering == Right)
+            return Left;
+        return Straight;
     }
 
     template<typename T>

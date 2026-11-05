@@ -87,7 +87,9 @@ namespace planning
             T speed;
         };
 
-        using Samples = std::array<Sample, NumV * NumW>;
+        static constexpr std::size_t sampleCount{ NumV * NumW };
+
+        using Samples = std::array<Sample, sampleCount>;
 
         static constexpr T pi{ std::numbers::pi_v<T> };
         static constexpr T straightCurvature{ T{ 1e-6f } };
@@ -127,9 +129,10 @@ namespace planning
         Maxima maxima{};
         bool anyAdmissible{ false };
 
-        for (std::size_t k = 0; k < samples.size(); ++k)
+        for (std::size_t k = 0; k < sampleCount; ++k)
         {
-            const auto& sample{ samples[k] = Evaluate(Interpolate(window.vMin, window.vMax, k / NumW, NumV), Interpolate(window.omegaMin, window.omegaMax, k % NumW, NumW), goal, obstacles) };
+            samples[k] = Evaluate(Interpolate(window.vMin, window.vMax, k / NumW, NumV), Interpolate(window.omegaMin, window.omegaMax, k % NumW, NumW), goal, obstacles);
+            const auto& sample{ samples[k] };
             if (sample.admissible)
             {
                 anyAdmissible = true;
