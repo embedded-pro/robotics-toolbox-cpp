@@ -102,6 +102,3 @@ prerequisites.
 
 ### `localization`
 `OdometryFusion` (E1) · `OccupancyGridMap` (E2) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
-
-### `controllers/manipulator`
-`CableTensionDistribution` (M25)

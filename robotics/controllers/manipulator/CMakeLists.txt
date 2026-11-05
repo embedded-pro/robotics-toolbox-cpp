@@ -14,6 +14,7 @@ target_link_libraries(robotics.controllers.manipulator ${ROBOTICS_VISIBILITY}
 )
 
 target_sources(robotics.controllers.manipulator PRIVATE
+    CableTensionDistribution.hpp
     ComputedTorqueControl.hpp
     HybridPositionForceControl.hpp
     ImpedanceControl.hpp
@@ -24,6 +25,7 @@ target_sources(robotics.controllers.manipulator PRIVATE
 )
 
 robotics_add_coverage_sources(robotics.controllers.manipulator
+    CableTensionDistribution.cpp
     ComputedTorqueControl.cpp
     HybridPositionForceControl.cpp
     ImpedanceControl.cpp

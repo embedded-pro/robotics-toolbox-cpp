@@ -117,11 +117,10 @@ existing `dynamics/` convention.
 
 ### Manipulator list (by priority)
 
-| #   | Component                                         | Target module             | Depends on  | Difficulty |
-|-----|---------------------------------------------------|---------------------------|-------------|------------|
-| M24 | Mobile-manipulator / nonholonomic-base kinematics | `kinematics`              | M8, M14, W1 | ★★★★☆      |
-| M25 | Cable-driven tension distribution                 | `controllers/manipulator` | NT53, NT65  | ★★★★☆      |
-| M27 | Time-optimal path parameterization (TOPP-RA)      | `trajectory` (new)        | M29         | ★★★★★      |
+| #   | Component                                         | Target module      | Depends on  | Difficulty |
+|-----|---------------------------------------------------|--------------------|-------------|------------|
+| M24 | Mobile-manipulator / nonholonomic-base kinematics | `kinematics`       | M8, M14, W1 | ★★★★☆      |
+| M27 | Time-optimal path parameterization (TOPP-RA)      | `trajectory` (new) | M29         | ★★★★★      |
 
 M2 (polynomial profile), M3 (trapezoidal profile), M4 (friction compensation), M6 (SE(3)) and M9
 (S-curve profile) moved to numerical-toolbox as NT55, NT56, NT57, NT53 and NT60; their numbers are
@@ -136,10 +135,6 @@ retired here.
 **M24. Mobile-manipulator / nonholonomic-base kinematics.** Combined base + arm Jacobian in the world frame with differential-drive constraints.
 - *Algorithm / paper:* Y. Yamamoto, X. Yun, *IEEE Trans. Automatic Control*, 39(6), 1994.
 - *Reuses / builds on:* the W1 differential-drive model for the base.
-
-**M25. Cable-driven tension distribution.** Structure matrix from cable geometry, Pott's closed-form (improved) tension distribution within `[tMin, tMax]`, and an exact QP path for the workspace boundary.
-- *Algorithm / paper:* Pott, Bruckmann, Mikelsons (2009); A. Pott (2014).
-- *Reuses / builds on:* upstream `solvers::ActiveSetQp` (NT65) for the exact path.
 
 ### Tier 5 — Hard / research-grade ★★★★★
 
