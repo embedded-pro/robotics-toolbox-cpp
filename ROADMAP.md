@@ -354,17 +354,12 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Motion planning and collision
 
-| #  | Component                                         | Target module | Depends on | Difficulty |
-|----|---------------------------------------------------|---------------|------------|------------|
-| P5 | GJK + EPA convex distance and penetration         | `planning`    | —          | ★★★★☆      |
-| P6 | RRT-Connect in joint space with a fixed node pool | `planning`    | P4         | ★★★★☆      |
+| #  | Component                                 | Target module | Depends on | Difficulty |
+|----|-------------------------------------------|---------------|------------|------------|
+| P5 | GJK + EPA convex distance and penetration | `planning`    | —          | ★★★★☆      |
 
 **P5. GJK + EPA.** Distance between convex shapes (sphere, capsule, box, bounded hull) from support functions, run on cores plus margins; penetration depth and normal by a bounded EPA, robust to tied supports.
 - *Algorithm / paper:* E. Gilbert, D. Johnson, S. Keerthi, *IEEE J. Robotics and Automation*, 4(2), 1988; G. van den Bergen, *Collision Detection in Interactive 3D Environments* (2003).
-
-**P6. RRT-Connect.** Bidirectional rapidly-exploring random trees in joint space with compile-time node pools, an injected sampler and validity test, and random shortcutting.
-- *Algorithm / paper:* J. Kuffner, S. LaValle, *ICRA* 2000.
-- *Reuses / builds on:* P4 (and P1/P5) as the validity test, supplied by the caller.
 
 ## Localization and mapping
 

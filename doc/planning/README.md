@@ -4,9 +4,10 @@ Geometric queries and planners for collision-free robot motion.
 
 ## Algorithms
 
-| Algorithm                                          | Description                                                                                                                     |
-|----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-| [Primitive Distance Queries](PrimitiveDistance.md) | Closed-form closest points and signed distances between points, segments, spheres, capsules and oriented boxes — $O(1)$         |
-| [Artificial Potential Fields](PotentialField.md)   | Quadratic-then-conic attraction plus Khatib repulsion as a clamped velocity, with local-minimum detection — $O(M)$              |
-| [Self-Collision Checking](SelfCollision.md)        | Joint-to-joint capsules per link, pairwise signed distances with an allowed-collision matrix and a safety margin — $O(n^2)$     |
-| [Grid Search (A* and Dijkstra)](GridSearch.md)     | Optimal shortest paths on bounded 2-D/3-D grids with per-cell costs, an indexed binary heap and the admissible octile heuristic |
+| Algorithm                                          | Description                                                                                                                                    |
+|----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Primitive Distance Queries](PrimitiveDistance.md) | Closed-form closest points and signed distances between points, segments, spheres, capsules and oriented boxes — $O(1)$                        |
+| [Artificial Potential Fields](PotentialField.md)   | Quadratic-then-conic attraction plus Khatib repulsion as a clamped velocity, with local-minimum detection — $O(M)$                             |
+| [Self-Collision Checking](SelfCollision.md)        | Joint-to-joint capsules per link, pairwise signed distances with an allowed-collision matrix and a safety margin — $O(n^2)$                    |
+| [Grid Search (A* and Dijkstra)](GridSearch.md)     | Optimal shortest paths on bounded 2-D/3-D grids with per-cell costs, an indexed binary heap and the admissible octile heuristic                |
+| [RRT-Connect](RrtConnect.md)                       | Bidirectional rapidly-exploring random trees in joint space with fixed node pools, injected sampler and validity test, and random shortcutting |

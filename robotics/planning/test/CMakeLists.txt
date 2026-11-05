@@ -11,5 +11,6 @@ target_sources(robotics.planning_test PRIVATE
     TestGridSearch.cpp
     TestPotentialField.cpp
     TestPrimitiveDistance.cpp
+    TestRrtConnect.cpp
     TestSelfCollision.cpp
 )

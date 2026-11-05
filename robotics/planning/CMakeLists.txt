@@ -15,6 +15,7 @@ target_sources(robotics.planning PRIVATE
     GridSearch.hpp
     PotentialField.hpp
     PrimitiveDistance.hpp
+    RrtConnect.hpp
     SelfCollision.hpp
 )
 
@@ -22,6 +23,7 @@ robotics_add_coverage_sources(robotics.planning
     GridSearch.cpp
     PotentialField.cpp
     PrimitiveDistance.cpp
+    RrtConnect.cpp
     SelfCollision.cpp
 )
 
