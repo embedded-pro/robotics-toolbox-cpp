@@ -92,7 +92,7 @@ prerequisites.
 `ManipulabilityIndex` (M11) · `PoseInverseKinematics` (M13) · `RedundancyResolution` (M14) · `ProductOfExponentials` (M15) · `AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26)
 
 ### `dynamics`
-`MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CoriolisMatrixAndRegressor` (M31) · `RneaExternalWrench` (M32)
+`MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CoriolisMatrixAndRegressor` (M31)
 
 ### `trajectory`
 `CartesianSlerpInterpolation` (M10) · `TimeOptimalPathParameterization` (M27)
