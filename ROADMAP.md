@@ -174,13 +174,8 @@ Cross-family building blocks that several of the families below depend on.
 
 | #   | Component                                          | Target module | Depends on | Difficulty |
 |-----|----------------------------------------------------|---------------|------------|------------|
-| W8  | Dubins shortest paths (+ car path type)            | `planning`    | NT66       | ★★☆☆☆      |
 | W9  | Dynamic window approach (local obstacle avoidance) | `planning`    | W1, NT66   | ★★★☆☆      |
 | W10 | Reeds–Shepp shortest paths (forward and reverse)   | `planning`    | W8, NT54   | ★★★☆☆      |
-
-**W8. Dubins paths.** Closed-form shortest forward-only paths for a bounded-curvature car (6 words), with float-safe existence tests; defines the `CarPath` type W10 reuses.
-- *Algorithm / paper:* L. E. Dubins, *Am. J. Math.*, 79(3), 1957; A. Shkel, V. Lumelsky, *Robotics and Autonomous Systems*, 34(4), 2001.
-- *Reuses / builds on:* NT66.
 
 **W9. Dynamic window approach.** Samples the reachable `(v, ω)` window per cycle and scores heading, clearance and speed; clearance is the closed-form arc distance to the points of a laser scan, so no collision library (P1) is needed.
 - *Algorithm / paper:* D. Fox, W. Burgard, S. Thrun, *IEEE Robotics & Automation Magazine*, 4(1), 1997.

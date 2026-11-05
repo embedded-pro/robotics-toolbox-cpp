@@ -9,6 +9,7 @@ target_link_libraries(robotics.planning_test PUBLIC
 
 target_sources(robotics.planning_test PRIVATE
     TestConvexCollision.cpp
+    TestDubinsPath.cpp
     TestGridSearch.cpp
     TestPotentialField.cpp
     TestPrimitiveDistance.cpp
