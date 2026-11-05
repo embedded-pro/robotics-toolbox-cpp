@@ -172,14 +172,9 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Wheeled mobile robots
 
-| #   | Component                                          | Target module | Depends on | Difficulty |
-|-----|----------------------------------------------------|---------------|------------|------------|
-| W9  | Dynamic window approach (local obstacle avoidance) | `planning`    | W1, NT66   | ★★★☆☆      |
-| W10 | Reeds–Shepp shortest paths (forward and reverse)   | `planning`    | W8, NT54   | ★★★☆☆      |
-
-**W9. Dynamic window approach.** Samples the reachable `(v, ω)` window per cycle and scores heading, clearance and speed; clearance is the closed-form arc distance to the points of a laser scan, so no collision library (P1) is needed.
-- *Algorithm / paper:* D. Fox, W. Burgard, S. Thrun, *IEEE Robotics & Automation Magazine*, 4(1), 1997.
-- *Reuses / builds on:* W1, NT66.
+| #   | Component                                        | Target module | Depends on | Difficulty |
+|-----|--------------------------------------------------|---------------|------------|------------|
+| W10 | Reeds–Shepp shortest paths (forward and reverse) | `planning`    | W8, NT54   | ★★★☆☆      |
 
 **W10. Reeds–Shepp paths.** Closed-form shortest paths for a bounded-curvature car that may reverse (48 words from 8 base formulas and their symmetries); continuous in the goal, the metric for parking and car-like planners.
 - *Algorithm / paper:* J. A. Reeds, L. A. Shepp, *Pacific J. Math.*, 145(2), 1990; corrected formulas as in OMPL.

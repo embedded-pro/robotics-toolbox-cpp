@@ -15,6 +15,7 @@ target_sources(robotics.planning PRIVATE
     CarPath.hpp
     ConvexCollision.hpp
     DubinsPath.hpp
+    DynamicWindowApproach.hpp
     GridSearch.hpp
     PotentialField.hpp
     PrimitiveDistance.hpp
@@ -26,6 +27,7 @@ robotics_add_coverage_sources(robotics.planning
     CarPath.cpp
     ConvexCollision.cpp
     DubinsPath.cpp
+    DynamicWindowApproach.cpp
     GridSearch.cpp
     PotentialField.cpp
     PrimitiveDistance.cpp

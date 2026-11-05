@@ -95,7 +95,7 @@ prerequisites.
 `TimeOptimalPathParameterization` (M27)
 
 ### `planning`
-`DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
+`ReedsSheppPath` (W10)
 
 ### `localization`
 `OdometryFusion` (E1) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
