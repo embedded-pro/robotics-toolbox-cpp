@@ -40,33 +40,33 @@ this roadmap needs that upstream does not ship yet are specified and built upstr
 
 Generic algorithms live in numerical-toolbox-cpp and are referenced here as **NT** plus its
 master-list item number (NT53 is upstream item 53). A robotics item that depends on one needs a
-numerical-toolbox pin that ships it. NT53–NT66 have shipped upstream, and their links point to the upstream
-docs; the current pin (`dc147fb`) includes them.
+numerical-toolbox pin that ships it. NT53–NT66 and NT74 have shipped upstream, and their links point to the
+upstream docs; the current pin (`c1a669b`) includes them.
 
-| #    | Component                                             | Upstream module      | Spec / doc                          | Needed by                                                                  |
-|------|-------------------------------------------------------|----------------------|-------------------------------------|----------------------------------------------------------------------------|
-| NT53 | SE(3) transform, twists, wrenches, exp/log, PoseError | `math`               | [SE3Transform][nt53]                | M7, M8, M10, M13, M15, M21, M23, M25, M26, M30, F3, A1, A6, L3, S2, G1, C1 |
-| NT54 | Angle utilities (wrap, shortest difference, unwrap)   | `math`               | [AngleUtilities][nt54]              | M21, W6, W9, W10, E1, E3, S1                                               |
-| NT55 | Polynomial point-to-point profile (+ profile types)   | `motion_profiles`    | [PolynomialProfile][nt55]           | M10, F4, L2                                                                |
-| NT56 | Trapezoidal (LSPB) profile + duration sync            | `motion_profiles`    | [TrapezoidalProfile][nt56]          | M10 (time law, optional), F4                                               |
-| NT57 | Friction compensation (Coulomb + viscous + Stribeck)  | `controllers`        | [FrictionCompensation][nt57]        | M5, M12, M29 (optional feedforward)                                        |
-| NT58 | Symplectic integrators (semi-implicit Euler, Verlet)  | `solvers`            | [SymplecticIntegrators][nt58]       | M34                                                                        |
-| NT59 | Tridiagonal (Thomas) solver                           | `math`               | [TridiagonalSolver][nt59]           | NT61                                                                       |
-| NT60 | S-curve (jerk-limited) profile                        | `motion_profiles`    | [SCurveProfile][nt60]               | M10 (time law, optional)                                                   |
-| NT61 | Cubic spline interpolation (vector-valued)            | `math`               | [CubicSpline][nt61]                 | M33                                                                        |
-| NT62 | Damped pseudo-inverse + null-space projector          | `solvers`            | [DampedPseudoInverse][nt62]         | M14, H5                                                                    |
-| NT63 | Incremental QR least squares (rank-revealing)         | `estimators/offline` | [IncrementalQrLeastSquares][nt63]   | M22                                                                        |
-| NT64 | Levenberg–Marquardt (retraction, pluggable damping)   | `optimization`       | [LevenbergMarquardt][nt64]          | M13, M23, E5, C2                                                           |
-| NT65 | Dense convex QP (Goldfarb–Idnani)                     | `solvers`            | [ActiveSetQp][nt65]                 | M25 (exact path), L6, G2, G3                                               |
-| NT66 | SE(2) transform, twists, exp/log, pose error          | `math`               | [SE2Transform][nt66]                | F1, W1–W10, M24, E1, E2, E3, E5                                            |
-| NT67 | Kabsch / Umeyama point-set alignment                  | `solvers`            | [PointSetAlignment][nt67] (spec)    | E5, C1                                                                     |
-| NT68 | Lie-group Jacobians and ⊕/⊖ (SO(3), SE(3), SE(2))     | `math`               | [master list][ntrm], no spec yet    | C1 (and NT71)                                                              |
-| NT69 | Control allocation (redistributed pseudo-inverse, QP) | `controllers`        | [master list][ntrm], no spec yet    | A2, S3                                                                     |
-| NT70 | Particle filter (bounded, systematic resampling)      | `filters/active`     | [ParticleFilter][nt70] (spec)       | E4                                                                         |
-| NT71 | Error-state EKF on Lie groups                         | `filters/active`     | [master list][ntrm], no spec yet    | L5                                                                         |
-| NT72 | Minimum-derivative (min-snap) piecewise polynomials   | `motion_profiles`    | [master list][ntrm], no spec yet    | A7                                                                         |
-| NT73 | Online jerk-limited trajectory from arbitrary state   | `motion_profiles`    | [master list][ntrm], no spec yet    | F2                                                                         |
-| NT74 | Residual-form Kalman update with χ² gating            | `filters/active`     | [ResidualKalmanUpdate][nt74] (spec) | E1, E3                                                                     |
+| #    | Component                                             | Upstream module      | Spec / doc                        | Needed by                                                                  |
+|------|-------------------------------------------------------|----------------------|-----------------------------------|----------------------------------------------------------------------------|
+| NT53 | SE(3) transform, twists, wrenches, exp/log, PoseError | `math`               | [SE3Transform][nt53]              | M7, M8, M10, M13, M15, M21, M23, M25, M26, M30, F3, A1, A6, L3, S2, G1, C1 |
+| NT54 | Angle utilities (wrap, shortest difference, unwrap)   | `math`               | [AngleUtilities][nt54]            | M21, W6, W9, W10, E1, E3, S1                                               |
+| NT55 | Polynomial point-to-point profile (+ profile types)   | `motion_profiles`    | [PolynomialProfile][nt55]         | M10, F4, L2                                                                |
+| NT56 | Trapezoidal (LSPB) profile + duration sync            | `motion_profiles`    | [TrapezoidalProfile][nt56]        | M10 (time law, optional), F4                                               |
+| NT57 | Friction compensation (Coulomb + viscous + Stribeck)  | `controllers`        | [FrictionCompensation][nt57]      | M5, M12, M29 (optional feedforward)                                        |
+| NT58 | Symplectic integrators (semi-implicit Euler, Verlet)  | `solvers`            | [SymplecticIntegrators][nt58]     | M34                                                                        |
+| NT59 | Tridiagonal (Thomas) solver                           | `math`               | [TridiagonalSolver][nt59]         | NT61                                                                       |
+| NT60 | S-curve (jerk-limited) profile                        | `motion_profiles`    | [SCurveProfile][nt60]             | M10 (time law, optional)                                                   |
+| NT61 | Cubic spline interpolation (vector-valued)            | `math`               | [CubicSpline][nt61]               | M33                                                                        |
+| NT62 | Damped pseudo-inverse + null-space projector          | `solvers`            | [DampedPseudoInverse][nt62]       | M14, H5                                                                    |
+| NT63 | Incremental QR least squares (rank-revealing)         | `estimators/offline` | [IncrementalQrLeastSquares][nt63] | M22                                                                        |
+| NT64 | Levenberg–Marquardt (retraction, pluggable damping)   | `optimization`       | [LevenbergMarquardt][nt64]        | M13, M23, E5, C2                                                           |
+| NT65 | Dense convex QP (Goldfarb–Idnani)                     | `solvers`            | [ActiveSetQp][nt65]               | M25 (exact path), L6, G2, G3                                               |
+| NT66 | SE(2) transform, twists, exp/log, pose error          | `math`               | [SE2Transform][nt66]              | F1, W1–W10, M24, E1, E2, E3, E5                                            |
+| NT67 | Kabsch / Umeyama point-set alignment                  | `solvers`            | [PointSetAlignment][nt67] (spec)  | E5, C1                                                                     |
+| NT68 | Lie-group Jacobians and ⊕/⊖ (SO(3), SE(3), SE(2))     | `math`               | [master list][ntrm], no spec yet  | C1 (and NT71)                                                              |
+| NT69 | Control allocation (redistributed pseudo-inverse, QP) | `controllers`        | [master list][ntrm], no spec yet  | A2, S3                                                                     |
+| NT70 | Particle filter (bounded, systematic resampling)      | `filters/active`     | [ParticleFilter][nt70] (spec)     | E4                                                                         |
+| NT71 | Error-state EKF on Lie groups                         | `filters/active`     | [master list][ntrm], no spec yet  | L5                                                                         |
+| NT72 | Minimum-derivative (min-snap) piecewise polynomials   | `motion_profiles`    | [master list][ntrm], no spec yet  | A7                                                                         |
+| NT73 | Online jerk-limited trajectory from arbitrary state   | `motion_profiles`    | [master list][ntrm], no spec yet  | F2                                                                         |
+| NT74 | Residual-form Kalman update with χ² gating            | `filters/active`     | [ResidualKalmanUpdate][nt74]      | E1, E3                                                                     |
 
 [ntrm]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/ROADMAP.md#master-list-by-priority
 [nt53]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md
@@ -85,7 +85,7 @@ docs; the current pin (`dc147fb`) includes them.
 [nt66]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE2Transform.md
 [nt67]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/solvers/PointSetAlignment/implementation.md
 [nt70]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/filters/active/ParticleFilter/implementation.md
-[nt74]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/filters/active/ResidualKalmanUpdate/implementation.md
+[nt74]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/filters/active/ResidualKalmanUpdate.md
 
 ## Robot manipulators & other manipulator types
 
