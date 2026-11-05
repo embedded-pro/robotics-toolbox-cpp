@@ -117,17 +117,10 @@ existing `dynamics/` convention.
 
 ### Manipulator list (by priority)
 
-| #   | Component                                                       | Target module             | Depends on  | Difficulty |
-|-----|-----------------------------------------------------------------|---------------------------|-------------|------------|
-| M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29     | ★★★★☆      |
-| M19 | Hybrid position/force control                                   | `controllers/manipulator` | M8, M29     | ★★★★☆      |
-| M20 | Passivity-based adaptive control (Slotine-Li)                   | `controllers/manipulator` | M31         | ★★★★☆      |
-| M21 | Analytical IK for ortho-parallel 6R arms with a spherical wrist | `kinematics`              | NT53, NT54  | ★★★★☆      |
-| M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta)          | `kinematics`              | NT53, NT64  | ★★★★☆      |
-| M24 | Mobile-manipulator / nonholonomic-base kinematics               | `kinematics`              | M8, M14, W1 | ★★★★☆      |
-| M25 | Cable-driven tension distribution                               | `controllers/manipulator` | NT53, NT65  | ★★★★☆      |
-| M26 | Continuum / soft constant-curvature kinematics                  | `kinematics`              | NT53        | ★★★★☆      |
-| M27 | Time-optimal path parameterization (TOPP-RA)                    | `trajectory` (new)        | M29         | ★★★★★      |
+| #   | Component                                         | Target module      | Depends on  | Difficulty |
+|-----|---------------------------------------------------|--------------------|-------------|------------|
+| M24 | Mobile-manipulator / nonholonomic-base kinematics | `kinematics`       | M8, M14, W1 | ★★★★☆      |
+| M27 | Time-optimal path parameterization (TOPP-RA)      | `trajectory` (new) | M29         | ★★★★★      |
 
 M2 (polynomial profile), M3 (trapezoidal profile), M4 (friction compensation), M6 (SE(3)) and M9
 (S-curve profile) moved to numerical-toolbox as NT55, NT56, NT57, NT53 and NT60; their numbers are
@@ -139,33 +132,9 @@ retired here.
 
 ### Tier 4 — Advanced ★★★★☆
 
-**M18. Operational-space control.** Task-space inertia `Λ = (J M⁻¹ Jᵀ)⁻¹`, `J̇q̇` compensation, full joint-space gravity/Coriolis compensation and a dynamically-consistent null space.
-- *Algorithm / paper:* O. Khatib, *IEEE J. Robotics and Automation*, 3(1), 1987.
-
-**M19. Hybrid position/force control.** Selection matrix in a constraint frame, PI force loop with anti-windup and damping, motion PD.
-- *Algorithm / paper:* M. Raibert, J. Craig, 1981; An & Hollerbach, 1987.
-
-**M20. Passivity-based adaptive control (Slotine-Li).** Tracks trajectories while estimating inertial parameters on-line through the regressor `Y(q,q̇,q̇r,q̈r)`.
-- *Algorithm / paper:* J.-J. Slotine, W. Li, *Int. J. Robotics Research*, 6(3), 1987.
-
-**M21. Analytical IK for ortho-parallel 6R arms with a spherical wrist (OPW).** Closed-form, all eight solutions, covering shoulder, lateral and elbow offsets of common industrial arms.
-- *Algorithm / paper:* M. Brandstötter, A. Angerer, M. Hofbaur, Austrian Robotics Workshop, 2014; D. Pieper, PhD thesis, Stanford, 1968.
-- *Reuses / builds on:* NT53; joint wrapping from NT54.
-
-**M23. Parallel-manipulator kinematics.** Stewart-Gough (leg-length IK, Newton FK) and Delta (per-arm closed-form IK, three-sphere FK).
-- *Algorithm / paper:* J.-P. Merlet, *Parallel Robots*, 2nd ed. (2006); R. Clavel (1990).
-- *Reuses / builds on:* NT53 retraction; the Stewart Newton FK runs on upstream `LevenbergMarquardt` (NT64).
-
 **M24. Mobile-manipulator / nonholonomic-base kinematics.** Combined base + arm Jacobian in the world frame with differential-drive constraints.
 - *Algorithm / paper:* Y. Yamamoto, X. Yun, *IEEE Trans. Automatic Control*, 39(6), 1994.
 - *Reuses / builds on:* the W1 differential-drive model for the base.
-
-**M25. Cable-driven tension distribution.** Structure matrix from cable geometry, Pott's closed-form (improved) tension distribution within `[tMin, tMax]`, and an exact QP path for the workspace boundary.
-- *Algorithm / paper:* Pott, Bruckmann, Mikelsons (2009); A. Pott (2014).
-- *Reuses / builds on:* upstream `solvers::ActiveSetQp` (NT65) for the exact path.
-
-**M26. Continuum / soft constant-curvature kinematics.** Piecewise-constant-curvature FK and single-section IK.
-- *Algorithm / paper:* R. Webster, B. Jones, *Int. J. Robotics Research*, 29(13), 2010.
 
 ### Tier 5 — Hard / research-grade ★★★★★
 
@@ -375,17 +344,8 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Motion planning and collision
 
-| #  | Component                                         | Target module | Depends on | Difficulty |
-|----|---------------------------------------------------|---------------|------------|------------|
-| P5 | GJK + EPA convex distance and penetration         | `planning`    | —          | ★★★★☆      |
-| P6 | RRT-Connect in joint space with a fixed node pool | `planning`    | P4         | ★★★★☆      |
-
-**P5. GJK + EPA.** Distance between convex shapes (sphere, capsule, box, bounded hull) from support functions, run on cores plus margins; penetration depth and normal by a bounded EPA, robust to tied supports.
-- *Algorithm / paper:* E. Gilbert, D. Johnson, S. Keerthi, *IEEE J. Robotics and Automation*, 4(2), 1988; G. van den Bergen, *Collision Detection in Interactive 3D Environments* (2003).
-
-**P6. RRT-Connect.** Bidirectional rapidly-exploring random trees in joint space with compile-time node pools, an injected sampler and validity test, and random shortcutting.
-- *Algorithm / paper:* J. Kuffner, S. LaValle, *ICRA* 2000.
-- *Reuses / builds on:* P4 (and P1/P5) as the validity test, supplied by the caller.
+| # | Component | Target module | Depends on | Difficulty |
+|---|-----------|---------------|------------|------------|
 
 ## Localization and mapping
 

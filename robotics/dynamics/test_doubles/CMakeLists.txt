@@ -8,5 +8,6 @@ target_link_libraries(robotics.dynamics_test_doubles INTERFACE
 
 target_sources(robotics.dynamics_test_doubles PRIVATE
     MockEulerLagrangeDynamics.hpp
+    MockInertialRegressor.hpp
     MockInverseDynamicsModel.hpp
 )

@@ -6,6 +6,7 @@ target_include_directories(robotics.controllers.manipulator ${ROBOTICS_VISIBILIT
 )
 
 target_link_libraries(robotics.controllers.manipulator ${ROBOTICS_VISIBILITY}
+    infra.util
     numerical.math
     numerical.solver
     robotics.dynamics
@@ -13,16 +14,24 @@ target_link_libraries(robotics.controllers.manipulator ${ROBOTICS_VISIBILITY}
 )
 
 target_sources(robotics.controllers.manipulator PRIVATE
+    CableTensionDistribution.hpp
     ComputedTorqueControl.hpp
+    HybridPositionForceControl.hpp
     ImpedanceControl.hpp
+    OperationalSpaceControl.hpp
     PdGravityCompensation.hpp
+    SlotineLiAdaptiveControl.hpp
     TaskError.hpp
 )
 
 robotics_add_coverage_sources(robotics.controllers.manipulator
+    CableTensionDistribution.cpp
     ComputedTorqueControl.cpp
+    HybridPositionForceControl.cpp
     ImpedanceControl.cpp
+    OperationalSpaceControl.cpp
     PdGravityCompensation.cpp
+    SlotineLiAdaptiveControl.cpp
 )
 
 add_subdirectory(test)
