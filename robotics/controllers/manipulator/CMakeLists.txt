@@ -15,6 +15,7 @@ target_link_libraries(robotics.controllers.manipulator ${ROBOTICS_VISIBILITY}
 target_sources(robotics.controllers.manipulator PRIVATE
     ComputedTorqueControl.hpp
     ImpedanceControl.hpp
+    OperationalSpaceControl.hpp
     PdGravityCompensation.hpp
     SlotineLiAdaptiveControl.hpp
     TaskError.hpp
@@ -23,6 +24,7 @@ target_sources(robotics.controllers.manipulator PRIVATE
 robotics_add_coverage_sources(robotics.controllers.manipulator
     ComputedTorqueControl.cpp
     ImpedanceControl.cpp
+    OperationalSpaceControl.cpp
     PdGravityCompensation.cpp
     SlotineLiAdaptiveControl.cpp
 )

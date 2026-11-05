@@ -119,7 +119,6 @@ existing `dynamics/` convention.
 
 | #   | Component                                              | Target module             | Depends on  | Difficulty |
 |-----|--------------------------------------------------------|---------------------------|-------------|------------|
-| M18 | Operational-space (task-space) control                 | `controllers/manipulator` | M8, M29     | ★★★★☆      |
 | M19 | Hybrid position/force control                          | `controllers/manipulator` | M8, M29     | ★★★★☆      |
 | M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta) | `kinematics`              | NT53, NT64  | ★★★★☆      |
 | M24 | Mobile-manipulator / nonholonomic-base kinematics      | `kinematics`              | M8, M14, W1 | ★★★★☆      |
@@ -135,9 +134,6 @@ retired here.
 ### Tier 3 — Moderate ★★★☆☆
 
 ### Tier 4 — Advanced ★★★★☆
-
-**M18. Operational-space control.** Task-space inertia `Λ = (J M⁻¹ Jᵀ)⁻¹`, `J̇q̇` compensation, full joint-space gravity/Coriolis compensation and a dynamically-consistent null space.
-- *Algorithm / paper:* O. Khatib, *IEEE J. Robotics and Automation*, 3(1), 1987.
 
 **M19. Hybrid position/force control.** Selection matrix in a constraint frame, PI force loop with anti-windup and damping, motion PD.
 - *Algorithm / paper:* M. Raibert, J. Craig, 1981; An & Hollerbach, 1987.
