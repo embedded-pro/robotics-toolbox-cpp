@@ -13,4 +13,5 @@ target_sources(robotics.controllers.manipulator_test PRIVATE
     TestComputedTorqueControl.cpp
     TestImpedanceControl.cpp
     TestPdGravityCompensation.cpp
+    TestSlotineLiAdaptiveControl.cpp
 )

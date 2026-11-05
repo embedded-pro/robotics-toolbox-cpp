@@ -16,6 +16,7 @@ target_sources(robotics.controllers.manipulator PRIVATE
     ComputedTorqueControl.hpp
     ImpedanceControl.hpp
     PdGravityCompensation.hpp
+    SlotineLiAdaptiveControl.hpp
     TaskError.hpp
 )
 
@@ -23,6 +24,7 @@ robotics_add_coverage_sources(robotics.controllers.manipulator
     ComputedTorqueControl.cpp
     ImpedanceControl.cpp
     PdGravityCompensation.cpp
+    SlotineLiAdaptiveControl.cpp
 )
 
 add_subdirectory(test)

@@ -121,7 +121,6 @@ existing `dynamics/` convention.
 |-----|--------------------------------------------------------|---------------------------|-------------|------------|
 | M18 | Operational-space (task-space) control                 | `controllers/manipulator` | M8, M29     | ★★★★☆      |
 | M19 | Hybrid position/force control                          | `controllers/manipulator` | M8, M29     | ★★★★☆      |
-| M20 | Passivity-based adaptive control (Slotine-Li)          | `controllers/manipulator` | M31         | ★★★★☆      |
 | M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta) | `kinematics`              | NT53, NT64  | ★★★★☆      |
 | M24 | Mobile-manipulator / nonholonomic-base kinematics      | `kinematics`              | M8, M14, W1 | ★★★★☆      |
 | M25 | Cable-driven tension distribution                      | `controllers/manipulator` | NT53, NT65  | ★★★★☆      |
@@ -142,9 +141,6 @@ retired here.
 
 **M19. Hybrid position/force control.** Selection matrix in a constraint frame, PI force loop with anti-windup and damping, motion PD.
 - *Algorithm / paper:* M. Raibert, J. Craig, 1981; An & Hollerbach, 1987.
-
-**M20. Passivity-based adaptive control (Slotine-Li).** Tracks trajectories while estimating inertial parameters on-line through the regressor `Y(q,q̇,q̇r,q̈r)`.
-- *Algorithm / paper:* J.-J. Slotine, W. Li, *Int. J. Robotics Research*, 6(3), 1987.
 
 **M23. Parallel-manipulator kinematics.** Stewart-Gough (leg-length IK, Newton FK) and Delta (per-arm closed-form IK, three-sphere FK).
 - *Algorithm / paper:* J.-P. Merlet, *Parallel Robots*, 2nd ed. (2006); R. Clavel (1990).

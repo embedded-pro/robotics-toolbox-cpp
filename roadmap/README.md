@@ -104,4 +104,4 @@ prerequisites.
 `OdometryFusion` (E1) · `OccupancyGridMap` (E2) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
 
 ### `controllers/manipulator`
-`OperationalSpaceControl` (M18) · `HybridPositionForceControl` (M19) · `SlotineLiAdaptiveControl` (M20) · `CableTensionDistribution` (M25)
+`OperationalSpaceControl` (M18) · `HybridPositionForceControl` (M19) · `CableTensionDistribution` (M25)
