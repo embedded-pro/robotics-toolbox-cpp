@@ -39,6 +39,7 @@ project already defines those targets. Includes are namespaced by domain, e.g.
 |----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | [Kinematics](doc/kinematics/README.md) | Forward Kinematics, Inverse Kinematics (Damped Least Squares)                                                                        |
 | [Dynamics](doc/dynamics/README.md)     | Euler-Lagrange, Newton-Euler, Recursive Newton-Euler (RNEA), Articulated Body Algorithm (ABA), Composite Rigid Body Algorithm (CRBA) |
+| [Planning](doc/planning/README.md)     | Primitive Distance Queries                                                                                                           |
 | [Trajectory](doc/trajectory/README.md) | Cubic Spline Trajectory                                                                                                              |
 
 Each category page lists its algorithms with a brief description and links to the detailed
