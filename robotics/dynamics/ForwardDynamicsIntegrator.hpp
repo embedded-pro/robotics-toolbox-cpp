@@ -52,7 +52,7 @@ namespace dynamics
     private:
         const LinkArray& links;
         Vector3 gravity;
-        ArticulatedBodyAlgorithm<T, NumLinks> aba;
+        [[no_unique_address]] ArticulatedBodyAlgorithm<T, NumLinks> aba;
     };
 
     template<typename T, std::size_t NumLinks, IntegrationMethod Method>
