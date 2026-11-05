@@ -8,6 +8,7 @@ target_include_directories(robotics.kinematics ${ROBOTICS_VISIBILITY}
 target_link_libraries(robotics.kinematics ${ROBOTICS_VISIBILITY}
     robotics.dynamics
     numerical.math
+    numerical.optimization
     numerical.solver
 )
 
@@ -21,6 +22,7 @@ target_sources(robotics.kinematics PRIVATE
     InverseKinematics.hpp
     JacobianProvider.hpp
     ManipulabilityIndex.hpp
+    PoseInverseKinematics.hpp
     ProductOfExponentials.hpp
     RedundancyResolution.hpp
 )
@@ -32,6 +34,7 @@ robotics_add_coverage_sources(robotics.kinematics
     GeometricJacobian.cpp
     InverseKinematics.cpp
     ManipulabilityIndex.cpp
+    PoseInverseKinematics.cpp
     ProductOfExponentials.cpp
     RedundancyResolution.cpp
 )

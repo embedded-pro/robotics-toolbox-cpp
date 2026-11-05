@@ -117,19 +117,18 @@ existing `dynamics/` convention.
 
 ### Manipulator list (by priority)
 
-| #   | Component                                                       | Target module             | Depends on     | Difficulty |
-|-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
-| M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, NT64, M8 | ★★★☆☆      |
-| M17 | Impedance control                                               | `controllers/manipulator` | M8, M29        | ★★★☆☆      |
-| M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29        | ★★★★☆      |
-| M19 | Hybrid position/force control                                   | `controllers/manipulator` | M8, M29        | ★★★★☆      |
-| M20 | Passivity-based adaptive control (Slotine-Li)                   | `controllers/manipulator` | M31            | ★★★★☆      |
-| M21 | Analytical IK for ortho-parallel 6R arms with a spherical wrist | `kinematics`              | NT53, NT54     | ★★★★☆      |
-| M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta)          | `kinematics`              | NT53, NT64     | ★★★★☆      |
-| M24 | Mobile-manipulator / nonholonomic-base kinematics               | `kinematics`              | M8, M14, W1    | ★★★★☆      |
-| M25 | Cable-driven tension distribution                               | `controllers/manipulator` | NT53, NT65     | ★★★★☆      |
-| M26 | Continuum / soft constant-curvature kinematics                  | `kinematics`              | NT53           | ★★★★☆      |
-| M27 | Time-optimal path parameterization (TOPP-RA)                    | `trajectory` (new)        | M29            | ★★★★★      |
+| #   | Component                                                       | Target module             | Depends on  | Difficulty |
+|-----|-----------------------------------------------------------------|---------------------------|-------------|------------|
+| M17 | Impedance control                                               | `controllers/manipulator` | M8, M29     | ★★★☆☆      |
+| M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29     | ★★★★☆      |
+| M19 | Hybrid position/force control                                   | `controllers/manipulator` | M8, M29     | ★★★★☆      |
+| M20 | Passivity-based adaptive control (Slotine-Li)                   | `controllers/manipulator` | M31         | ★★★★☆      |
+| M21 | Analytical IK for ortho-parallel 6R arms with a spherical wrist | `kinematics`              | NT53, NT54  | ★★★★☆      |
+| M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta)          | `kinematics`              | NT53, NT64  | ★★★★☆      |
+| M24 | Mobile-manipulator / nonholonomic-base kinematics               | `kinematics`              | M8, M14, W1 | ★★★★☆      |
+| M25 | Cable-driven tension distribution                               | `controllers/manipulator` | NT53, NT65  | ★★★★☆      |
+| M26 | Continuum / soft constant-curvature kinematics                  | `kinematics`              | NT53        | ★★★★☆      |
+| M27 | Time-optimal path parameterization (TOPP-RA)                    | `trajectory` (new)        | M29         | ★★★★★      |
 
 M2 (polynomial profile), M3 (trapezoidal profile), M4 (friction compensation), M6 (SE(3)) and M9
 (S-curve profile) moved to numerical-toolbox as NT55, NT56, NT57, NT53 and NT60; their numbers are
@@ -138,10 +137,6 @@ retired here.
 ### Tier 2 — Easy ★★☆☆☆
 
 ### Tier 3 — Moderate ★★★☆☆
-
-**M13. Full 6-DOF pose IK.** Damped least squares on the SE(3) log-map error with position/rotation weighting, adaptive damping, step and joint-limit clamping.
-- *Algorithm / paper:* S. R. Buss (2004); Nakamura & Hanafusa (1986); Chiaverini (1997).
-- *Reuses / builds on:* upstream `optimization::LevenbergMarquardt` (NT64) with a manipulability damping policy.
 
 **M17. Impedance control.** Stiffness/damping impedance via `Jᵀ` (no force sensor), and inertia-shaping impedance with measured contact wrench via the task-space inertia.
 - *Algorithm / paper:* N. Hogan, *ASME J. Dyn. Sys. Meas. Control*, 1985.
