@@ -21,6 +21,7 @@ target_sources(robotics.kinematics PRIVATE
     InverseKinematics.hpp
     JacobianProvider.hpp
     ManipulabilityIndex.hpp
+    ProductOfExponentials.hpp
     RedundancyResolution.hpp
 )
 
@@ -31,6 +32,7 @@ robotics_add_coverage_sources(robotics.kinematics
     GeometricJacobian.cpp
     InverseKinematics.cpp
     ManipulabilityIndex.cpp
+    ProductOfExponentials.cpp
     RedundancyResolution.cpp
 )
 

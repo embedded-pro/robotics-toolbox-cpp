@@ -15,5 +15,6 @@ target_sources(robotics.kinematics_test PRIVATE
     TestGeometricJacobian.cpp
     TestInverseKinematics.cpp
     TestManipulabilityIndex.cpp
+    TestProductOfExponentials.cpp
     TestRedundancyResolution.cpp
 )

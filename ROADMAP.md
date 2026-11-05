@@ -120,7 +120,6 @@ existing `dynamics/` convention.
 | #   | Component                                                       | Target module             | Depends on     | Difficulty |
 |-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
 | M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, NT64, M8 | ★★★☆☆      |
-| M15 | Product-of-Exponentials forward kinematics                      | `kinematics`              | NT53           | ★★★☆☆      |
 | M16 | Momentum-based collision-detection observer                     | `dynamics`                | M29, M31       | ★★★☆☆      |
 | M17 | Impedance control                                               | `controllers/manipulator` | M8, M29        | ★★★☆☆      |
 | M31 | Coriolis matrix and inertial-parameter regressor                | `dynamics`                | M28            | ★★★☆☆      |
@@ -146,9 +145,6 @@ retired here.
 **M13. Full 6-DOF pose IK.** Damped least squares on the SE(3) log-map error with position/rotation weighting, adaptive damping, step and joint-limit clamping.
 - *Algorithm / paper:* S. R. Buss (2004); Nakamura & Hanafusa (1986); Chiaverini (1997).
 - *Reuses / builds on:* upstream `optimization::LevenbergMarquardt` (NT64) with a manipulability damping policy.
-
-**M15. Product-of-Exponentials forward kinematics.** Screw-theory FK and the space Jacobian, with conversion to the geometric Jacobian.
-- *Algorithm / paper:* Lynch & Park, *Modern Robotics*, Ch. 4.
 
 **M16. Momentum-based collision-detection observer.** External joint-torque estimate from the generalized-momentum residual, using `Cᵀq̇`.
 - *Algorithm / paper:* A. De Luca, A. Albu-Schäffer, S. Haddadin, G. Hirzinger, *IROS*, 2006.
