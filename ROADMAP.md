@@ -174,14 +174,9 @@ Cross-family building blocks that several of the families below depend on.
 
 | #   | Component                                          | Target module | Depends on | Difficulty |
 |-----|----------------------------------------------------|---------------|------------|------------|
-| W6  | Stanley path tracking                              | `mobile`      | W2, W5     | ★★☆☆☆      |
 | W8  | Dubins shortest paths (+ car path type)            | `planning`    | NT66       | ★★☆☆☆      |
 | W9  | Dynamic window approach (local obstacle avoidance) | `planning`    | W1, NT66   | ★★★☆☆      |
 | W10 | Reeds–Shepp shortest paths (forward and reverse)   | `planning`    | W8, NT54   | ★★★☆☆      |
-
-**W6. Stanley controller.** Front-axle cross-track and heading-error steering law for car-like vehicles.
-- *Algorithm / paper:* S. Thrun et al., "Stanley: The robot that won the DARPA Grand Challenge," *J. Field Robotics*, 23(9), 2006.
-- *Reuses / builds on:* W2, W5 (path).
 
 **W8. Dubins paths.** Closed-form shortest forward-only paths for a bounded-curvature car (6 words), with float-safe existence tests; defines the `CarPath` type W10 reuses.
 - *Algorithm / paper:* L. E. Dubins, *Am. J. Math.*, 79(3), 1957; A. Shkel, V. Lumelsky, *Robotics and Autonomous Systems*, 34(4), 2001.

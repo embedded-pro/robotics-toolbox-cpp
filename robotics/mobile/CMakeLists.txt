@@ -19,6 +19,7 @@ target_sources(robotics.mobile PRIVATE
     PlanarPath.hpp
     PurePursuit.hpp
     SkidSteerKinematics.hpp
+    StanleyController.hpp
 )
 
 robotics_add_coverage_sources(robotics.mobile
@@ -30,6 +31,7 @@ robotics_add_coverage_sources(robotics.mobile
     PlanarPath.cpp
     PurePursuit.cpp
     SkidSteerKinematics.cpp
+    StanleyController.cpp
 )
 
 add_subdirectory(test)

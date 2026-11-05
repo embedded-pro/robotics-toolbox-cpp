@@ -94,9 +94,6 @@ prerequisites.
 ### `trajectory`
 `TimeOptimalPathParameterization` (M27)
 
-### `mobile`
-`StanleyController` (W6)
-
 ### `planning`
 `DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
 
