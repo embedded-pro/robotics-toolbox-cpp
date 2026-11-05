@@ -175,7 +175,6 @@ Cross-family building blocks that several of the families below depend on.
 | #   | Component                                          | Target module | Depends on | Difficulty |
 |-----|----------------------------------------------------|---------------|------------|------------|
 | W6  | Stanley path tracking                              | `mobile`      | W2, W5     | ★★☆☆☆      |
-| W7  | Kanayama Lyapunov trajectory tracking              | `mobile`      | W1, NT66   | ★★☆☆☆      |
 | W8  | Dubins shortest paths (+ car path type)            | `planning`    | NT66       | ★★☆☆☆      |
 | W9  | Dynamic window approach (local obstacle avoidance) | `planning`    | W1, NT66   | ★★★☆☆      |
 | W10 | Reeds–Shepp shortest paths (forward and reverse)   | `planning`    | W8, NT54   | ★★★☆☆      |
@@ -183,10 +182,6 @@ Cross-family building blocks that several of the families below depend on.
 **W6. Stanley controller.** Front-axle cross-track and heading-error steering law for car-like vehicles.
 - *Algorithm / paper:* S. Thrun et al., "Stanley: The robot that won the DARPA Grand Challenge," *J. Field Robotics*, 23(9), 2006.
 - *Reuses / builds on:* W2, W5 (path).
-
-**W7. Kanayama tracking controller.** Lyapunov-stable tracking of a reference pose and twist for unicycle-type bases, error expressed in the robot frame.
-- *Algorithm / paper:* Y. Kanayama, Y. Kimura, F. Miyazaki, T. Noguchi, *ICRA* 1990.
-- *Reuses / builds on:* W1, NT66.
 
 **W8. Dubins paths.** Closed-form shortest forward-only paths for a bounded-curvature car (6 words), with float-safe existence tests; defines the `CarPath` type W10 reuses.
 - *Algorithm / paper:* L. E. Dubins, *Am. J. Math.*, 79(3), 1957; A. Shkel, V. Lumelsky, *Robotics and Autonomous Systems*, 34(4), 2001.

@@ -10,6 +10,7 @@ target_link_libraries(robotics.mobile_test PUBLIC
 target_sources(robotics.mobile_test PRIVATE
     TestCarLikeKinematics.cpp
     TestDifferentialDrive.cpp
+    TestKanayamaController.cpp
     TestOmnidirectionalKinematics.cpp
     TestPlanarOdometry.cpp
     TestPlanarPath.cpp

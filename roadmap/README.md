@@ -27,7 +27,7 @@ The canonical worked example is
 
 Conventions shared by every spec: 6-vectors are ordered linear part first — twists `(v; ω)`, wrenches
 `(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md) (NT53), and planar
-3-vectors `(vx, vy, ω)` by [math/SE2Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE2Transform/implementation.md) (NT66); dynamics
+3-vectors `(vx, vy, ω)` by [math/SE2Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE2Transform.md) (NT66); dynamics
 and Jacobians reach controllers through interfaces implemented by
 [dynamics/ChainDynamicsModel](../robotics/dynamics/ChainDynamicsModel.hpp) and
 [kinematics/JacobianProvider](../robotics/kinematics/JacobianProvider.hpp) (shipped).
@@ -95,7 +95,7 @@ prerequisites.
 `TimeOptimalPathParameterization` (M27)
 
 ### `mobile`
-`StanleyController` (W6) · `KanayamaController` (W7)
+`StanleyController` (W6)
 
 ### `planning`
 `DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
