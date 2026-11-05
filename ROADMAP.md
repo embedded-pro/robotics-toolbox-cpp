@@ -172,20 +172,15 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Wheeled mobile robots
 
-| #   | Component                                            | Target module | Depends on | Difficulty |
-|-----|------------------------------------------------------|---------------|------------|------------|
-| W3  | Omnidirectional (mecanum / Swedish-wheel) kinematics | `mobile`      | NT66       | ★☆☆☆☆      |
-| W4  | Skid-steer kinematics with slip (ICR model)          | `mobile`      | W1         | ★★☆☆☆      |
-| W5  | Pure-pursuit path tracking (+ planar polyline path)  | `mobile`      | W1, NT66   | ★★☆☆☆      |
-| W6  | Stanley path tracking                                | `mobile`      | W2, W5     | ★★☆☆☆      |
-| W7  | Kanayama Lyapunov trajectory tracking                | `mobile`      | W1, NT66   | ★★☆☆☆      |
-| W8  | Dubins shortest paths (+ car path type)              | `planning`    | NT66       | ★★☆☆☆      |
-| W9  | Dynamic window approach (local obstacle avoidance)   | `planning`    | W1, NT66   | ★★★☆☆      |
-| W10 | Reeds–Shepp shortest paths (forward and reverse)     | `planning`    | W8, NT54   | ★★★☆☆      |
-
-**W3. Omnidirectional kinematics.** Wheel-speed ↔ body-twist maps for mecanum and Swedish-wheel bases, including the roller-angle geometry.
-- *Algorithm / paper:* P. Muir, C. Neuman, "Kinematic modeling of wheeled mobile robots," *J. Robotic Systems*, 4(2), 1987.
-- *Reuses / builds on:* NT66.
+| #   | Component                                           | Target module | Depends on | Difficulty |
+|-----|-----------------------------------------------------|---------------|------------|------------|
+| W4  | Skid-steer kinematics with slip (ICR model)         | `mobile`      | W1         | ★★☆☆☆      |
+| W5  | Pure-pursuit path tracking (+ planar polyline path) | `mobile`      | W1, NT66   | ★★☆☆☆      |
+| W6  | Stanley path tracking                               | `mobile`      | W2, W5     | ★★☆☆☆      |
+| W7  | Kanayama Lyapunov trajectory tracking               | `mobile`      | W1, NT66   | ★★☆☆☆      |
+| W8  | Dubins shortest paths (+ car path type)             | `planning`    | NT66       | ★★☆☆☆      |
+| W9  | Dynamic window approach (local obstacle avoidance)  | `planning`    | W1, NT66   | ★★★☆☆      |
+| W10 | Reeds–Shepp shortest paths (forward and reverse)    | `planning`    | W8, NT54   | ★★★☆☆      |
 
 **W4. Skid-steer kinematics.** Instantaneous-centre-of-rotation model with identified ICR offsets for tracked and skid-steered vehicles.
 - *Algorithm / paper:* J. L. Martínez, A. Mandow, J. Morales, S. Pedraza, A. García-Cerezo, *IJRR*, 24(10), 2005.
