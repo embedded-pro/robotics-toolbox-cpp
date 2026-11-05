@@ -93,7 +93,7 @@ function ComputeTorque(q, qDot, desiredPose, xdDot, xdDdot, tauSecondary):   # O
 - New module: create `robotics/controllers/manipulator/CMakeLists.txt` via `robotics_add_header_library(...)`,
   add a `test/` subdir, register it in `robotics/CMakeLists.txt`, and add a
   `doc/controllers/manipulator/` folder.
-- Depends on: NT53 (`math::SE3Transform`), M8 (`JacobianProvider`), M29 (`ChainDynamicsModel`); `TaskError.hpp`
-  (specified in M17, deployed with whichever of M17/M18/M19 lands first); `solvers::SolveSystem` from
+- Depends on: NT53 (`math::SE3Transform`), M8 (`JacobianProvider`), M29 (`ChainDynamicsModel`); `TaskError` from
+  `robotics/controllers/manipulator/TaskError.hpp` (shipped with M17); `solvers::SolveSystem` from
   [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp).
 - Generic pattern: see `roadmap/DEPLOYMENT.md`.

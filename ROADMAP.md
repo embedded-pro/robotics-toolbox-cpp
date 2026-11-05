@@ -119,7 +119,6 @@ existing `dynamics/` convention.
 
 | #   | Component                                                       | Target module             | Depends on  | Difficulty |
 |-----|-----------------------------------------------------------------|---------------------------|-------------|------------|
-| M17 | Impedance control                                               | `controllers/manipulator` | M8, M29     | ★★★☆☆      |
 | M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29     | ★★★★☆      |
 | M19 | Hybrid position/force control                                   | `controllers/manipulator` | M8, M29     | ★★★★☆      |
 | M20 | Passivity-based adaptive control (Slotine-Li)                   | `controllers/manipulator` | M31         | ★★★★☆      |
@@ -137,9 +136,6 @@ retired here.
 ### Tier 2 — Easy ★★☆☆☆
 
 ### Tier 3 — Moderate ★★★☆☆
-
-**M17. Impedance control.** Stiffness/damping impedance via `Jᵀ` (no force sensor), and inertia-shaping impedance with measured contact wrench via the task-space inertia.
-- *Algorithm / paper:* N. Hogan, *ASME J. Dyn. Sys. Meas. Control*, 1985.
 
 ### Tier 4 — Advanced ★★★★☆
 
