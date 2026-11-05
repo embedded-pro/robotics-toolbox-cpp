@@ -12,6 +12,7 @@ target_sources(robotics.kinematics_test PRIVATE
     TestAnalyticalIkOpw.cpp
     TestChainPoseKinematics.cpp
     TestContinuumKinematics.cpp
+    TestDeltaKinematics.cpp
     TestDenavitHartenberg.cpp
     TestForwardKinematics.cpp
     TestGeometricJacobian.cpp
@@ -20,4 +21,5 @@ target_sources(robotics.kinematics_test PRIVATE
     TestPoseInverseKinematics.cpp
     TestProductOfExponentials.cpp
     TestRedundancyResolution.cpp
+    TestStewartGoughKinematics.cpp
 )

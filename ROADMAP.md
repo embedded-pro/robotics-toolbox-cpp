@@ -117,12 +117,11 @@ existing `dynamics/` convention.
 
 ### Manipulator list (by priority)
 
-| #   | Component                                              | Target module             | Depends on  | Difficulty |
-|-----|--------------------------------------------------------|---------------------------|-------------|------------|
-| M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta) | `kinematics`              | NT53, NT64  | ★★★★☆      |
-| M24 | Mobile-manipulator / nonholonomic-base kinematics      | `kinematics`              | M8, M14, W1 | ★★★★☆      |
-| M25 | Cable-driven tension distribution                      | `controllers/manipulator` | NT53, NT65  | ★★★★☆      |
-| M27 | Time-optimal path parameterization (TOPP-RA)           | `trajectory` (new)        | M29         | ★★★★★      |
+| #   | Component                                         | Target module             | Depends on  | Difficulty |
+|-----|---------------------------------------------------|---------------------------|-------------|------------|
+| M24 | Mobile-manipulator / nonholonomic-base kinematics | `kinematics`              | M8, M14, W1 | ★★★★☆      |
+| M25 | Cable-driven tension distribution                 | `controllers/manipulator` | NT53, NT65  | ★★★★☆      |
+| M27 | Time-optimal path parameterization (TOPP-RA)      | `trajectory` (new)        | M29         | ★★★★★      |
 
 M2 (polynomial profile), M3 (trapezoidal profile), M4 (friction compensation), M6 (SE(3)) and M9
 (S-curve profile) moved to numerical-toolbox as NT55, NT56, NT57, NT53 and NT60; their numbers are
@@ -133,10 +132,6 @@ retired here.
 ### Tier 3 — Moderate ★★★☆☆
 
 ### Tier 4 — Advanced ★★★★☆
-
-**M23. Parallel-manipulator kinematics.** Stewart-Gough (leg-length IK, Newton FK) and Delta (per-arm closed-form IK, three-sphere FK).
-- *Algorithm / paper:* J.-P. Merlet, *Parallel Robots*, 2nd ed. (2006); R. Clavel (1990).
-- *Reuses / builds on:* NT53 retraction; the Stewart Newton FK runs on upstream `LevenbergMarquardt` (NT64).
 
 **M24. Mobile-manipulator / nonholonomic-base kinematics.** Combined base + arm Jacobian in the world frame with differential-drive constraints.
 - *Algorithm / paper:* Y. Yamamoto, X. Yun, *IEEE Trans. Automatic Control*, 39(6), 1994.

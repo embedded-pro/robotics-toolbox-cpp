@@ -89,7 +89,7 @@ prerequisites.
 ## Index
 
 ### `kinematics`
-`ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24)
+`MobileManipulatorKinematics` (M24)
 
 ### `trajectory`
 `TimeOptimalPathParameterization` (M27)

@@ -17,6 +17,7 @@ target_sources(robotics.kinematics PRIVATE
     ChainPoseKinematics.hpp
     ChainTaskJacobian.hpp
     ContinuumKinematics.hpp
+    DeltaKinematics.hpp
     DenavitHartenberg.hpp
     DhTaskJacobian.hpp
     ForwardKinematics.hpp
@@ -27,12 +28,14 @@ target_sources(robotics.kinematics PRIVATE
     PoseInverseKinematics.hpp
     ProductOfExponentials.hpp
     RedundancyResolution.hpp
+    StewartGoughKinematics.hpp
 )
 
 robotics_add_coverage_sources(robotics.kinematics
     AnalyticalIkOpw.cpp
     ChainPoseKinematics.cpp
     ContinuumKinematics.cpp
+    DeltaKinematics.cpp
     DenavitHartenberg.cpp
     ForwardKinematics.cpp
     GeometricJacobian.cpp
@@ -41,6 +44,7 @@ robotics_add_coverage_sources(robotics.kinematics
     PoseInverseKinematics.cpp
     ProductOfExponentials.cpp
     RedundancyResolution.cpp
+    StewartGoughKinematics.cpp
 )
 
 add_subdirectory(test)
