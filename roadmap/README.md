@@ -92,7 +92,7 @@ prerequisites.
 `DenavitHartenberg` (M7) · `GeometricJacobian` (M8) · `ManipulabilityIndex` (M11) · `PoseInverseKinematics` (M13) · `RedundancyResolution` (M14) · `ProductOfExponentials` (M15) · `AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26) · `ChainPoseKinematics` (M30)
 
 ### `dynamics`
-`GenericJointLink` (M1) · `MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CompositeRigidBodyAlgorithm` (M28) · `ChainDynamicsModel` (M29) · `CoriolisMatrixAndRegressor` (M31) · `RneaExternalWrench` (M32) · `ForwardDynamicsIntegrator` (M34)
+`GenericJointLink` (M1) · `MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `ChainDynamicsModel` (M29) · `CoriolisMatrixAndRegressor` (M31) · `RneaExternalWrench` (M32) · `ForwardDynamicsIntegrator` (M34)
 
 ### `trajectory`
 `CartesianSlerpInterpolation` (M10) · `TimeOptimalPathParameterization` (M27)

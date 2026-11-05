@@ -5,6 +5,7 @@
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
 #include "robotics/dynamics/RevoluteJointLink.hpp"
+#include "robotics/dynamics/SpatialInertia.hpp"
 #include <array>
 #include <cassert>
 
@@ -39,18 +40,8 @@ namespace dynamics
             Vector3 cJLin;
         };
 
-        struct SpatialInertia
-        {
-            Matrix3 rot;
-            Matrix3 cross;
-            Matrix3 lin;
-        };
-
-        struct BiasWrench
-        {
-            Vector3 force;
-            Vector3 torque;
-        };
+        using SpatialInertia = dynamics::SpatialInertia<T>;
+        using BiasWrench = SpatialWrench<T>;
 
         struct JointProjection
         {
@@ -67,9 +58,6 @@ namespace dynamics
             LinkKinematics& current, const LinkKinematics& parent,
             const RevoluteJointLink<T>& link, T qDot_i);
 
-        static SpatialInertia ComputeRigidBodyInertia(
-            const RevoluteJointLink<T>& link);
-
         static BiasWrench ComputeBiasWrench(
             const RevoluteJointLink<T>& link,
             const LinkKinematics& kin);
@@ -84,14 +72,6 @@ namespace dynamics
         static BiasWrench ComputeArticulatedBiasWrench(
             const BiasWrench& pA, const SpatialInertia& Ia,
             const LinkKinematics& kin, const JointProjection& proj);
-
-        static SpatialInertia TransformInertiaToParent(
-            const SpatialInertia& Ia, const Matrix3& R,
-            const Vector3& parentToJoint);
-
-        static BiasWrench TransformWrenchToParent(
-            const BiasWrench& wrench, const Matrix3& R,
-            const Vector3& parentToJoint);
 
         static void AccumulateChildContribution(
             const LinkArray& links, std::size_t childIndex,
@@ -153,21 +133,6 @@ namespace dynamics
         }
 
         return kin;
-    }
-
-    template<typename T, std::size_t NumLinks>
-    typename ArticulatedBodyAlgorithm<T, NumLinks>::SpatialInertia
-    ArticulatedBodyAlgorithm<T, NumLinks>::ComputeRigidBodyInertia(
-        const RevoluteJointLink<T>& link)
-    {
-        auto rSkew = math::SkewSymmetric(link.jointToCoM);
-        auto rSkewT = rSkew.Transpose();
-
-        return SpatialInertia{
-            link.inertia + rSkewT * rSkew * link.mass,
-            rSkew * link.mass,
-            math::ScaledIdentity(link.mass)
-        };
     }
 
     template<typename T, std::size_t NumLinks>
@@ -235,41 +200,6 @@ namespace dynamics
     }
 
     template<typename T, std::size_t NumLinks>
-    typename ArticulatedBodyAlgorithm<T, NumLinks>::SpatialInertia
-    ArticulatedBodyAlgorithm<T, NumLinks>::TransformInertiaToParent(
-        const SpatialInertia& Ia, const Matrix3& R,
-        const Vector3& parentToJoint)
-    {
-        auto Rt = R.Transpose();
-        auto IaRotP = R * Ia.rot * Rt;
-        auto IaCrossP = R * Ia.cross * Rt;
-        auto IaLinP = R * Ia.lin * Rt;
-
-        auto rSkew = math::SkewSymmetric(parentToJoint);
-
-        return SpatialInertia{
-            IaRotP - IaCrossP * rSkew + rSkew * IaCrossP.Transpose() - rSkew * IaLinP * rSkew,
-            IaCrossP + rSkew * IaLinP,
-            IaLinP
-        };
-    }
-
-    template<typename T, std::size_t NumLinks>
-    typename ArticulatedBodyAlgorithm<T, NumLinks>::BiasWrench
-    ArticulatedBodyAlgorithm<T, NumLinks>::TransformWrenchToParent(
-        const BiasWrench& wrench, const Matrix3& R,
-        const Vector3& parentToJoint)
-    {
-        auto forceP = R * wrench.force;
-        auto torqueP = R * wrench.torque;
-
-        return BiasWrench{
-            forceP,
-            torqueP + math::CrossProduct(parentToJoint, forceP)
-        };
-    }
-
-    template<typename T, std::size_t NumLinks>
     T ArticulatedBodyAlgorithm<T, NumLinks>::ComputeJointAcceleration(
         const JointProjection& proj,
         const Vector3& aPrimeAng, const Vector3& aPrimeLin)
@@ -293,9 +223,7 @@ namespace dynamics
         auto IaParent = TransformInertiaToParent(IaA, kin[childIndex].R, links[childIndex].parentToJoint);
         auto pAParent = TransformWrenchToParent(pAA, kin[childIndex].R, links[childIndex].parentToJoint);
 
-        Ia[parentIndex].rot = Ia[parentIndex].rot + IaParent.rot;
-        Ia[parentIndex].cross = Ia[parentIndex].cross + IaParent.cross;
-        Ia[parentIndex].lin = Ia[parentIndex].lin + IaParent.lin;
+        Ia[parentIndex] += IaParent;
         pA[parentIndex].force = pA[parentIndex].force + pAParent.force;
         pA[parentIndex].torque = pA[parentIndex].torque + pAParent.torque;
     }
@@ -310,7 +238,7 @@ namespace dynamics
     {
         for (std::size_t i = 0; i < NumLinks; ++i)
         {
-            Ia[i] = ComputeRigidBodyInertia(links[i]);
+            Ia[i] = RigidBodyInertia(links[i]);
             pA[i] = ComputeBiasWrench(links[i], kin[i]);
         }
 

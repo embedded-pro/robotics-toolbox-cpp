@@ -91,7 +91,8 @@ docs; the current pin (`63c9b91`) includes them.
 
 The library already has the core of manipulator **modelling**: forward/inverse dynamics
 ([RNEA](robotics/dynamics/RecursiveNewtonEuler.hpp), [ABA](robotics/dynamics/ArticulatedBodyAlgorithm.hpp),
-[Euler-Lagrange](robotics/dynamics/EulerLagrangeSolver.hpp)), position forward kinematics with base and
+[Euler-Lagrange](robotics/dynamics/EulerLagrangeSolver.hpp)), the joint-space mass matrix
+([CRBA](robotics/dynamics/CompositeRigidBodyAlgorithm.hpp)), position forward kinematics with base and
 tool offsets, and damped-least-squares [IK](robotics/kinematics/InverseKinematics.hpp). What is missing is
 the **full-pose kinematics, model plumbing, planning and control layer** that turns those models into a
 usable manipulator stack. Two current limitations gate many items below:
@@ -118,7 +119,6 @@ existing `dynamics/` convention.
 | M1  | Generic joint link (prismatic, limits, armature)                | `dynamics` + `kinematics` | —              | ★☆☆☆☆      |
 | M5  | PD + gravity compensation control                               | `controllers/manipulator` | M29            | ★☆☆☆☆      |
 | M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —              | ★☆☆☆☆      |
-| M28 | Composite Rigid Body Algorithm (mass matrix)                    | `dynamics`                | —              | ★★☆☆☆      |
 | M29 | Chain dynamics model (link chain → M, C, g, inverse dynamics)   | `dynamics`                | M28            | ★★☆☆☆      |
 | M30 | Chain pose kinematics (full-pose FK, frame chain)               | `kinematics`              | NT53           | ★★☆☆☆      |
 | M7  | Denavit-Hartenberg parameters (standard + modified)             | `kinematics`              | NT53, M30      | ★★☆☆☆      |
@@ -161,9 +161,6 @@ retired here.
 - *Algorithm / paper:* Luh, Walker, Paul (1980).
 
 ### Tier 2 — Easy ★★☆☆☆
-
-**M28. Composite Rigid Body Algorithm.** `O(n²)` joint-space mass matrix, sharing the spatial algebra of ABA.
-- *Algorithm / paper:* Walker & Orin (1982); Featherstone (2008), Ch. 6.
 
 **M29. Chain dynamics model.** Adapter implementing `EulerLagrangeDynamics` (M via CRBA, `Cq̇` and `g` via RNEA) and a one-call `InverseDynamicsModel` for the controllers.
 - *Reuses / builds on:* RNEA, M28; optional friction model from NT57.
