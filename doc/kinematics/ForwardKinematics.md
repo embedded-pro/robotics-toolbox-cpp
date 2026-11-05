@@ -29,6 +29,10 @@ $$R(\hat{u}, \theta) = \cos\theta\,\mathbf{I}_3 + (1 - \cos\theta)\,\hat{u}\hat{
 
 The product is taken left to right because every axis is expressed in its own link frame: $^{0}R_{i}$ maps vectors written in link $i$ coordinates into base coordinates. Rotations are right-handed: a positive angle about $\hat{y}$ carries $\hat{x}$ towards $-\hat{z}$.
 
+### Prismatic Joints
+
+A prismatic joint slides its link along $\hat{z}_k$ instead of rotating it: its factor in the orientation product is $\mathbf{I}_3$, and its offset becomes $r_k + \hat{z}_k q_k$. The recursions below use the offset at the current joint value, so revolute and prismatic joints mix freely.
+
 ### Position Recursion
 
 $$p_0 = r_0, \qquad p_{i+1} = p_i + {}^{0}R_{i}\, r_{i+1} \quad (0 \le i < n - 1), \qquad p_{\text{tool}} = p_{n-1} + {}^{0}R_{n-1}\, t$$
@@ -62,7 +66,6 @@ Consider a 2-link arm with $y$-axis joints, joint 2 located $1$ along $\hat{x}$ 
 
 - **Planar vs. spatial chains**: in purely planar manipulators all axes are parallel and the rotations reduce to 2D trigonometry, but the algorithmic structure (one pass accumulating transforms) is the same.
 - **Full pose**: returning $^{0}R_{n-1}$ together with $p_{\text{tool}}$ gives the complete tool pose needed for orientation control.
-- **Prismatic joints**: $R_k$ stays constant while the joint offset becomes a function of the joint displacement; the same forward sweep applies.
 - **Different parameterizations**: Denavit–Hartenberg, modified DH, or product-of-exponentials formulations all recursively compose rigid transforms along the chain.
 - **Multiple end-effectors**: for branched chains the routine runs per branch, reusing shared prefixes.
 

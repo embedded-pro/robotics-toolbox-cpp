@@ -12,6 +12,7 @@ target_sources(robotics.dynamics_test PRIVATE
     TestCompositeRigidBodyAlgorithm.cpp
     TestEulerLagrangeSolver.cpp
     TestForwardDynamicsIntegrator.cpp
+    TestJointLink.cpp
     TestNewtonEulerSolver.cpp
     TestRecursiveNewtonEuler.cpp
 )

@@ -2,7 +2,7 @@
 
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
-#include "robotics/dynamics/RevoluteJointLink.hpp"
+#include "robotics/dynamics/JointLink.hpp"
 #include <type_traits>
 
 namespace dynamics
@@ -35,7 +35,7 @@ namespace dynamics
     };
 
     template<typename T>
-    SpatialInertia<T> RigidBodyInertia(const RevoluteJointLink<T>& link)
+    SpatialInertia<T> RigidBodyInertia(const JointLink<T>& link)
     {
         const auto rSkew{ math::SkewSymmetric(link.jointToCoM) };
 

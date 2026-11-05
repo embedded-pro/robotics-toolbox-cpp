@@ -18,7 +18,7 @@ The joint torque at each joint is then the projection of the net torque onto the
 
 ### Kinematic Chain Model
 
-A serial chain of $n$ rigid bodies (links) connected by revolute joints. Each link $i$ is described by:
+A serial chain of $n$ rigid bodies (links) connected by revolute or prismatic joints. Each link $i$ is described by:
 
 - $m_i$ — mass
 - $I_i \in \mathbb{R}^{3 \times 3}$ — inertia tensor at the center of mass, in the link frame
@@ -58,6 +58,14 @@ $$\tau_i = I_i \dot{\omega}_i + \omega_i \times (I_i \omega_i) + r_{j \to c}^{(i
 
 **Joint torque:**
 $$\tau_{q_i} = \hat{z}_i^T \tau_i$$
+
+### Prismatic Joints and Armature
+
+A prismatic joint slides along $\hat{z}_i$ instead of rotating about it. Its frame keeps the parent's orientation ($R_i = \mathbf{I}_3$), its offset becomes $r_{p \to j}^{(i)} + \hat{z}_i q_i$, and it adds no angular velocity. The joint-origin acceleration gains a Coriolis and a relative term:
+
+$$a_{J_i} = R_i^T \left( a_{J_{i-1}} + \dot{\omega}_{i-1} \times r^{(i)} + \omega_{i-1} \times (\omega_{i-1} \times r^{(i)}) \right) + 2\,\omega_i \times (\dot{q}_i \hat{z}_i) + \ddot{q}_i \hat{z}_i$$
+
+The joint effort projects the force instead of the moment, $\tau_{q_i} = \hat{z}_i^T f_i$. With the motion subspace $(s_\omega; s_v)$ both cases read $\tau_{q_i} = s_\omega^T \tau_i + s_v^T f_i$. Reflected actuator inertia (armature) adds $J_{a,i}\ddot{q}_i$ to each joint effort.
 
 ### Rodrigues' Rotation Formula
 

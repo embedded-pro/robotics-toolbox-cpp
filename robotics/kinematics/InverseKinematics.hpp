@@ -5,7 +5,7 @@
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
 #include "numerical/solvers/GaussianElimination.hpp"
-#include "robotics/dynamics/RevoluteJointLink.hpp"
+#include "robotics/dynamics/JointLink.hpp"
 #include "robotics/kinematics/ForwardKinematics.hpp"
 #include <array>
 #include <cstddef>
@@ -44,7 +44,7 @@ namespace kinematics
         using Matrix3 = math::Matrix3<T>;
         using JointVector = math::Vector<T, NumLinks>;
         using Jacobian = math::Matrix<T, 3, NumLinks>;
-        using LinkArray = std::array<dynamics::RevoluteJointLink<T>, NumLinks>;
+        using LinkArray = std::array<dynamics::JointLink<T>, NumLinks>;
         using PositionArray = std::array<Vector3, NumLinks + 1>;
 
         explicit InverseKinematics(const Vector3& toolOffset, InverseKinematicsConfig<T> cfg = {});
@@ -117,14 +117,13 @@ namespace kinematics
 
         for (std::size_t i = 0; i < NumLinks; ++i)
         {
-            const Vector3 worldAxis{ R * links[i].jointAxis };
-            const Vector3 column{ math::CrossProduct(worldAxis, Vector3{ toolPosition - positions[i] }) };
+            const Vector3 column{ math::CrossProduct(R * links[i].AngularAxis(), Vector3{ toolPosition - positions[i] }) + R * links[i].LinearAxis() };
 
             J.at(0, i) = column.at(0, 0);
             J.at(1, i) = column.at(1, 0);
             J.at(2, i) = column.at(2, 0);
 
-            R = R * math::RotationAboutAxis(links[i].jointAxis, q.at(i, 0));
+            R = R * links[i].JointTransform(q.at(i, 0)).rotation;
         }
 
         return J;

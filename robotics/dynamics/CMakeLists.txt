@@ -17,6 +17,7 @@ target_sources(robotics.dynamics PRIVATE
     EulerLagrangeDynamics.hpp
     EulerLagrangeSolver.hpp
     ForwardDynamicsIntegrator.hpp
+    JointLink.hpp
     NewtonEulerBody.hpp
     NewtonEulerSolver.hpp
     RecursiveNewtonEuler.hpp
@@ -29,6 +30,7 @@ robotics_add_coverage_sources(robotics.dynamics
     CompositeRigidBodyAlgorithm.cpp
     EulerLagrangeSolver.cpp
     ForwardDynamicsIntegrator.cpp
+    JointLink.cpp
     NewtonEulerSolver.cpp
     RecursiveNewtonEuler.cpp
 )

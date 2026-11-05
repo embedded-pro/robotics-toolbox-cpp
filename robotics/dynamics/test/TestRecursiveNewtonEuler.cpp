@@ -161,3 +161,34 @@ TEST_F(TestRecursiveNewtonEuler, matches_euler_lagrange_model_under_gravity_and_
     EXPECT_NEAR(tau.at(0, 0), reference.at(0, 0), math::Tolerance<float>());
     EXPECT_NEAR(tau.at(1, 0), reference.at(1, 0), math::Tolerance<float>());
 }
+
+TEST_F(TestRecursiveNewtonEuler, vertical_slider_needs_weight_plus_inertial_force)
+{
+    const float mass{ 2.0f };
+    const float acceleration{ 1.0f };
+    std::array<Link, 1> links{ Link{ mass, math::SquareMatrix<float, 3>{}, zAxis, Vector3{}, Vector3{}, dynamics::JointType::Prismatic } };
+
+    auto tau = rnea1.InverseDynamics(links, math::Vector<float, 1>{ 0.3f }, math::Vector<float, 1>{ 0.5f }, math::Vector<float, 1>{ acceleration }, gravityVector);
+
+    EXPECT_NEAR(tau.at(0, 0), mass * (gravity + acceleration), math::Tolerance<float>());
+}
+
+TEST_F(TestRecursiveNewtonEuler, prismatic_coriolis_term_on_rotating_base)
+{
+    const float mass{ 2.0f };
+    const float radius{ 0.5f };
+    const float extensionRate{ 0.3f };
+    const float spinRate{ 1.5f };
+    const float spinAcceleration{ 0.4f };
+    const float extensionAcceleration{ 0.2f };
+    std::array<Link, 2> links{
+        Link{ 0.0f, math::SquareMatrix<float, 3>{}, zAxis, Vector3{}, Vector3{} },
+        Link{ mass, math::SquareMatrix<float, 3>{}, Vector3{ 1.0f, 0.0f, 0.0f }, Vector3{}, Vector3{}, dynamics::JointType::Prismatic }
+    };
+
+    auto tau = rnea2.InverseDynamics(links, math::Vector<float, 2>{ 0.7f, radius }, math::Vector<float, 2>{ spinRate, extensionRate },
+        math::Vector<float, 2>{ spinAcceleration, extensionAcceleration }, Vector3{});
+
+    EXPECT_NEAR(tau.at(0, 0), 2.0f * mass * radius * extensionRate * spinRate + mass * radius * radius * spinAcceleration, math::Tolerance<float>());
+    EXPECT_NEAR(tau.at(1, 0), mass * (extensionAcceleration - radius * spinRate * spinRate), math::Tolerance<float>());
+}

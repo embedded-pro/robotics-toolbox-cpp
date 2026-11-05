@@ -3,7 +3,7 @@
 #include "numerical/math/CompilerOptimizations.hpp"
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
-#include "robotics/dynamics/RevoluteJointLink.hpp"
+#include "robotics/dynamics/JointLink.hpp"
 #include <array>
 #include <cassert>
 
@@ -20,7 +20,7 @@ namespace kinematics
         using Vector3 = math::Vector<T, 3>;
         using Matrix3 = math::SquareMatrix<T, 3>;
         using JointVector = math::Vector<T, NumLinks>;
-        using LinkArray = std::array<dynamics::RevoluteJointLink<T>, NumLinks>;
+        using LinkArray = std::array<dynamics::JointLink<T>, NumLinks>;
         using PositionArray = std::array<Vector3, NumLinks + 1>;
 
         explicit ForwardKinematics(const Vector3& toolOffset);
@@ -46,19 +46,19 @@ namespace kinematics
             const JointVector& q) const
     {
         PositionArray positions{};
-        positions[0] = links[0].parentToJoint;
-
+        Vector3 origin{};
         auto R = Matrix3::Identity();
 
         for (std::size_t i = 0; i < NumLinks; ++i)
         {
             assert(dynamics::HasUnitJointAxis(links[i]));
-            R = R * math::RotationAboutAxis(links[i].jointAxis, q.at(i, 0));
-
-            const Vector3& offsetToNext = (i + 1 < NumLinks) ? links[i + 1].parentToJoint : toolOffset;
-            positions[i + 1] = positions[i] + R * offsetToNext;
+            const auto transform{ links[i].JointTransform(q.at(i, 0)) };
+            origin = origin + R * transform.translation;
+            R = R * transform.rotation;
+            positions[i] = origin;
         }
 
+        positions[NumLinks] = origin + R * toolOffset;
         return positions;
     }
 

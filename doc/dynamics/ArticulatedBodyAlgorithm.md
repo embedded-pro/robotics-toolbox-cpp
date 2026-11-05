@@ -52,6 +52,11 @@ $$p^a_i = p^A_i + \hat{I}^A_i c_i + U_i \frac{u_i}{D_i}, \qquad p^A_{\lambda(i)}
 
 where $p^A_i$ starts as the rigid-body bias force $v_i \times^* I_i v_i$ (gyroscopic and centripetal terms).
 
+### Prismatic Joints and Armature
+
+With the motion subspace $S_i$ — $(\hat{z}_i; 0)$ for a revolute joint, $(0; \hat{z}_i)$ for a prismatic one — the projections are $U_i = I^A_i S_i$, $D_i = S_i^T U_i + J_{a,i}$ and $u_i = \tau_i - S_i^T p^A_i$. The velocity-product term is $c_i = v_i \times S_i \dot{q}_i$.
+Every transform to the parent uses the joint offset at the current displacement, and the armature $J_{a,i}$ (reflected rotor inertia) enters only through $D_i$.
+
 ## Complexity Analysis
 
 | Case | Time   | Space  | Notes                              |

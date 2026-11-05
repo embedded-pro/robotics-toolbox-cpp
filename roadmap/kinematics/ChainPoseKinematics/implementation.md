@@ -5,7 +5,7 @@
 The shipped `ForwardKinematics` returns joint origins and the tool point only. Pose-level algorithms
 (M8, M13, M17–M19) also need the tool **orientation** and every joint **axis** in the base frame. This
 spec extends the same recursion over the existing link model (`RevoluteJointLink`, and
-`GenericJointLink` once M1 lands) and produces a model-independent `FrameChain` — the single input
+`JointLink` since M1) and produces a model-independent `FrameChain` — the single input
 the geometric Jacobian (M8) consumes, whether the frames come from this link model, from DH (M7) or
 from PoE (M15).
 
@@ -43,7 +43,7 @@ function Compute(links, q):                     # OPTIMIZE_FOR_SPEED
         if i > 0: o = o + R · links[i].parentToJoint
         frames.jointOrigins[i] = o
         frames.jointAxes[i]    = R · links[i].jointAxis          # axis is invariant under its own rotation
-        frames.jointTypes[i]   = Revolute                        # (GenericJointLink: links[i].type)
+        frames.jointTypes[i]   = Revolute                        # (JointLink: links[i].type)
         R = R · RotationAboutAxis(links[i].jointAxis, q[i])      # prismatic (M1): R unchanged, o += axis·q
     frames.tool = SE3Transform{ R, o } * toolInLastLink
     return frames

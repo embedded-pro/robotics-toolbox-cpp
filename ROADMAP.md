@@ -98,10 +98,10 @@ tool offsets, and damped-least-squares [IK](robotics/kinematics/InverseKinematic
 the **full-pose kinematics, model plumbing, planning and control layer** that turns those models into a
 usable manipulator stack. Two current limitations gate many items below:
 
-> **Position-only, revolute-only.** [ForwardKinematics.hpp](robotics/kinematics/ForwardKinematics.hpp)
-> returns joint and tool *positions* (a 3×N Jacobian lives privately inside IK), and only
-> [RevoluteJointLink](robotics/dynamics/RevoluteJointLink.hpp) exists. Items **M1** (prismatic joints,
-> limits, armature), **M30** (full-pose kinematics) and **M8** (6×N Jacobian) lift these limits.
+> **Position-only.** [ForwardKinematics.hpp](robotics/kinematics/ForwardKinematics.hpp) returns joint
+> and tool *positions* (a 3×N Jacobian lives privately inside IK). Links are generic
+> ([JointLink](robotics/dynamics/JointLink.hpp): revolute or prismatic, limits, armature). Items **M30**
+> (full-pose kinematics) and **M8** (6×N Jacobian) lift the position-only limit.
 
 **Conventions (normative for every item):** 6-vectors are ordered linear part first — twists `(v; ω)`,
 wrenches `(f; n)` — as defined by upstream `math::SE3Transform` (**NT53**); the geometric Jacobian
@@ -117,7 +117,6 @@ existing `dynamics/` convention.
 
 | #   | Component                                                       | Target module             | Depends on     | Difficulty |
 |-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
-| M1  | Generic joint link (prismatic, limits, armature)                | `dynamics` + `kinematics` | —              | ★☆☆☆☆      |
 | M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —              | ★☆☆☆☆      |
 | M29 | Chain dynamics model (link chain → M, C, g, inverse dynamics)   | `dynamics`                | M28            | ★★☆☆☆      |
 | M30 | Chain pose kinematics (full-pose FK, frame chain)               | `kinematics`              | NT53           | ★★☆☆☆      |
@@ -148,9 +147,6 @@ M2 (polynomial profile), M3 (trapezoidal profile), M4 (friction compensation), M
 retired here.
 
 ### Tier 1 — Trivial ★☆☆☆☆
-
-**M1. Generic joint link.** Evolve `RevoluteJointLink` (compatibly, via trailing defaulted fields) into a link with a joint type (revolute/prismatic), joint limits and armature, and add the prismatic branches to FK, RNEA, ABA, CRBA and the Jacobian.
-- *Algorithm / paper:* J. J. Craig, *Introduction to Robotics: Mechanics and Control*, 4th ed., Ch. 3 and 6; Featherstone (2008), Ch. 4.
 
 **M32. Inverse dynamics with an external tool wrench.** RNEA overload taking the environment's wrench on the tool; satisfies `τ(w) − τ(0) = −Jᵀw`.
 - *Algorithm / paper:* Luh, Walker, Paul (1980).
