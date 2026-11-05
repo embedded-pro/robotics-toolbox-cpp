@@ -9,14 +9,17 @@ target_link_libraries(robotics.localization ${ROBOTICS_VISIBILITY}
     infra.util
     numerical.filters.active
     numerical.math
+    robotics.mobile
 )
 
 target_sources(robotics.localization PRIVATE
+    LandmarkLocalization.hpp
     OccupancyGridMap.hpp
     OdometryFusion.hpp
 )
 
 robotics_add_coverage_sources(robotics.localization
+    LandmarkLocalization.cpp
     OccupancyGridMap.cpp
     OdometryFusion.cpp
 )

@@ -92,4 +92,4 @@ prerequisites.
 `TimeOptimalPathParameterization` (M27)
 
 ### `localization`
-`LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
+`MonteCarloLocalization` (E4) · `ScanMatcher` (E5)

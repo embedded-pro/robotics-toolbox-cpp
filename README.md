@@ -3,7 +3,7 @@
 ## Overview
 
 This library provides robotics algorithms — today robot-manipulator kinematics, rigid-body dynamics,
-trajectory generation, manipulator control, motion planning, wheeled mobile robots and occupancy-grid
+trajectory generation, manipulator control, motion planning, wheeled mobile robots, localization and
 mapping; aerial, legged and marine robots are on the [roadmap](ROADMAP.md) — designed for robust and
 efficient real-time use on resource-constrained embedded systems (no heap, deterministic, float-only).
 It builds on the shared numerical primitives (linear algebra, solvers, controllers) provided by
@@ -42,7 +42,7 @@ project already defines those targets. Includes are namespaced by domain, e.g.
 | [Planning](doc/planning/README.md)                           | Primitive Distance Queries, Artificial Potential Fields, Self-Collision Checking, Convex Collision (GJK and EPA), Grid Search (A* and Dijkstra), RRT-Connect, Dubins Shortest Paths, Dynamic Window Approach, Reeds–Shepp Shortest Paths                                                                                         |
 | [Trajectory](doc/trajectory/README.md)                       | Cubic Spline Trajectory, Cartesian Path with SLERP Orientation                                                                                                                                                                                                                                                                   |
 | [Mobile Robots](doc/mobile/README.md)                        | Planar Odometry, Differential-Drive Kinematics, Car-Like Kinematics, Omnidirectional Kinematics, Skid-Steer Kinematics, Pure-Pursuit Path Tracking, Kanayama Trajectory Tracking, Stanley Path Tracking                                                                                                                          |
-| [Localization & Mapping](doc/localization/README.md)         | Occupancy-Grid Mapping, Odometry Fusion                                                                                                                                                                                                                                                                                          |
+| [Localization & Mapping](doc/localization/README.md)         | Occupancy-Grid Mapping, Odometry Fusion, EKF Landmark Localization                                                                                                                                                                                                                                                               |
 | [Manipulator Control](doc/controllers/manipulator/README.md) | PD Control with Gravity Compensation, Computed-Torque Control, Impedance Control, Operational-Space Control, Hybrid Position/Force Control, Slotine–Li Adaptive Control, Cable Tension Distribution                                                                                                                              |
 
 Each category page lists its algorithms with a brief description and links to the detailed

@@ -290,13 +290,8 @@ All planning items have shipped: see [Planning](doc/planning/README.md).
 
 | #  | Component                                              | Target module  | Depends on       | Difficulty |
 |----|--------------------------------------------------------|----------------|------------------|------------|
-| E3 | EKF landmark localization (known map, range–bearing)   | `localization` | F1, NT66, NT74   | ★★★☆☆      |
 | E4 | Monte Carlo localization                               | `localization` | NT70, E2, F1     | ★★★★☆      |
 | E5 | 2-D scan matching (point-to-point / point-to-line ICP) | `localization` | NT67, NT64, NT66 | ★★★★☆      |
-
-**E3. EKF landmark localization.** Pose tracking against a known landmark map with range–bearing measurements and gated data association.
-- *Algorithm / paper:* Thrun et al. (2005), Ch. 7.
-- *Reuses / builds on:* F1 (odometry noise), NT66, NT74.
 
 **E4. Monte Carlo localization.** Particle-filter localization in an occupancy grid with the odometry motion model and a likelihood-field sensor model (two-pass chamfer distance map); samplers injected by the caller.
 - *Algorithm / paper:* F. Dellaert, D. Fox, W. Burgard, S. Thrun, *ICRA* 1999.
