@@ -119,7 +119,6 @@ existing `dynamics/` convention.
 |-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
 | M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —              | ★☆☆☆☆      |
 | M29 | Chain dynamics model (link chain → M, C, g, inverse dynamics)   | `dynamics`                | M28            | ★★☆☆☆      |
-| M30 | Chain pose kinematics (full-pose FK, frame chain)               | `kinematics`              | NT53           | ★★☆☆☆      |
 | M7  | Denavit-Hartenberg parameters (standard + modified)             | `kinematics`              | NT53, M30      | ★★☆☆☆      |
 | M8  | Geometric Jacobian (6×N), bias term, Jacobian provider          | `kinematics`              | NT53, M30      | ★★☆☆☆      |
 | M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | NT53, NT55     | ★★☆☆☆      |
@@ -155,9 +154,6 @@ retired here.
 
 **M29. Chain dynamics model.** Adapter implementing `EulerLagrangeDynamics` (M via CRBA, `Cq̇` and `g` via RNEA) and a one-call `InverseDynamicsModel` for the controllers.
 - *Reuses / builds on:* RNEA, M28; optional friction model from NT57.
-
-**M30. Chain pose kinematics.** Full tool pose and a model-independent frame chain (joint origins/axes in the base frame) for the link model.
-- *Algorithm / paper:* Siciliano et al. (2009), Ch. 2.
 
 **M7. Denavit-Hartenberg parameters.** Standard and modified `(a, α, d, θ)` descriptions with joint offsets, producing the M30 frame chain.
 - *Algorithm / paper:* Craig, *Introduction to Robotics*, Ch. 3.

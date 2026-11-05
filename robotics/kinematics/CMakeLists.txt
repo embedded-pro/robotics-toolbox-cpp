@@ -12,11 +12,13 @@ target_link_libraries(robotics.kinematics ${ROBOTICS_VISIBILITY}
 )
 
 target_sources(robotics.kinematics PRIVATE
+    ChainPoseKinematics.hpp
     ForwardKinematics.hpp
     InverseKinematics.hpp
 )
 
 robotics_add_coverage_sources(robotics.kinematics
+    ChainPoseKinematics.cpp
     ForwardKinematics.cpp
     InverseKinematics.cpp
 )
