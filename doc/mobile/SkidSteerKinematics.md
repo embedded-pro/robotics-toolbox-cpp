@@ -4,7 +4,8 @@
 
 Tracked vehicles and four-wheel skid-steered robots have no steering mechanism. They turn by driving the left and right sides at different speeds, which forces the treads or wheels to **skid** sideways. The ideal differential-drive model assumes rolling without slip, so it over-predicts the turn rate of these vehicles, often by a third or more.
 
-The **instantaneous centre of rotation (ICR)** model keeps the linear structure of the differential drive but replaces the geometric half-track with identified ICR positions for each tread. It also adds a longitudinal offset of the vehicle's ICR, which produces the lateral slip velocity seen in turns. The three parameters can be identified from logged driving data with a closed-form least-squares fit.
+The **instantaneous centre of rotation (ICR)** model keeps the linear structure of the differential drive but replaces the geometric half-track with identified ICR positions for each tread. It also adds a longitudinal offset of the vehicle's ICR, which produces the lateral slip velocity seen in turns.
+The three parameters can be identified from logged driving data with a closed-form least-squares fit.
 
 ## Mathematical Theory
 
