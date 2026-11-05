@@ -11,11 +11,13 @@ target_link_libraries(robotics.mobile ${ROBOTICS_VISIBILITY}
 )
 
 target_sources(robotics.mobile PRIVATE
+    CarLikeKinematics.hpp
     DifferentialDrive.hpp
     PlanarOdometry.hpp
 )
 
 robotics_add_coverage_sources(robotics.mobile
+    CarLikeKinematics.cpp
     DifferentialDrive.cpp
     PlanarOdometry.cpp
 )
