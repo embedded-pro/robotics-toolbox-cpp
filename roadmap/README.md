@@ -88,9 +88,6 @@ prerequisites.
 
 ## Index
 
-### `kinematics`
-`MobileManipulatorKinematics` (M24)
-
 ### `trajectory`
 `TimeOptimalPathParameterization` (M27)
 
