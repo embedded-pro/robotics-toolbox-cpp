@@ -23,7 +23,7 @@ All pseudocode respects the library constraints: **no heap**, bounded containers
 (no `Q15`/`Q31`). The generic signature keeps a future fixed-point specialisation cheap to add.
 
 The canonical worked example is
-[mobile/PurePursuit](mobile/PurePursuit/implementation.md).
+[localization/OdometryFusion](localization/OdometryFusion/implementation.md).
 
 Conventions shared by every spec: 6-vectors are ordered linear part first — twists `(v; ω)`, wrenches
 `(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md) (NT53), and planar
@@ -95,7 +95,7 @@ prerequisites.
 `TimeOptimalPathParameterization` (M27)
 
 ### `mobile`
-`PurePursuit` (W5) · `StanleyController` (W6) · `KanayamaController` (W7)
+`StanleyController` (W6) · `KanayamaController` (W7)
 
 ### `planning`
 `DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)

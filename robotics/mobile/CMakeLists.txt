@@ -15,6 +15,8 @@ target_sources(robotics.mobile PRIVATE
     DifferentialDrive.hpp
     OmnidirectionalKinematics.hpp
     PlanarOdometry.hpp
+    PlanarPath.hpp
+    PurePursuit.hpp
     SkidSteerKinematics.hpp
 )
 
@@ -23,6 +25,8 @@ robotics_add_coverage_sources(robotics.mobile
     DifferentialDrive.cpp
     OmnidirectionalKinematics.cpp
     PlanarOdometry.cpp
+    PlanarPath.cpp
+    PurePursuit.cpp
     SkidSteerKinematics.cpp
 )
 
