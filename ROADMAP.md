@@ -121,7 +121,6 @@ existing `dynamics/` convention.
 |-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
 | M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, NT64, M8 | ★★★☆☆      |
 | M17 | Impedance control                                               | `controllers/manipulator` | M8, M29        | ★★★☆☆      |
-| M22 | Dynamic (base-parameter) identification                         | `dynamics`                | M31, NT63      | ★★★☆☆      |
 | M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29        | ★★★★☆      |
 | M19 | Hybrid position/force control                                   | `controllers/manipulator` | M8, M29        | ★★★★☆      |
 | M20 | Passivity-based adaptive control (Slotine-Li)                   | `controllers/manipulator` | M31            | ★★★★☆      |
@@ -146,10 +145,6 @@ retired here.
 
 **M17. Impedance control.** Stiffness/damping impedance via `Jᵀ` (no force sensor), and inertia-shaping impedance with measured contact wrench via the task-space inertia.
 - *Algorithm / paper:* N. Hogan, *ASME J. Dyn. Sys. Meas. Control*, 1985.
-
-**M22. Dynamic (base-parameter) identification.** Regressor rows streamed into a rank-revealing least-squares solve; the kept directions are the base parameters.
-- *Algorithm / paper:* Atkeson, An, Hollerbach (1986); Gautier & Khalil (1990).
-- *Reuses / builds on:* M31; upstream `estimators::IncrementalQrLeastSquares` (NT63).
 
 ### Tier 4 — Advanced ★★★★☆
 

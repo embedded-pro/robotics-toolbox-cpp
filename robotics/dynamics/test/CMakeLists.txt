@@ -14,6 +14,7 @@ target_sources(robotics.dynamics_test PRIVATE
     TestChainInertialRegressor.cpp
     TestCompositeRigidBodyAlgorithm.cpp
     TestCoriolisMatrix.cpp
+    TestDynamicParameterIdentification.cpp
     TestEulerLagrangeSolver.cpp
     TestForwardDynamicsIntegrator.cpp
     TestJointLink.cpp

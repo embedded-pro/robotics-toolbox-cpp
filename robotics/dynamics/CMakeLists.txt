@@ -7,6 +7,7 @@ target_include_directories(robotics.dynamics ${ROBOTICS_VISIBILITY}
 
 target_link_libraries(robotics.dynamics ${ROBOTICS_VISIBILITY}
     infra.util
+    numerical.estimators
     numerical.math
     numerical.solver
 )
@@ -17,6 +18,7 @@ target_sources(robotics.dynamics PRIVATE
     ChainInertialRegressor.hpp
     CompositeRigidBodyAlgorithm.hpp
     CoriolisMatrix.hpp
+    DynamicParameterIdentification.hpp
     EulerLagrangeDynamics.hpp
     EulerLagrangeSolver.hpp
     ForwardDynamicsIntegrator.hpp
@@ -38,6 +40,7 @@ robotics_add_coverage_sources(robotics.dynamics
     ChainInertialRegressor.cpp
     CompositeRigidBodyAlgorithm.cpp
     CoriolisMatrix.cpp
+    DynamicParameterIdentification.cpp
     EulerLagrangeSolver.cpp
     ForwardDynamicsIntegrator.cpp
     JointLink.cpp
