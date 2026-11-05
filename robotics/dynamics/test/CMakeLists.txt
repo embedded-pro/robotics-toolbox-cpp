@@ -17,6 +17,7 @@ target_sources(robotics.dynamics_test PRIVATE
     TestEulerLagrangeSolver.cpp
     TestForwardDynamicsIntegrator.cpp
     TestJointLink.cpp
+    TestMomentumObserver.cpp
     TestNewtonEulerSolver.cpp
     TestRecursiveNewtonEuler.cpp
 )

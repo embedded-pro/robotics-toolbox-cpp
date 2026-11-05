@@ -24,6 +24,7 @@ target_sources(robotics.dynamics PRIVATE
     InverseDynamicsModel.hpp
     JointLink.hpp
     ModifiedRecursiveNewtonEuler.hpp
+    MomentumObserver.hpp
     NewtonEulerBody.hpp
     NewtonEulerSolver.hpp
     RecursiveNewtonEuler.hpp
@@ -41,6 +42,7 @@ robotics_add_coverage_sources(robotics.dynamics
     ForwardDynamicsIntegrator.cpp
     JointLink.cpp
     ModifiedRecursiveNewtonEuler.cpp
+    MomentumObserver.cpp
     NewtonEulerSolver.cpp
     RecursiveNewtonEuler.cpp
 )

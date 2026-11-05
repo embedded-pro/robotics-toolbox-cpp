@@ -120,7 +120,6 @@ existing `dynamics/` convention.
 | #   | Component                                                       | Target module             | Depends on     | Difficulty |
 |-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
 | M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, NT64, M8 | ★★★☆☆      |
-| M16 | Momentum-based collision-detection observer                     | `dynamics`                | M29, M31       | ★★★☆☆      |
 | M17 | Impedance control                                               | `controllers/manipulator` | M8, M29        | ★★★☆☆      |
 | M22 | Dynamic (base-parameter) identification                         | `dynamics`                | M31, NT63      | ★★★☆☆      |
 | M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29        | ★★★★☆      |
@@ -144,9 +143,6 @@ retired here.
 **M13. Full 6-DOF pose IK.** Damped least squares on the SE(3) log-map error with position/rotation weighting, adaptive damping, step and joint-limit clamping.
 - *Algorithm / paper:* S. R. Buss (2004); Nakamura & Hanafusa (1986); Chiaverini (1997).
 - *Reuses / builds on:* upstream `optimization::LevenbergMarquardt` (NT64) with a manipulability damping policy.
-
-**M16. Momentum-based collision-detection observer.** External joint-torque estimate from the generalized-momentum residual, using `Cᵀq̇`.
-- *Algorithm / paper:* A. De Luca, A. Albu-Schäffer, S. Haddadin, G. Hirzinger, *IROS*, 2006.
 
 **M17. Impedance control.** Stiffness/damping impedance via `Jᵀ` (no force sensor), and inertia-shaping impedance with measured contact wrench via the task-space inertia.
 - *Algorithm / paper:* N. Hogan, *ASME J. Dyn. Sys. Meas. Control*, 1985.

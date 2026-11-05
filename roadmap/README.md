@@ -92,7 +92,7 @@ prerequisites.
 `PoseInverseKinematics` (M13) · `AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26)
 
 ### `dynamics`
-`MomentumObserver` (M16) · `DynamicParameterIdentification` (M22)
+`DynamicParameterIdentification` (M22)
 
 ### `trajectory`
 `TimeOptimalPathParameterization` (M27)
