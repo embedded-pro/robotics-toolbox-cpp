@@ -9,4 +9,5 @@ target_link_libraries(robotics.localization_test PUBLIC
 
 target_sources(robotics.localization_test PRIVATE
     TestOccupancyGridMap.cpp
+    TestOdometryFusion.cpp
 )
