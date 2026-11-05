@@ -101,7 +101,7 @@ prerequisites.
 `PlanarOdometry` (F1) · `DifferentialDrive` (W1) · `CarLikeKinematics` (W2) · `OmnidirectionalKinematics` (W3) · `SkidSteerKinematics` (W4) · `PurePursuit` (W5) · `StanleyController` (W6) · `KanayamaController` (W7)
 
 ### `planning`
-`GridSearch` (P3) · `SelfCollision` (P4) · `ConvexCollision` (P5) · `RrtConnect` (P6) · `DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
+`GridSearch` (P3) · `ConvexCollision` (P5) · `RrtConnect` (P6) · `DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
 
 ### `localization`
 `OdometryFusion` (E1) · `OccupancyGridMap` (E2) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)

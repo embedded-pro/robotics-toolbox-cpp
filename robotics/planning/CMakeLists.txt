@@ -8,16 +8,19 @@ target_include_directories(robotics.planning ${ROBOTICS_VISIBILITY}
 target_link_libraries(robotics.planning ${ROBOTICS_VISIBILITY}
     infra.util
     numerical.math
+    robotics.kinematics
 )
 
 target_sources(robotics.planning PRIVATE
     PotentialField.hpp
     PrimitiveDistance.hpp
+    SelfCollision.hpp
 )
 
 robotics_add_coverage_sources(robotics.planning
     PotentialField.cpp
     PrimitiveDistance.cpp
+    SelfCollision.cpp
 )
 
 add_subdirectory(test)
