@@ -172,13 +172,8 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Wheeled mobile robots
 
-| #   | Component                                        | Target module | Depends on | Difficulty |
-|-----|--------------------------------------------------|---------------|------------|------------|
-| W10 | Reeds–Shepp shortest paths (forward and reverse) | `planning`    | W8, NT54   | ★★★☆☆      |
-
-**W10. Reeds–Shepp paths.** Closed-form shortest paths for a bounded-curvature car that may reverse (48 words from 8 base formulas and their symmetries); continuous in the goal, the metric for parking and car-like planners.
-- *Algorithm / paper:* J. A. Reeds, L. A. Shepp, *Pacific J. Math.*, 145(2), 1990; corrected formulas as in OMPL.
-- *Reuses / builds on:* W8 (`CarPath`), NT54.
+All wheeled-robot items have shipped: see [Wheeled Mobile Robots](doc/mobile/README.md), and
+[Planning](doc/planning/README.md) for the Dubins, Reeds–Shepp and dynamic-window planners.
 
 ## Aerial robots
 
@@ -294,8 +289,7 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Motion planning and collision
 
-| # | Component | Target module | Depends on | Difficulty |
-|---|-----------|---------------|------------|------------|
+All planning items have shipped: see [Planning](doc/planning/README.md).
 
 ## Localization and mapping
 

@@ -94,8 +94,5 @@ prerequisites.
 ### `trajectory`
 `TimeOptimalPathParameterization` (M27)
 
-### `planning`
-`ReedsSheppPath` (W10)
-
 ### `localization`
 `OdometryFusion` (E1) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
