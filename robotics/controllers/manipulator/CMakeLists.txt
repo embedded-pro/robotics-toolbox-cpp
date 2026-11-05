@@ -6,6 +6,7 @@ target_include_directories(robotics.controllers.manipulator ${ROBOTICS_VISIBILIT
 )
 
 target_link_libraries(robotics.controllers.manipulator ${ROBOTICS_VISIBILITY}
+    infra.util
     numerical.math
     numerical.solver
     robotics.dynamics
@@ -14,6 +15,7 @@ target_link_libraries(robotics.controllers.manipulator ${ROBOTICS_VISIBILITY}
 
 target_sources(robotics.controllers.manipulator PRIVATE
     ComputedTorqueControl.hpp
+    HybridPositionForceControl.hpp
     ImpedanceControl.hpp
     OperationalSpaceControl.hpp
     PdGravityCompensation.hpp
@@ -23,6 +25,7 @@ target_sources(robotics.controllers.manipulator PRIVATE
 
 robotics_add_coverage_sources(robotics.controllers.manipulator
     ComputedTorqueControl.cpp
+    HybridPositionForceControl.cpp
     ImpedanceControl.cpp
     OperationalSpaceControl.cpp
     PdGravityCompensation.cpp

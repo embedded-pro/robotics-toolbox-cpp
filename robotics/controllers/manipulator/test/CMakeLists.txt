@@ -11,6 +11,7 @@ target_link_libraries(robotics.controllers.manipulator_test PUBLIC
 
 target_sources(robotics.controllers.manipulator_test PRIVATE
     TestComputedTorqueControl.cpp
+    TestHybridPositionForceControl.cpp
     TestImpedanceControl.cpp
     TestOperationalSpaceControl.cpp
     TestPdGravityCompensation.cpp
