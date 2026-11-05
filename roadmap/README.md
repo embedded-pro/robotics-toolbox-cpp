@@ -23,11 +23,11 @@ All pseudocode respects the library constraints: **no heap**, bounded containers
 (no `Q15`/`Q31`). The generic signature keeps a future fixed-point specialisation cheap to add.
 
 The canonical worked example is
-[mobile/PurePursuit](mobile/PurePursuit/implementation.md).
+[localization/OdometryFusion](localization/OdometryFusion/implementation.md).
 
 Conventions shared by every spec: 6-vectors are ordered linear part first — twists `(v; ω)`, wrenches
 `(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md) (NT53), and planar
-3-vectors `(vx, vy, ω)` by [math/SE2Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE2Transform/implementation.md) (NT66); dynamics
+3-vectors `(vx, vy, ω)` by [math/SE2Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE2Transform.md) (NT66); dynamics
 and Jacobians reach controllers through interfaces implemented by
 [dynamics/ChainDynamicsModel](../robotics/dynamics/ChainDynamicsModel.hpp) and
 [kinematics/JacobianProvider](../robotics/kinematics/JacobianProvider.hpp) (shipped).
@@ -88,17 +88,8 @@ prerequisites.
 
 ## Index
 
-### `kinematics`
-`MobileManipulatorKinematics` (M24)
-
 ### `trajectory`
 `TimeOptimalPathParameterization` (M27)
 
-### `mobile`
-`PlanarOdometry` (F1) · `DifferentialDrive` (W1) · `CarLikeKinematics` (W2) · `OmnidirectionalKinematics` (W3) · `SkidSteerKinematics` (W4) · `PurePursuit` (W5) · `StanleyController` (W6) · `KanayamaController` (W7)
-
-### `planning`
-`DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
-
 ### `localization`
-`OdometryFusion` (E1) · `OccupancyGridMap` (E2) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
+`OdometryFusion` (E1) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)

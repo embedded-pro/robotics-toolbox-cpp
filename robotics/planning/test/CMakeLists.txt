@@ -9,9 +9,12 @@ target_link_libraries(robotics.planning_test PUBLIC
 
 target_sources(robotics.planning_test PRIVATE
     TestConvexCollision.cpp
+    TestDubinsPath.cpp
+    TestDynamicWindowApproach.cpp
     TestGridSearch.cpp
     TestPotentialField.cpp
     TestPrimitiveDistance.cpp
+    TestReedsSheppPath.cpp
     TestRrtConnect.cpp
     TestSelfCollision.cpp
 )

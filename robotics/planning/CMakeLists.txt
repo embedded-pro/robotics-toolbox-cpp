@@ -12,19 +12,27 @@ target_link_libraries(robotics.planning ${ROBOTICS_VISIBILITY}
 )
 
 target_sources(robotics.planning PRIVATE
+    CarPath.hpp
     ConvexCollision.hpp
+    DubinsPath.hpp
+    DynamicWindowApproach.hpp
     GridSearch.hpp
     PotentialField.hpp
     PrimitiveDistance.hpp
+    ReedsSheppPath.hpp
     RrtConnect.hpp
     SelfCollision.hpp
 )
 
 robotics_add_coverage_sources(robotics.planning
+    CarPath.cpp
     ConvexCollision.cpp
+    DubinsPath.cpp
+    DynamicWindowApproach.cpp
     GridSearch.cpp
     PotentialField.cpp
     PrimitiveDistance.cpp
+    ReedsSheppPath.cpp
     RrtConnect.cpp
     SelfCollision.cpp
 )

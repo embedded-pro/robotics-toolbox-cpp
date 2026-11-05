@@ -1,5 +1,7 @@
 add_subdirectory(controllers)
 add_subdirectory(dynamics)
 add_subdirectory(kinematics)
+add_subdirectory(localization)
+add_subdirectory(mobile)
 add_subdirectory(planning)
 add_subdirectory(trajectory)

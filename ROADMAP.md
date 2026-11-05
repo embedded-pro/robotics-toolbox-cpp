@@ -40,8 +40,8 @@ this roadmap needs that upstream does not ship yet are specified and built upstr
 
 Generic algorithms live in numerical-toolbox-cpp and are referenced here as **NT** plus its
 master-list item number (NT53 is upstream item 53). A robotics item that depends on one needs a
-numerical-toolbox pin that ships it. NT53–NT65 have shipped upstream, and their links point to the upstream
-docs; the current pin (`63c9b91`) includes them.
+numerical-toolbox pin that ships it. NT53–NT66 have shipped upstream, and their links point to the upstream
+docs; the current pin (`dc147fb`) includes them.
 
 | #    | Component                                             | Upstream module      | Spec / doc                          | Needed by                                                                  |
 |------|-------------------------------------------------------|----------------------|-------------------------------------|----------------------------------------------------------------------------|
@@ -58,7 +58,7 @@ docs; the current pin (`63c9b91`) includes them.
 | NT63 | Incremental QR least squares (rank-revealing)         | `estimators/offline` | [IncrementalQrLeastSquares][nt63]   | M22                                                                        |
 | NT64 | Levenberg–Marquardt (retraction, pluggable damping)   | `optimization`       | [LevenbergMarquardt][nt64]          | M13, M23, E5, C2                                                           |
 | NT65 | Dense convex QP (Goldfarb–Idnani)                     | `solvers`            | [ActiveSetQp][nt65]                 | M25 (exact path), L6, G2, G3                                               |
-| NT66 | SE(2) transform, twists, exp/log, pose error          | `math`               | [SE2Transform][nt66] (spec)         | F1, W1–W10, M24, E1, E2, E3, E5                                            |
+| NT66 | SE(2) transform, twists, exp/log, pose error          | `math`               | [SE2Transform][nt66]                | F1, W1–W10, M24, E1, E2, E3, E5                                            |
 | NT67 | Kabsch / Umeyama point-set alignment                  | `solvers`            | [PointSetAlignment][nt67] (spec)    | E5, C1                                                                     |
 | NT68 | Lie-group Jacobians and ⊕/⊖ (SO(3), SE(3), SE(2))     | `math`               | [master list][ntrm], no spec yet    | C1 (and NT71)                                                              |
 | NT69 | Control allocation (redistributed pseudo-inverse, QP) | `controllers`        | [master list][ntrm], no spec yet    | A2, S3                                                                     |
@@ -82,7 +82,7 @@ docs; the current pin (`63c9b91`) includes them.
 [nt63]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/estimators/IncrementalQrLeastSquares.md
 [nt64]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/optimization/LevenbergMarquardt.md
 [nt65]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/solvers/ActiveSetQp.md
-[nt66]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE2Transform/implementation.md
+[nt66]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE2Transform.md
 [nt67]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/solvers/PointSetAlignment/implementation.md
 [nt70]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/filters/active/ParticleFilter/implementation.md
 [nt74]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/filters/active/ResidualKalmanUpdate/implementation.md
@@ -117,10 +117,9 @@ existing `dynamics/` convention.
 
 ### Manipulator list (by priority)
 
-| #   | Component                                         | Target module      | Depends on  | Difficulty |
-|-----|---------------------------------------------------|--------------------|-------------|------------|
-| M24 | Mobile-manipulator / nonholonomic-base kinematics | `kinematics`       | M8, M14, W1 | ★★★★☆      |
-| M27 | Time-optimal path parameterization (TOPP-RA)      | `trajectory` (new) | M29         | ★★★★★      |
+| #   | Component                                    | Target module      | Depends on | Difficulty |
+|-----|----------------------------------------------|--------------------|------------|------------|
+| M27 | Time-optimal path parameterization (TOPP-RA) | `trajectory` (new) | M29        | ★★★★★      |
 
 M2 (polynomial profile), M3 (trapezoidal profile), M4 (friction compensation), M6 (SE(3)) and M9
 (S-curve profile) moved to numerical-toolbox as NT55, NT56, NT57, NT53 and NT60; their numbers are
@@ -131,10 +130,6 @@ retired here.
 ### Tier 3 — Moderate ★★★☆☆
 
 ### Tier 4 — Advanced ★★★★☆
-
-**M24. Mobile-manipulator / nonholonomic-base kinematics.** Combined base + arm Jacobian in the world frame with differential-drive constraints.
-- *Algorithm / paper:* Y. Yamamoto, X. Yun, *IEEE Trans. Automatic Control*, 39(6), 1994.
-- *Reuses / builds on:* the W1 differential-drive model for the base.
 
 ### Tier 5 — Hard / research-grade ★★★★★
 
@@ -149,15 +144,10 @@ Cross-family building blocks that several of the families below depend on.
 
 | #  | Component                                                    | Target module | Depends on      | Difficulty |
 |----|--------------------------------------------------------------|---------------|-----------------|------------|
-| F1 | Planar odometry on SE(2) (exact arc integration)             | `mobile`      | NT66            | ★★☆☆☆      |
 | F2 | Online multi-axis trajectory generation (time-synchronized)  | `trajectory`  | NT73, M1        | ★★☆☆☆      |
 | F3 | Floating-base RNEA / ABA / CRBA                              | `dynamics`    | M28, NT53       | ★★★☆☆      |
 | F4 | Via-point blending (joint and Cartesian)                     | `trajectory`  | NT55, NT56, M10 | ★★★☆☆      |
 | F5 | Contact Jacobians and constrained (contact) forward dynamics | `dynamics`    | F3, M8          | ★★★★☆      |
-
-**F1. Planar odometry on SE(2).** Integrates a body twist `(vx, vy, ω)` over a sample period with the SE(2) exponential (exact constant-twist arc), shared by every wheeled model and the localization filters.
-- *Algorithm / paper:* R. Siegwart, I. Nourbakhsh, D. Scaramuzza, *Introduction to Autonomous Mobile Robots*, 2nd ed. (2011), Ch. 5.
-- *Reuses / builds on:* NT66.
 
 **F2. Online multi-axis trajectory generation.** Joint-space wrapper over the upstream online generator: per-joint limits from M1, recomputation every cycle, all joints time-synchronized to the slowest.
 - *Algorithm / paper:* T. Kröger, F. Wahl, *IEEE T-RO*, 26(1), 2010.
@@ -177,58 +167,8 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Wheeled mobile robots
 
-| #   | Component                                            | Target module | Depends on | Difficulty |
-|-----|------------------------------------------------------|---------------|------------|------------|
-| W1  | Differential-drive kinematics                        | `mobile`      | NT66       | ★☆☆☆☆      |
-| W2  | Car-like (Ackermann / kinematic bicycle) kinematics  | `mobile`      | NT66       | ★☆☆☆☆      |
-| W3  | Omnidirectional (mecanum / Swedish-wheel) kinematics | `mobile`      | NT66       | ★☆☆☆☆      |
-| W4  | Skid-steer kinematics with slip (ICR model)          | `mobile`      | W1         | ★★☆☆☆      |
-| W5  | Pure-pursuit path tracking (+ planar polyline path)  | `mobile`      | W1, NT66   | ★★☆☆☆      |
-| W6  | Stanley path tracking                                | `mobile`      | W2, W5     | ★★☆☆☆      |
-| W7  | Kanayama Lyapunov trajectory tracking                | `mobile`      | W1, NT66   | ★★☆☆☆      |
-| W8  | Dubins shortest paths (+ car path type)              | `planning`    | NT66       | ★★☆☆☆      |
-| W9  | Dynamic window approach (local obstacle avoidance)   | `planning`    | W1, NT66   | ★★★☆☆      |
-| W10 | Reeds–Shepp shortest paths (forward and reverse)     | `planning`    | W8, NT54   | ★★★☆☆      |
-
-**W1. Differential-drive kinematics.** Body twist from wheel speeds and back, wheel-speed limits mapped to `(v, ω)` limits; the base model of M24.
-- *Algorithm / paper:* Siegwart et al. (2011), Ch. 3.
-- *Reuses / builds on:* NT66.
-
-**W2. Car-like kinematics.** Kinematic bicycle model with steering-angle and steering-rate limits, Ackermann wheel angles for the two front wheels.
-- *Algorithm / paper:* R. Rajamani, *Vehicle Dynamics and Control*, 2nd ed. (2012), Ch. 2.
-- *Reuses / builds on:* NT66.
-
-**W3. Omnidirectional kinematics.** Wheel-speed ↔ body-twist maps for mecanum and Swedish-wheel bases, including the roller-angle geometry.
-- *Algorithm / paper:* P. Muir, C. Neuman, "Kinematic modeling of wheeled mobile robots," *J. Robotic Systems*, 4(2), 1987.
-- *Reuses / builds on:* NT66.
-
-**W4. Skid-steer kinematics.** Instantaneous-centre-of-rotation model with identified ICR offsets for tracked and skid-steered vehicles.
-- *Algorithm / paper:* J. L. Martínez, A. Mandow, J. Morales, S. Pedraza, A. García-Cerezo, *IJRR*, 24(10), 2005.
-- *Reuses / builds on:* W1.
-
-**W5. Pure pursuit.** Curvature command towards a look-ahead point on the path, with speed-scheduled look-ahead distance and monotone progress; defines the bounded polyline `PlanarPath` that W6 and the planners share.
-- *Algorithm / paper:* R. C. Coulter, "Implementation of the pure pursuit path tracking algorithm," CMU-RI-TR-92-01, 1992.
-- *Reuses / builds on:* W1 (or W2), NT66.
-
-**W6. Stanley controller.** Front-axle cross-track and heading-error steering law for car-like vehicles.
-- *Algorithm / paper:* S. Thrun et al., "Stanley: The robot that won the DARPA Grand Challenge," *J. Field Robotics*, 23(9), 2006.
-- *Reuses / builds on:* W2, W5 (path).
-
-**W7. Kanayama tracking controller.** Lyapunov-stable tracking of a reference pose and twist for unicycle-type bases, error expressed in the robot frame.
-- *Algorithm / paper:* Y. Kanayama, Y. Kimura, F. Miyazaki, T. Noguchi, *ICRA* 1990.
-- *Reuses / builds on:* W1, NT66.
-
-**W8. Dubins paths.** Closed-form shortest forward-only paths for a bounded-curvature car (6 words), with float-safe existence tests; defines the `CarPath` type W10 reuses.
-- *Algorithm / paper:* L. E. Dubins, *Am. J. Math.*, 79(3), 1957; A. Shkel, V. Lumelsky, *Robotics and Autonomous Systems*, 34(4), 2001.
-- *Reuses / builds on:* NT66.
-
-**W9. Dynamic window approach.** Samples the reachable `(v, ω)` window per cycle and scores heading, clearance and speed; clearance is the closed-form arc distance to the points of a laser scan, so no collision library (P1) is needed.
-- *Algorithm / paper:* D. Fox, W. Burgard, S. Thrun, *IEEE Robotics & Automation Magazine*, 4(1), 1997.
-- *Reuses / builds on:* W1, NT66.
-
-**W10. Reeds–Shepp paths.** Closed-form shortest paths for a bounded-curvature car that may reverse (48 words from 8 base formulas and their symmetries); continuous in the goal, the metric for parking and car-like planners.
-- *Algorithm / paper:* J. A. Reeds, L. A. Shepp, *Pacific J. Math.*, 145(2), 1990; corrected formulas as in OMPL.
-- *Reuses / builds on:* W8 (`CarPath`), NT54.
+All wheeled-robot items have shipped: see [Wheeled Mobile Robots](doc/mobile/README.md), and
+[Planning](doc/planning/README.md) for the Dubins, Reeds–Shepp and dynamic-window planners.
 
 ## Aerial robots
 
@@ -344,15 +284,13 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Motion planning and collision
 
-| # | Component | Target module | Depends on | Difficulty |
-|---|-----------|---------------|------------|------------|
+All planning items have shipped: see [Planning](doc/planning/README.md).
 
 ## Localization and mapping
 
 | #  | Component                                              | Target module  | Depends on       | Difficulty |
 |----|--------------------------------------------------------|----------------|------------------|------------|
 | E1 | Wheel + gyro odometry fusion (EKF on SE(2))            | `localization` | F1, NT66, NT74   | ★★★☆☆      |
-| E2 | Occupancy-grid mapping (log-odds, ray casting)         | `localization` | NT66             | ★★★☆☆      |
 | E3 | EKF landmark localization (known map, range–bearing)   | `localization` | F1, NT66, NT74   | ★★★☆☆      |
 | E4 | Monte Carlo localization                               | `localization` | NT70, E2, F1     | ★★★★☆      |
 | E5 | 2-D scan matching (point-to-point / point-to-line ICP) | `localization` | NT67, NT64, NT66 | ★★★★☆      |
@@ -360,10 +298,6 @@ Cross-family building blocks that several of the families below depend on.
 **E1. Odometry fusion.** EKF on `(x, y, θ, gyro bias)`: wheel speed and gyro rate drive the prediction, the wheel yaw rate is a χ²-gated bias measurement (a rejected update flags slip), and optional heading and position fixes share the same update.
 - *Algorithm / paper:* S. Thrun, W. Burgard, D. Fox, *Probabilistic Robotics* (2005), Ch. 5 and 7; J. Borenstein, L. Feng, "Gyrodometry," *ICRA* 1996.
 - *Reuses / builds on:* F1, NT66, NT74 (upstream `ExtendedKalmanFilter` cannot wrap residuals or gate).
-
-**E2. Occupancy-grid mapping.** Log-odds cell updates from range scans along Bresenham rays on a bounded grid.
-- *Algorithm / paper:* A. Elfes, *Computer*, 22(6), 1989; Thrun et al. (2005), Ch. 9.
-- *Reuses / builds on:* NT66.
 
 **E3. EKF landmark localization.** Pose tracking against a known landmark map with range–bearing measurements and gated data association.
 - *Algorithm / paper:* Thrun et al. (2005), Ch. 7.
