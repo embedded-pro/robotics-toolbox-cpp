@@ -12,12 +12,21 @@ target_link_libraries(robotics.kinematics ${ROBOTICS_VISIBILITY}
 )
 
 target_sources(robotics.kinematics PRIVATE
+    ChainPoseKinematics.hpp
+    ChainTaskJacobian.hpp
+    DenavitHartenberg.hpp
+    DhTaskJacobian.hpp
     ForwardKinematics.hpp
+    GeometricJacobian.hpp
     InverseKinematics.hpp
+    JacobianProvider.hpp
 )
 
 robotics_add_coverage_sources(robotics.kinematics
+    ChainPoseKinematics.cpp
+    DenavitHartenberg.cpp
     ForwardKinematics.cpp
+    GeometricJacobian.cpp
     InverseKinematics.cpp
 )
 

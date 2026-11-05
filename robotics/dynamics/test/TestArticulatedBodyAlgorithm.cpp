@@ -134,3 +134,28 @@ TEST_F(TestArticulatedBodyAlgorithm, spatial_chain_inverts_recursive_newton_eule
     EXPECT_NEAR(qDDot.at(1, 0), expected.at(1, 0), math::Tolerance<float>());
     EXPECT_NEAR(qDDot.at(2, 0), expected.at(2, 0), math::Tolerance<float>());
 }
+
+TEST_F(TestArticulatedBodyAlgorithm, mixed_chain_round_trips_through_aba)
+{
+    const math::SquareMatrix<float, 3> inertia{
+        { 0.02f, 0.001f, 0.0f },
+        { 0.001f, 0.03f, 0.002f },
+        { 0.0f, 0.002f, 0.025f }
+    };
+    std::array<Link, 3> links{
+        Link{ 1.2f, inertia, zAxis, Vector3{ 0.0f, 0.0f, 0.1f }, Vector3{ 0.05f, 0.02f, 0.1f } },
+        Link{ 0.9f, inertia * 0.6f, Normalized(1.0f, 0.2f, 0.3f), Vector3{ 0.1f, 0.0f, 0.2f }, Vector3{ 0.15f, -0.03f, 0.02f }, dynamics::JointType::Prismatic },
+        Link{ 0.6f, inertia * 0.3f, Normalized(1.0f, 0.0f, 1.0f), Vector3{ 0.3f, 0.05f, 0.0f }, Vector3{ 0.1f, 0.04f, -0.05f } }
+    };
+    dynamics::RecursiveNewtonEuler<float, 3> rnea;
+    math::Vector<float, 3> q{ 0.4f, 0.25f, 1.1f };
+    math::Vector<float, 3> qDot{ 0.8f, -0.6f, 2.1f };
+    math::Vector<float, 3> expected{ 0.3f, -1.2f, 0.7f };
+
+    auto tau = rnea.InverseDynamics(links, q, qDot, expected, gravityVector);
+    auto qDDot = aba3.ForwardDynamics(links, q, qDot, tau, gravityVector);
+
+    EXPECT_NEAR(qDDot.at(0, 0), expected.at(0, 0), math::Tolerance<float>());
+    EXPECT_NEAR(qDDot.at(1, 0), expected.at(1, 0), math::Tolerance<float>());
+    EXPECT_NEAR(qDDot.at(2, 0), expected.at(2, 0), math::Tolerance<float>());
+}

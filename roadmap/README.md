@@ -29,8 +29,8 @@ Conventions shared by every spec: 6-vectors are ordered linear part first — tw
 `(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md) (NT53), and planar
 3-vectors `(vx, vy, ω)` by [math/SE2Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE2Transform/implementation.md) (NT66); dynamics
 and Jacobians reach controllers through interfaces implemented by
-[dynamics/ChainDynamicsModel](dynamics/ChainDynamicsModel/implementation.md) and
-[kinematics/GeometricJacobian](kinematics/GeometricJacobian/implementation.md).
+[dynamics/ChainDynamicsModel](../robotics/dynamics/ChainDynamicsModel.hpp) and
+[kinematics/JacobianProvider](../robotics/kinematics/JacobianProvider.hpp) (shipped).
 
 ## Deployment shape (float-only)
 
@@ -89,10 +89,10 @@ prerequisites.
 ## Index
 
 ### `kinematics`
-`DenavitHartenberg` (M7) · `GeometricJacobian` (M8) · `ManipulabilityIndex` (M11) · `PoseInverseKinematics` (M13) · `RedundancyResolution` (M14) · `ProductOfExponentials` (M15) · `AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26) · `ChainPoseKinematics` (M30)
+`ManipulabilityIndex` (M11) · `PoseInverseKinematics` (M13) · `RedundancyResolution` (M14) · `ProductOfExponentials` (M15) · `AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26)
 
 ### `dynamics`
-`GenericJointLink` (M1) · `MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `ChainDynamicsModel` (M29) · `CoriolisMatrixAndRegressor` (M31) · `RneaExternalWrench` (M32)
+`MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CoriolisMatrixAndRegressor` (M31) · `RneaExternalWrench` (M32)
 
 ### `trajectory`
 `CartesianSlerpInterpolation` (M10) · `TimeOptimalPathParameterization` (M27)

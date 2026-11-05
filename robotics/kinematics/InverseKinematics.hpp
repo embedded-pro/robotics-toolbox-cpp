@@ -5,8 +5,9 @@
 #include "numerical/math/Geometry3D.hpp"
 #include "numerical/math/Matrix.hpp"
 #include "numerical/solvers/GaussianElimination.hpp"
-#include "robotics/dynamics/RevoluteJointLink.hpp"
-#include "robotics/kinematics/ForwardKinematics.hpp"
+#include "robotics/dynamics/JointLink.hpp"
+#include "robotics/kinematics/ChainPoseKinematics.hpp"
+#include "robotics/kinematics/GeometricJacobian.hpp"
 #include <array>
 #include <cstddef>
 
@@ -44,8 +45,7 @@ namespace kinematics
         using Matrix3 = math::Matrix3<T>;
         using JointVector = math::Vector<T, NumLinks>;
         using Jacobian = math::Matrix<T, 3, NumLinks>;
-        using LinkArray = std::array<dynamics::RevoluteJointLink<T>, NumLinks>;
-        using PositionArray = std::array<Vector3, NumLinks + 1>;
+        using LinkArray = std::array<dynamics::JointLink<T>, NumLinks>;
 
         explicit InverseKinematics(const Vector3& toolOffset, InverseKinematicsConfig<T> cfg = {});
 
@@ -55,23 +55,18 @@ namespace kinematics
             const JointVector& initialQ) const;
 
     private:
-        Jacobian ComputeJacobian(
-            const LinkArray& links,
-            const JointVector& q,
-            const PositionArray& positions) const;
-
         JointVector DampedLeastSquaresStep(const Jacobian& jacobian, const Vector3& error) const;
 
         T PositionError(const LinkArray& links, const JointVector& q, const Vector3& target) const;
 
         InverseKinematicsConfig<T> config;
-        ForwardKinematics<T, NumLinks> fk;
+        ChainPoseKinematics<T, NumLinks> kinematics;
     };
 
     template<typename T, std::size_t NumLinks>
     InverseKinematics<T, NumLinks>::InverseKinematics(const Vector3& toolOffset, InverseKinematicsConfig<T> cfg)
         : config{ cfg }
-        , fk{ toolOffset }
+        , kinematics{ math::SE3Transform<T>{ Matrix3::Identity(), toolOffset } }
     {
         really_assert(config.dampingFactor > T(0));
         really_assert(config.tolerance > T(0));
@@ -90,44 +85,18 @@ namespace kinematics
 
         for (std::size_t iteration = 0; iteration < config.maxIterations; ++iteration)
         {
-            const auto positions = fk.Compute(links, q);
-            const Vector3 error{ target - positions[NumLinks] };
+            const auto frames{ kinematics.Compute(links, q) };
+            const Vector3 error{ target - frames.tool.translation };
             const T errorNorm{ math::VectorNorm(error) };
 
             if (errorNorm < config.tolerance)
                 return { q, errorNorm, iteration, true };
 
-            q = q + DampedLeastSquaresStep(ComputeJacobian(links, q, positions), error);
+            const auto jacobian{ GeometricJacobian<T, NumLinks>::template TaskRows<3>(GeometricJacobian<T, NumLinks>::Compute(frames)) };
+            q = q + DampedLeastSquaresStep(jacobian, error);
         }
 
         return { q, PositionError(links, q, target), config.maxIterations, false };
-    }
-
-    template<typename T, std::size_t NumLinks>
-    typename InverseKinematics<T, NumLinks>::Jacobian
-    InverseKinematics<T, NumLinks>::ComputeJacobian(
-        const LinkArray& links,
-        const JointVector& q,
-        const PositionArray& positions) const
-    {
-        const Vector3& toolPosition = positions[NumLinks];
-
-        Matrix3 R{ Matrix3::Identity() };
-        Jacobian J{};
-
-        for (std::size_t i = 0; i < NumLinks; ++i)
-        {
-            const Vector3 worldAxis{ R * links[i].jointAxis };
-            const Vector3 column{ math::CrossProduct(worldAxis, Vector3{ toolPosition - positions[i] }) };
-
-            J.at(0, i) = column.at(0, 0);
-            J.at(1, i) = column.at(1, 0);
-            J.at(2, i) = column.at(2, 0);
-
-            R = R * math::RotationAboutAxis(links[i].jointAxis, q.at(i, 0));
-        }
-
-        return J;
     }
 
     template<typename T, std::size_t NumLinks>
@@ -146,8 +115,7 @@ namespace kinematics
     template<typename T, std::size_t NumLinks>
     T InverseKinematics<T, NumLinks>::PositionError(const LinkArray& links, const JointVector& q, const Vector3& target) const
     {
-        const auto positions = fk.Compute(links, q);
-        return math::VectorNorm(Vector3{ target - positions[NumLinks] });
+        return math::VectorNorm(Vector3{ target - kinematics.ToolPose(links, q).translation });
     }
 
 #ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD

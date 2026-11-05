@@ -93,15 +93,17 @@ The library already has the core of manipulator **modelling**: forward/inverse d
 ([RNEA](robotics/dynamics/RecursiveNewtonEuler.hpp), [ABA](robotics/dynamics/ArticulatedBodyAlgorithm.hpp),
 [Euler-Lagrange](robotics/dynamics/EulerLagrangeSolver.hpp)), the joint-space mass matrix
 ([CRBA](robotics/dynamics/CompositeRigidBodyAlgorithm.hpp)), a fixed-step simulation step
-([ForwardDynamicsIntegrator](robotics/dynamics/ForwardDynamicsIntegrator.hpp)), position forward kinematics with base and
-tool offsets, and damped-least-squares [IK](robotics/kinematics/InverseKinematics.hpp). What is missing is
-the **full-pose kinematics, model plumbing, planning and control layer** that turns those models into a
-usable manipulator stack. Two current limitations gate many items below:
+([ForwardDynamicsIntegrator](robotics/dynamics/ForwardDynamicsIntegrator.hpp)), the manipulator-equation adapter
+([ChainDynamicsModel](robotics/dynamics/ChainDynamicsModel.hpp)), position forward kinematics with base and
+tool offsets, and damped-least-squares [IK](robotics/kinematics/InverseKinematics.hpp). Full-pose
+kinematics and the geometric Jacobian have shipped (see the note below); what is missing is the
+**planning and control layer** that turns those models into a usable manipulator stack.
 
-> **Position-only, revolute-only.** [ForwardKinematics.hpp](robotics/kinematics/ForwardKinematics.hpp)
-> returns joint and tool *positions* (a 3×N Jacobian lives privately inside IK), and only
-> [RevoluteJointLink](robotics/dynamics/RevoluteJointLink.hpp) exists. Items **M1** (prismatic joints,
-> limits, armature), **M30** (full-pose kinematics) and **M8** (6×N Jacobian) lift these limits.
+> **Full-pose kinematics shipped.** Links are generic ([JointLink](robotics/dynamics/JointLink.hpp):
+> revolute or prismatic, limits, armature); [ChainPoseKinematics](robotics/kinematics/ChainPoseKinematics.hpp)
+> and [DenavitHartenberg](robotics/kinematics/DenavitHartenberg.hpp) produce a frame chain, and
+> [GeometricJacobian](robotics/kinematics/GeometricJacobian.hpp) builds the 6×N Jacobian from it behind
+> the [JacobianProvider](robotics/kinematics/JacobianProvider.hpp) seam.
 
 **Conventions (normative for every item):** 6-vectors are ordered linear part first — twists `(v; ω)`,
 wrenches `(f; n)` — as defined by upstream `math::SE3Transform` (**NT53**); the geometric Jacobian
@@ -117,12 +119,7 @@ existing `dynamics/` convention.
 
 | #   | Component                                                       | Target module             | Depends on     | Difficulty |
 |-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
-| M1  | Generic joint link (prismatic, limits, armature)                | `dynamics` + `kinematics` | —              | ★☆☆☆☆      |
 | M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —              | ★☆☆☆☆      |
-| M29 | Chain dynamics model (link chain → M, C, g, inverse dynamics)   | `dynamics`                | M28            | ★★☆☆☆      |
-| M30 | Chain pose kinematics (full-pose FK, frame chain)               | `kinematics`              | NT53           | ★★☆☆☆      |
-| M7  | Denavit-Hartenberg parameters (standard + modified)             | `kinematics`              | NT53, M30      | ★★☆☆☆      |
-| M8  | Geometric Jacobian (6×N), bias term, Jacobian provider          | `kinematics`              | NT53, M30      | ★★☆☆☆      |
 | M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | NT53, NT55     | ★★☆☆☆      |
 | M11 | Manipulability ellipsoid / Yoshikawa index                      | `kinematics`              | M8             | ★★☆☆☆      |
 | M14 | Redundancy resolution / null-space projection                   | `kinematics`              | M8, NT62       | ★★☆☆☆      |
@@ -149,25 +146,10 @@ retired here.
 
 ### Tier 1 — Trivial ★☆☆☆☆
 
-**M1. Generic joint link.** Evolve `RevoluteJointLink` (compatibly, via trailing defaulted fields) into a link with a joint type (revolute/prismatic), joint limits and armature, and add the prismatic branches to FK, RNEA, ABA, CRBA and the Jacobian.
-- *Algorithm / paper:* J. J. Craig, *Introduction to Robotics: Mechanics and Control*, 4th ed., Ch. 3 and 6; Featherstone (2008), Ch. 4.
-
 **M32. Inverse dynamics with an external tool wrench.** RNEA overload taking the environment's wrench on the tool; satisfies `τ(w) − τ(0) = −Jᵀw`.
 - *Algorithm / paper:* Luh, Walker, Paul (1980).
 
 ### Tier 2 — Easy ★★☆☆☆
-
-**M29. Chain dynamics model.** Adapter implementing `EulerLagrangeDynamics` (M via CRBA, `Cq̇` and `g` via RNEA) and a one-call `InverseDynamicsModel` for the controllers.
-- *Reuses / builds on:* RNEA, M28; optional friction model from NT57.
-
-**M30. Chain pose kinematics.** Full tool pose and a model-independent frame chain (joint origins/axes in the base frame) for the link model.
-- *Algorithm / paper:* Siciliano et al. (2009), Ch. 2.
-
-**M7. Denavit-Hartenberg parameters.** Standard and modified `(a, α, d, θ)` descriptions with joint offsets, producing the M30 frame chain.
-- *Algorithm / paper:* Craig, *Introduction to Robotics*, Ch. 3.
-
-**M8. Geometric Jacobian (6×N).** Jacobian and `J̇q̇` from any frame chain, statics `τ = Jᵀw`, and the `JacobianProvider` seam used by IK and the task-space controllers; replaces IK's private 3×N Jacobian.
-- *Algorithm / paper:* Siciliano et al. (2009), Ch. 3; Lynch & Park (2017), Ch. 5.
 
 **M10. Cartesian path + orientation interpolation.** Straight-line position with SLERP orientation, one shared time law, twist feed-forward.
 - *Algorithm / paper:* Lynch & Park, Ch. 9; K. Shoemake, *SIGGRAPH* 1985.

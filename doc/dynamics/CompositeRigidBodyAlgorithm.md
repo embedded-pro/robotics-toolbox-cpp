@@ -49,6 +49,10 @@ $$f \leftarrow R_j f, \qquad n \leftarrow R_j n + r_j \times f$$
 
 projected on each ancestor axis gives $M_{ji} = M_{ij} = \hat{z}_j^T n$ for $j < i$. Each column costs one projection per ancestor, which gives the triangular operation count.
 
+### Prismatic Joints and Armature
+
+For a prismatic joint the unit motion is $(0; \hat{z}_i)$, so the column wrench is $I^c_i (0; \hat{z}_i)$ and each projection uses the force part. With the motion subspace $S_j$ both cases read $M_{ji} = S_j^T (n; f)$. Transforms use the joint offsets at the current displacements. Reflected actuator inertia $J_{a,i} = k_r^2 I_{\text{rotor}}$ adds to the diagonal entry $M_{ii}$ only.
+
 ### Properties
 
 - $M$ is symmetric, and positive definite whenever every composite body has non-zero inertia about its joint axis.
@@ -86,8 +90,6 @@ These are the textbook closed-form entries of the planar two-link arm.
 
 ## Variants & Generalizations
 
-- **Armature and rotor inertia**: add $k_r^2 I_{\text{rotor}}$ to each diagonal entry.
-- **Prismatic joints**: the unit motion is $(0; \hat{z}_i)$, so the column wrench becomes $I^c_i (0; \hat{z}_i)$ and the projection uses the force part.
 - **Floating base**: the base becomes a 6-DOF joint and $M$ gains a $6 \times 6$ block and coupling rows (Featherstone, Ch. 9).
 - **Branched trees**: the ancestor loop follows the parent array instead of $j - 1$. Sparsity can then be exploited in the factorization.
 - **Column-by-column RNEA**: $M e_j = \mathrm{ID}(q, 0, e_j)$ with gravity off. Simpler to derive and useful as a test oracle, but $n$ times the cost of one inverse-dynamics pass.

@@ -7,7 +7,7 @@
 #include "numerical/solvers/SecondOrderSystem.hpp"
 #include "numerical/solvers/SymplecticIntegrators.hpp"
 #include "robotics/dynamics/ArticulatedBodyAlgorithm.hpp"
-#include "robotics/dynamics/RevoluteJointLink.hpp"
+#include "robotics/dynamics/JointLink.hpp"
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -42,7 +42,7 @@ namespace dynamics
         using Vector3 = math::Vector<T, 3>;
         using JointVector = math::Vector<T, NumLinks>;
         using StateVector = math::Vector<T, 2 * NumLinks>;
-        using LinkArray = std::array<RevoluteJointLink<T>, NumLinks>;
+        using LinkArray = std::array<JointLink<T>, NumLinks>;
 
         ChainAccelerationSystem(const LinkArray& links, const Vector3& gravity);
 
@@ -63,7 +63,7 @@ namespace dynamics
     public:
         using Vector3 = math::Vector<T, 3>;
         using JointVector = math::Vector<T, NumLinks>;
-        using LinkArray = std::array<RevoluteJointLink<T>, NumLinks>;
+        using LinkArray = std::array<JointLink<T>, NumLinks>;
         using State = ChainState<T, NumLinks>;
 
         ForwardDynamicsIntegrator(const LinkArray& links, const Vector3& gravity, T dt);

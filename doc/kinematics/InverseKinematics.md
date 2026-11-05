@@ -115,7 +115,8 @@ After 7 iterations the error drops below $10^{-4}$ and $p_{\text{ee}} \approx (0
 
 ## Connections to Other Algorithms
 
-- [Forward Kinematics](ForwardKinematics.md): Called internally every iteration to compute current end-effector position and joint positions for the Jacobian.
+- [Chain Pose Kinematics](ChainPoseKinematics.md): Called internally every iteration to compute the current tool position and the joint origins and axes.
+- [Geometric Jacobian](GeometricJacobian.md): Its position rows are the $3 \times n$ Jacobian of the damped-least-squares step; prismatic joints contribute their axis as the column.
 - Gaussian elimination ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)): Solves the $3 \times 3$ DLS system $Ay = e$ at the core of each iteration.
 - 3D geometry primitives (cross product, axis–angle rotation, vector norm) from numerical-toolbox-cpp build the Jacobian columns, the accumulated rotations and the convergence test.
 
