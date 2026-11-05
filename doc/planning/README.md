@@ -7,3 +7,4 @@ Geometric queries and planners for collision-free robot motion.
 | Algorithm                                          | Description                                                                                                             |
 |----------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
 | [Primitive Distance Queries](PrimitiveDistance.md) | Closed-form closest points and signed distances between points, segments, spheres, capsules and oriented boxes — $O(1)$ |
+| [Artificial Potential Fields](PotentialField.md)   | Quadratic-then-conic attraction plus Khatib repulsion as a clamped velocity, with local-minimum detection — $O(M)$      |

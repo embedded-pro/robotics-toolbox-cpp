@@ -5,6 +5,7 @@ emil_add_test(robotics.dynamics_test)
 target_link_libraries(robotics.dynamics_test PUBLIC
     gmock_main
     robotics.dynamics
+    robotics.kinematics
 )
 
 target_sources(robotics.dynamics_test PRIVATE

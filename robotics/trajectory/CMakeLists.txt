@@ -8,14 +8,17 @@ target_include_directories(robotics.trajectory ${ROBOTICS_VISIBILITY}
 target_link_libraries(robotics.trajectory ${ROBOTICS_VISIBILITY}
     infra.util
     numerical.math
+    numerical.motion_profiles
 )
 
 target_sources(robotics.trajectory PRIVATE
+    CartesianSlerpInterpolation.hpp
     CubicSplineTrajectory.hpp
     TrajectoryTypes.hpp
 )
 
 robotics_add_coverage_sources(robotics.trajectory
+    CartesianSlerpInterpolation.cpp
     CubicSplineTrajectory.cpp
 )
 

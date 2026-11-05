@@ -20,6 +20,8 @@ target_sources(robotics.kinematics PRIVATE
     GeometricJacobian.hpp
     InverseKinematics.hpp
     JacobianProvider.hpp
+    ManipulabilityIndex.hpp
+    RedundancyResolution.hpp
 )
 
 robotics_add_coverage_sources(robotics.kinematics
@@ -28,6 +30,9 @@ robotics_add_coverage_sources(robotics.kinematics
     ForwardKinematics.cpp
     GeometricJacobian.cpp
     InverseKinematics.cpp
+    ManipulabilityIndex.cpp
+    RedundancyResolution.cpp
 )
 
 add_subdirectory(test)
+add_subdirectory(test_doubles)

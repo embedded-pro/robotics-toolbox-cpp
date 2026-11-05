@@ -5,6 +5,7 @@ emil_add_test(robotics.kinematics_test)
 target_link_libraries(robotics.kinematics_test PUBLIC
     gmock_main
     robotics.kinematics
+    robotics.kinematics_test_doubles
 )
 
 target_sources(robotics.kinematics_test PRIVATE
@@ -13,4 +14,6 @@ target_sources(robotics.kinematics_test PRIVATE
     TestForwardKinematics.cpp
     TestGeometricJacobian.cpp
     TestInverseKinematics.cpp
+    TestManipulabilityIndex.cpp
+    TestRedundancyResolution.cpp
 )

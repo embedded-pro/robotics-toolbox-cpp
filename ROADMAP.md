@@ -119,11 +119,6 @@ existing `dynamics/` convention.
 
 | #   | Component                                                       | Target module             | Depends on     | Difficulty |
 |-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
-| M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —              | ★☆☆☆☆      |
-| M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | NT53, NT55     | ★★☆☆☆      |
-| M11 | Manipulability ellipsoid / Yoshikawa index                      | `kinematics`              | M8             | ★★☆☆☆      |
-| M14 | Redundancy resolution / null-space projection                   | `kinematics`              | M8, NT62       | ★★☆☆☆      |
-| M12 | Computed-torque (inverse-dynamics) control                      | `controllers/manipulator` | M29            | ★★★☆☆      |
 | M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, NT64, M8 | ★★★☆☆      |
 | M15 | Product-of-Exponentials forward kinematics                      | `kinematics`              | NT53           | ★★★☆☆      |
 | M16 | Momentum-based collision-detection observer                     | `dynamics`                | M29, M31       | ★★★☆☆      |
@@ -144,28 +139,9 @@ M2 (polynomial profile), M3 (trapezoidal profile), M4 (friction compensation), M
 (S-curve profile) moved to numerical-toolbox as NT55, NT56, NT57, NT53 and NT60; their numbers are
 retired here.
 
-### Tier 1 — Trivial ★☆☆☆☆
-
-**M32. Inverse dynamics with an external tool wrench.** RNEA overload taking the environment's wrench on the tool; satisfies `τ(w) − τ(0) = −Jᵀw`.
-- *Algorithm / paper:* Luh, Walker, Paul (1980).
-
 ### Tier 2 — Easy ★★☆☆☆
 
-**M10. Cartesian path + orientation interpolation.** Straight-line position with SLERP orientation, one shared time law, twist feed-forward.
-- *Algorithm / paper:* Lynch & Park, Ch. 9; K. Shoemake, *SIGGRAPH* 1985.
-- *Reuses / builds on:* NT53 poses; any upstream motion profile (NT55, NT56, NT60) as the time law.
-
-**M11. Manipulability ellipsoid / Yoshikawa index.** `√det(JJᵀ)` (or `√det(JᵀJ)` when the task has more rows than joints), condition number and ellipsoid axes via SVD, translational and rotational parts separately.
-- *Algorithm / paper:* T. Yoshikawa, *Int. J. Robotics Research*, 4(2), 1985.
-
-**M14. Redundancy resolution / null-space projection.** `q̇ = J⁺_λ ẋ + (I − J⁺J)·q̇₀` with an exact (undamped, rank-thresholded) projector, bound to the arm's task Jacobian.
-- *Algorithm / paper:* A. Liégeois, *IEEE Trans. SMC*, 7(12), 1977.
-- *Reuses / builds on:* upstream `solvers::DampedPseudoInverse` (NT62).
-
 ### Tier 3 — Moderate ★★★☆☆
-
-**M12. Computed-torque (inverse-dynamics) control.** `τ = ID(q, q̇, q̈_d + Kd·ė + Kp·e)` in one `O(n)` call, yielding decoupled error dynamics.
-- *Algorithm / paper:* Spong et al., *Robot Modeling and Control*, Ch. 8; Luh, Walker, Paul (1980).
 
 **M13. Full 6-DOF pose IK.** Damped least squares on the SE(3) log-map error with position/rotation weighting, adaptive damping, step and joint-limit clamping.
 - *Algorithm / paper:* S. R. Buss (2004); Nakamura & Hanafusa (1986); Chiaverini (1997).
@@ -427,15 +403,10 @@ Cross-family building blocks that several of the families below depend on.
 
 | #  | Component                                                | Target module | Depends on | Difficulty |
 |----|----------------------------------------------------------|---------------|------------|------------|
-| P2 | Artificial potential fields                              | `planning`    | P1         | ★★☆☆☆      |
 | P3 | A* / Dijkstra on bounded occupancy grids                 | `planning`    | —          | ★★★☆☆      |
 | P4 | Self-collision checking for a link chain (capsule model) | `planning`    | P1, M30    | ★★★☆☆      |
 | P5 | GJK + EPA convex distance and penetration                | `planning`    | —          | ★★★★☆      |
 | P6 | RRT-Connect in joint space with a fixed node pool        | `planning`    | P4         | ★★★★☆      |
-
-**P2. Potential fields.** Quadratic-then-conic attraction and Khatib repulsion from obstacle proximity readings as a clamped task-space velocity; local minima are detected and reported.
-- *Algorithm / paper:* O. Khatib, *IJRR*, 5(1), 1986.
-- *Reuses / builds on:* P1.
 
 **P3. Grid search.** A* and Dijkstra on 2-D/3-D grids with per-cell costs from a callable, an indexed binary heap with decrease-key, 16-bit indices on small grids and the octile heuristic (no heap allocation).
 - *Algorithm / paper:* P. Hart, N. Nilsson, B. Raphael, *IEEE Trans. Systems Science and Cybernetics*, 4(2), 1968.

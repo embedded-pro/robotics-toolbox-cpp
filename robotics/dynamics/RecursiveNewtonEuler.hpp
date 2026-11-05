@@ -6,9 +6,20 @@
 #include "robotics/dynamics/JointLink.hpp"
 #include <array>
 #include <cassert>
+#include <type_traits>
 
 namespace dynamics
 {
+    template<typename T>
+    struct ToolWrench
+    {
+        static_assert(std::is_floating_point_v<T>, "ToolWrench supports floating-point types");
+
+        math::Vector<T, 3> force{};
+        math::Vector<T, 3> moment{};
+        math::Vector<T, 3> toolOffset{};
+    };
+
     template<typename T, std::size_t NumLinks>
     class RecursiveNewtonEuler
     {
@@ -27,6 +38,10 @@ namespace dynamics
         OPTIMIZE_FOR_SPEED JointVector InverseDynamics(const LinkArray& links,
             const JointVector& q, const JointVector& qDot, const JointVector& qDDot,
             const Vector3& gravity) const;
+
+        OPTIMIZE_FOR_SPEED JointVector InverseDynamics(const LinkArray& links,
+            const JointVector& q, const JointVector& qDot, const JointVector& qDDot,
+            const Vector3& gravity, const ToolWrench<T>& wrench) const;
 
     private:
         struct LinkState
@@ -58,7 +73,7 @@ namespace dynamics
 
         static JointVector ComputeBackwardPass(
             const LinkArray& links, const std::array<LinkState, NumLinks>& states,
-            const JointVector& qDDot);
+            const JointVector& qDDot, const Vector3& tipForce, const Vector3& tipTorque);
     };
 
     template<typename T, std::size_t NumLinks>
@@ -132,7 +147,7 @@ namespace dynamics
     typename RecursiveNewtonEuler<T, NumLinks>::JointVector
     RecursiveNewtonEuler<T, NumLinks>::ComputeBackwardPass(
         const LinkArray& links, const std::array<LinkState, NumLinks>& states,
-        const JointVector& qDDot)
+        const JointVector& qDDot, const Vector3& tipForce, const Vector3& tipTorque)
     {
         std::array<Vector3, NumLinks> force;
         std::array<Vector3, NumLinks> torque;
@@ -146,6 +161,11 @@ namespace dynamics
             if (i + 1 < NumLinks)
                 AccumulateChildWrench(force[i], torque[i], force[i + 1], torque[i + 1],
                     states[i + 1].R, states[i + 1].offset);
+            else
+            {
+                force[i] = force[i] - tipForce;
+                torque[i] = torque[i] - tipTorque;
+            }
         }
 
         JointVector tau{};
@@ -163,7 +183,25 @@ namespace dynamics
             const Vector3& gravity) const
     {
         auto states = ComputeForwardPass(links, q, qDot, qDDot, gravity);
-        return ComputeBackwardPass(links, states, qDDot);
+        return ComputeBackwardPass(links, states, qDDot, Vector3{}, Vector3{});
+    }
+
+    template<typename T, std::size_t NumLinks>
+    OPTIMIZE_FOR_SPEED
+        typename RecursiveNewtonEuler<T, NumLinks>::JointVector
+        RecursiveNewtonEuler<T, NumLinks>::InverseDynamics(const LinkArray& links,
+            const JointVector& q, const JointVector& qDot, const JointVector& qDDot,
+            const Vector3& gravity, const ToolWrench<T>& wrench) const
+    {
+        auto states = ComputeForwardPass(links, q, qDot, qDDot, gravity);
+
+        Matrix3 baseFromLast{ Matrix3::Identity() };
+        for (const auto& state : states)
+            baseFromLast = baseFromLast * state.R;
+
+        const Vector3 tipForce{ baseFromLast.Transpose() * wrench.force };
+        const Vector3 tipTorque{ baseFromLast.Transpose() * wrench.moment + math::CrossProduct(wrench.toolOffset, tipForce) };
+        return ComputeBackwardPass(links, states, qDDot, tipForce, tipTorque);
     }
 
 #ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD

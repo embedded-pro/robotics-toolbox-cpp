@@ -23,7 +23,7 @@ All pseudocode respects the library constraints: **no heap**, bounded containers
 (no `Q15`/`Q31`). The generic signature keeps a future fixed-point specialisation cheap to add.
 
 The canonical worked example is
-[controllers/manipulator/ComputedTorqueControl](controllers/manipulator/ComputedTorqueControl/implementation.md).
+[controllers/manipulator/ImpedanceControl](controllers/manipulator/ImpedanceControl/implementation.md).
 
 Conventions shared by every spec: 6-vectors are ordered linear part first — twists `(v; ω)`, wrenches
 `(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md) (NT53), and planar
@@ -89,22 +89,22 @@ prerequisites.
 ## Index
 
 ### `kinematics`
-`ManipulabilityIndex` (M11) · `PoseInverseKinematics` (M13) · `RedundancyResolution` (M14) · `ProductOfExponentials` (M15) · `AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26)
+`PoseInverseKinematics` (M13) · `ProductOfExponentials` (M15) · `AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26)
 
 ### `dynamics`
-`MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CoriolisMatrixAndRegressor` (M31) · `RneaExternalWrench` (M32)
+`MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CoriolisMatrixAndRegressor` (M31)
 
 ### `trajectory`
-`CartesianSlerpInterpolation` (M10) · `TimeOptimalPathParameterization` (M27)
+`TimeOptimalPathParameterization` (M27)
 
 ### `mobile`
 `PlanarOdometry` (F1) · `DifferentialDrive` (W1) · `CarLikeKinematics` (W2) · `OmnidirectionalKinematics` (W3) · `SkidSteerKinematics` (W4) · `PurePursuit` (W5) · `StanleyController` (W6) · `KanayamaController` (W7)
 
 ### `planning`
-`PotentialField` (P2) · `GridSearch` (P3) · `SelfCollision` (P4) · `ConvexCollision` (P5) · `RrtConnect` (P6) · `DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
+`GridSearch` (P3) · `SelfCollision` (P4) · `ConvexCollision` (P5) · `RrtConnect` (P6) · `DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
 
 ### `localization`
 `OdometryFusion` (E1) · `OccupancyGridMap` (E2) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
 
 ### `controllers/manipulator`
-`ComputedTorqueControl` (M12) · `ImpedanceControl` (M17) · `OperationalSpaceControl` (M18) · `HybridPositionForceControl` (M19) · `SlotineLiAdaptiveControl` (M20) · `CableTensionDistribution` (M25)
+`ImpedanceControl` (M17) · `OperationalSpaceControl` (M18) · `HybridPositionForceControl` (M19) · `SlotineLiAdaptiveControl` (M20) · `CableTensionDistribution` (M25)

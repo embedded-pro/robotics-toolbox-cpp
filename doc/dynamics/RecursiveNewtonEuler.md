@@ -67,6 +67,14 @@ $$a_{J_i} = R_i^T \left( a_{J_{i-1}} + \dot{\omega}_{i-1} \times r^{(i)} + \omeg
 
 The joint effort projects the force instead of the moment, $\tau_{q_i} = \hat{z}_i^T f_i$. With the motion subspace $(s_\omega; s_v)$ both cases read $\tau_{q_i} = s_\omega^T \tau_i + s_v^T f_i$. Reflected actuator inertia (armature) adds $J_{a,i}\ddot{q}_i$ to each joint effort.
 
+### External Tool Wrench
+
+When the environment pushes on the tool with a wrench $(f_e; n_e)$ (base frame, moment about the tool point), with the tool point $t$ given in the last link frame,, the last link receives that wrench in addition to its inertial load. Rotated into the last link frame and moved to its joint origin:
+
+$$f_e' = {}^{0}R_{n-1}^T f_e, \qquad n_e' = {}^{0}R_{n-1}^T n_e + t \times f_e'$$
+
+The backward pass starts from $f_{n-1} - f_e'$ and $\tau_{n-1} - n_e'$: the environment carries part of the load, so the joints need less. The result satisfies $\tau(w) - \tau(0) = -J^T w$ with the geometric Jacobian at the tool point. A held payload of mass $m_p$ is the wrench $(m_p g; 0)$, with $g$ the gravity vector.
+
 ### Rodrigues' Rotation Formula
 
 The rotation matrix for angle $\theta$ about unit axis $\hat{u} = [u_x, u_y, u_z]^T$:

@@ -2,6 +2,8 @@
 #include "robotics/dynamics/EulerLagrangeDynamics.hpp"
 #include "robotics/dynamics/EulerLagrangeSolver.hpp"
 #include "robotics/dynamics/RecursiveNewtonEuler.hpp"
+#include "robotics/kinematics/ChainPoseKinematics.hpp"
+#include "robotics/kinematics/GeometricJacobian.hpp"
 #include <cmath>
 #include <gtest/gtest.h>
 
@@ -86,6 +88,7 @@ namespace
     protected:
         dynamics::RecursiveNewtonEuler<float, 1> rnea1;
         dynamics::RecursiveNewtonEuler<float, 2> rnea2;
+        dynamics::RecursiveNewtonEuler<float, 3> rnea3;
     };
 }
 
@@ -191,4 +194,83 @@ TEST_F(TestRecursiveNewtonEuler, prismatic_coriolis_term_on_rotating_base)
 
     EXPECT_NEAR(tau.at(0, 0), 2.0f * mass * radius * extensionRate * spinRate + mass * radius * radius * spinAcceleration, math::Tolerance<float>());
     EXPECT_NEAR(tau.at(1, 0), mass * (extensionAcceleration - radius * spinRate * spinRate), math::Tolerance<float>());
+}
+
+namespace
+{
+    const Vector3 toolOffset{ 0.3f, 0.05f, 0.0f };
+
+    Vector3 Normalized(float x, float y, float z)
+    {
+        const float norm{ std::sqrt(x * x + y * y + z * z) };
+        return Vector3{ x / norm, y / norm, z / norm };
+    }
+
+    std::array<Link, 3> SkewedChain()
+    {
+        const math::SquareMatrix<float, 3> inertia{ { 0.05f, 0.01f, -0.005f }, { 0.01f, 0.04f, 0.008f }, { -0.005f, 0.008f, 0.03f } };
+        return std::array<Link, 3>{
+            Link{ 1.4f, inertia, Normalized(0.0f, 0.2f, 1.0f), Vector3{ 0.0f, 0.0f, 0.1f }, Vector3{ 0.02f, -0.01f, 0.15f } },
+            Link{ 0.9f, inertia * 0.8f, Normalized(0.1f, 1.0f, 0.0f), Vector3{ 0.05f, 0.0f, 0.3f }, Vector3{ 0.2f, 0.03f, -0.02f } },
+            Link{ 0.5f, inertia * 0.5f, Normalized(1.0f, 0.3f, -0.4f), Vector3{ 0.4f, -0.05f, 0.02f }, Vector3{ 0.1f, 0.02f, 0.03f } }
+        };
+    }
+}
+
+TEST_F(TestRecursiveNewtonEuler, zero_wrench_matches_shipped_overload)
+{
+    const auto chain{ SkewedChain() };
+    const math::Vector<float, 3> q{ 0.4f, -0.7f, 1.1f };
+    const math::Vector<float, 3> qDot{ 0.9f, -1.3f, 0.6f };
+    const math::Vector<float, 3> qDDot{ 1.5f, -2.0f, 0.7f };
+
+    const auto withWrench{ rnea3.InverseDynamics(chain, q, qDot, qDDot, gravityVector, dynamics::ToolWrench<float>{ Vector3{}, Vector3{}, toolOffset }) };
+    const auto shipped{ rnea3.InverseDynamics(chain, q, qDot, qDDot, gravityVector) };
+
+    for (std::size_t i = 0; i < 3; ++i)
+        EXPECT_NEAR(withWrench.at(i, 0), shipped.at(i, 0), math::Tolerance<float>());
+}
+
+TEST_F(TestRecursiveNewtonEuler, wrench_enters_as_minus_jacobian_transpose)
+{
+    const auto chain{ SkewedChain() };
+    const math::Vector<float, 3> q{ 0.4f, -0.7f, 1.1f };
+    const math::Vector<float, 3> qDot{ 0.9f, -1.3f, 0.6f };
+    const math::Vector<float, 3> qDDot{ 1.5f, -2.0f, 0.7f };
+    const dynamics::ToolWrench<float> wrench{ Vector3{ 1.0f, -2.0f, 0.5f }, Vector3{ 0.1f, 0.0f, -0.2f }, toolOffset };
+    const kinematics::ChainPoseKinematics<float, 3> kinematics{ math::SE3Transform<float>{ math::SquareMatrix<float, 3>::Identity(), toolOffset } };
+    math::Vector6<float> stacked{};
+    stacked.SetBlock(wrench.force, 0, 0);
+    stacked.SetBlock(wrench.moment, 3, 0);
+
+    const auto loaded{ rnea3.InverseDynamics(chain, q, qDot, qDDot, gravityVector, wrench) };
+    const auto free{ rnea3.InverseDynamics(chain, q, qDot, qDDot, gravityVector) };
+
+    using Jacobian = kinematics::GeometricJacobian<float, 3>;
+    const auto expected{ Jacobian::JointTorques(Jacobian::Compute(kinematics.Compute(chain, q)), stacked) };
+    for (std::size_t i = 0; i < 3; ++i)
+        EXPECT_NEAR(loaded.at(i, 0) - free.at(i, 0), -expected.at(i, 0), math::Tolerance<float>());
+}
+
+TEST_F(TestRecursiveNewtonEuler, horizontal_link_holding_a_payload)
+{
+    const float mass{ 1.0f };
+    const float length{ 1.0f };
+    const float payload{ 0.5f };
+    std::array<Link, 1> links{ MakeRod(mass, length, yAxis, Vector3{}) };
+    const dynamics::ToolWrench<float> wrench{ Vector3{ 0.0f, 0.0f, -payload * gravity }, Vector3{}, Vector3{ length, 0.0f, 0.0f } };
+
+    auto tau = rnea1.InverseDynamics(links, math::Vector<float, 1>{ 0.0f }, math::Vector<float, 1>{}, math::Vector<float, 1>{}, gravityVector, wrench);
+
+    EXPECT_NEAR(tau.at(0, 0), -(mass * length / 2.0f + payload * length) * gravity, math::Tolerance<float>());
+}
+
+TEST_F(TestRecursiveNewtonEuler, pure_moment_projects_on_the_axis)
+{
+    std::array<Link, 1> links{ MakeRod(1.0f, 1.0f, zAxis, Vector3{}) };
+    const dynamics::ToolWrench<float> wrench{ Vector3{}, Vector3{ 0.0f, 0.0f, 2.0f }, Vector3{ 1.0f, 0.0f, 0.0f } };
+
+    auto tau = rnea1.InverseDynamics(links, math::Vector<float, 1>{ 0.6f }, math::Vector<float, 1>{}, math::Vector<float, 1>{}, gravityVector, wrench);
+
+    EXPECT_NEAR(tau.at(0, 0), -2.0f, math::Tolerance<float>());
 }
