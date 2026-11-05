@@ -92,7 +92,8 @@ docs; the current pin (`63c9b91`) includes them.
 The library already has the core of manipulator **modelling**: forward/inverse dynamics
 ([RNEA](robotics/dynamics/RecursiveNewtonEuler.hpp), [ABA](robotics/dynamics/ArticulatedBodyAlgorithm.hpp),
 [Euler-Lagrange](robotics/dynamics/EulerLagrangeSolver.hpp)), the joint-space mass matrix
-([CRBA](robotics/dynamics/CompositeRigidBodyAlgorithm.hpp)), position forward kinematics with base and
+([CRBA](robotics/dynamics/CompositeRigidBodyAlgorithm.hpp)), a fixed-step simulation step
+([ForwardDynamicsIntegrator](robotics/dynamics/ForwardDynamicsIntegrator.hpp)), position forward kinematics with base and
 tool offsets, and damped-least-squares [IK](robotics/kinematics/InverseKinematics.hpp). What is missing is
 the **full-pose kinematics, model plumbing, planning and control layer** that turns those models into a
 usable manipulator stack. Two current limitations gate many items below:
@@ -125,7 +126,6 @@ existing `dynamics/` convention.
 | M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | NT53, NT55     | ★★☆☆☆      |
 | M11 | Manipulability ellipsoid / Yoshikawa index                      | `kinematics`              | M8             | ★★☆☆☆      |
 | M14 | Redundancy resolution / null-space projection                   | `kinematics`              | M8, NT62       | ★★☆☆☆      |
-| M34 | Forward-dynamics integrator (simulation step)                   | `dynamics`                | NT58           | ★★☆☆☆      |
 | M12 | Computed-torque (inverse-dynamics) control                      | `controllers/manipulator` | M29            | ★★★☆☆      |
 | M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, NT64, M8 | ★★★☆☆      |
 | M15 | Product-of-Exponentials forward kinematics                      | `kinematics`              | NT53           | ★★★☆☆      |
@@ -179,10 +179,6 @@ retired here.
 **M14. Redundancy resolution / null-space projection.** `q̇ = J⁺_λ ẋ + (I − J⁺J)·q̇₀` with an exact (undamped, rank-thresholded) projector, bound to the arm's task Jacobian.
 - *Algorithm / paper:* A. Liégeois, *IEEE Trans. SMC*, 7(12), 1977.
 - *Reuses / builds on:* upstream `solvers::DampedPseudoInverse` (NT62).
-
-**M34. Forward-dynamics integrator.** Fixed-step semi-implicit Euler / RK4 simulation step on ABA for model-in-the-loop tests.
-- *Algorithm / paper:* Hairer, Lubich, Wanner (2006); Featherstone (2008), Ch. 7.
-- *Reuses / builds on:* upstream `solvers::SemiImplicitEuler` (NT58) and `solvers::RungeKutta4`.
 
 ### Tier 3 — Moderate ★★★☆☆
 
