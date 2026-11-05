@@ -174,17 +174,12 @@ Cross-family building blocks that several of the families below depend on.
 
 | #   | Component                                           | Target module | Depends on | Difficulty |
 |-----|-----------------------------------------------------|---------------|------------|------------|
-| W4  | Skid-steer kinematics with slip (ICR model)         | `mobile`      | W1         | ★★☆☆☆      |
 | W5  | Pure-pursuit path tracking (+ planar polyline path) | `mobile`      | W1, NT66   | ★★☆☆☆      |
 | W6  | Stanley path tracking                               | `mobile`      | W2, W5     | ★★☆☆☆      |
 | W7  | Kanayama Lyapunov trajectory tracking               | `mobile`      | W1, NT66   | ★★☆☆☆      |
 | W8  | Dubins shortest paths (+ car path type)             | `planning`    | NT66       | ★★☆☆☆      |
 | W9  | Dynamic window approach (local obstacle avoidance)  | `planning`    | W1, NT66   | ★★★☆☆      |
 | W10 | Reeds–Shepp shortest paths (forward and reverse)    | `planning`    | W8, NT54   | ★★★☆☆      |
-
-**W4. Skid-steer kinematics.** Instantaneous-centre-of-rotation model with identified ICR offsets for tracked and skid-steered vehicles.
-- *Algorithm / paper:* J. L. Martínez, A. Mandow, J. Morales, S. Pedraza, A. García-Cerezo, *IJRR*, 24(10), 2005.
-- *Reuses / builds on:* W1.
 
 **W5. Pure pursuit.** Curvature command towards a look-ahead point on the path, with speed-scheduled look-ahead distance and monotone progress; defines the bounded polyline `PlanarPath` that W6 and the planners share.
 - *Algorithm / paper:* R. C. Coulter, "Implementation of the pure pursuit path tracking algorithm," CMU-RI-TR-92-01, 1992.

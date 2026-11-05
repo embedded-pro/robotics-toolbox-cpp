@@ -15,6 +15,7 @@ target_sources(robotics.mobile PRIVATE
     DifferentialDrive.hpp
     OmnidirectionalKinematics.hpp
     PlanarOdometry.hpp
+    SkidSteerKinematics.hpp
 )
 
 robotics_add_coverage_sources(robotics.mobile
@@ -22,6 +23,7 @@ robotics_add_coverage_sources(robotics.mobile
     DifferentialDrive.cpp
     OmnidirectionalKinematics.cpp
     PlanarOdometry.cpp
+    SkidSteerKinematics.cpp
 )
 
 add_subdirectory(test)

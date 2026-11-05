@@ -12,4 +12,5 @@ target_sources(robotics.mobile_test PRIVATE
     TestDifferentialDrive.cpp
     TestOmnidirectionalKinematics.cpp
     TestPlanarOdometry.cpp
+    TestSkidSteerKinematics.cpp
 )

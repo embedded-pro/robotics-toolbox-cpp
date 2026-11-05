@@ -10,3 +10,4 @@ Kinematics, odometry and path tracking for ground vehicles moving in the plane.
 | [Differential-Drive Kinematics](DifferentialDrive.md)      | Two-wheel unicycle kinematics: forward and inverse maps, curvature-preserving wheel saturation and the speed envelope — $O(1)$           |
 | [Car-Like Kinematics](CarLikeKinematics.md)                | Kinematic bicycle twist at any reference point, steering for a curvature, angle and rate limits, and Ackermann wheel angles — $O(1)$     |
 | [Omnidirectional Kinematics](OmnidirectionalKinematics.md) | Swedish-wheel and mecanum Jacobian for any layout, least-squares forward kinematics, slip residual and uniform wheel saturation — $O(N)$ |
+| [Skid-Steer Kinematics](SkidSteerKinematics.md)            | ICR model for skid-steered and tracked vehicles with lateral slip, plus closed-form least-squares identification of the ICRs — $O(1)$    |
