@@ -117,16 +117,15 @@ existing `dynamics/` convention.
 
 ### Manipulator list (by priority)
 
-| #   | Component                                                       | Target module             | Depends on  | Difficulty |
-|-----|-----------------------------------------------------------------|---------------------------|-------------|------------|
-| M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29     | ★★★★☆      |
-| M19 | Hybrid position/force control                                   | `controllers/manipulator` | M8, M29     | ★★★★☆      |
-| M20 | Passivity-based adaptive control (Slotine-Li)                   | `controllers/manipulator` | M31         | ★★★★☆      |
-| M21 | Analytical IK for ortho-parallel 6R arms with a spherical wrist | `kinematics`              | NT53, NT54  | ★★★★☆      |
-| M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta)          | `kinematics`              | NT53, NT64  | ★★★★☆      |
-| M24 | Mobile-manipulator / nonholonomic-base kinematics               | `kinematics`              | M8, M14, W1 | ★★★★☆      |
-| M25 | Cable-driven tension distribution                               | `controllers/manipulator` | NT53, NT65  | ★★★★☆      |
-| M27 | Time-optimal path parameterization (TOPP-RA)                    | `trajectory` (new)        | M29         | ★★★★★      |
+| #   | Component                                              | Target module             | Depends on  | Difficulty |
+|-----|--------------------------------------------------------|---------------------------|-------------|------------|
+| M18 | Operational-space (task-space) control                 | `controllers/manipulator` | M8, M29     | ★★★★☆      |
+| M19 | Hybrid position/force control                          | `controllers/manipulator` | M8, M29     | ★★★★☆      |
+| M20 | Passivity-based adaptive control (Slotine-Li)          | `controllers/manipulator` | M31         | ★★★★☆      |
+| M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta) | `kinematics`              | NT53, NT64  | ★★★★☆      |
+| M24 | Mobile-manipulator / nonholonomic-base kinematics      | `kinematics`              | M8, M14, W1 | ★★★★☆      |
+| M25 | Cable-driven tension distribution                      | `controllers/manipulator` | NT53, NT65  | ★★★★☆      |
+| M27 | Time-optimal path parameterization (TOPP-RA)           | `trajectory` (new)        | M29         | ★★★★★      |
 
 M2 (polynomial profile), M3 (trapezoidal profile), M4 (friction compensation), M6 (SE(3)) and M9
 (S-curve profile) moved to numerical-toolbox as NT55, NT56, NT57, NT53 and NT60; their numbers are
@@ -146,10 +145,6 @@ retired here.
 
 **M20. Passivity-based adaptive control (Slotine-Li).** Tracks trajectories while estimating inertial parameters on-line through the regressor `Y(q,q̇,q̇r,q̈r)`.
 - *Algorithm / paper:* J.-J. Slotine, W. Li, *Int. J. Robotics Research*, 6(3), 1987.
-
-**M21. Analytical IK for ortho-parallel 6R arms with a spherical wrist (OPW).** Closed-form, all eight solutions, covering shoulder, lateral and elbow offsets of common industrial arms.
-- *Algorithm / paper:* M. Brandstötter, A. Angerer, M. Hofbaur, Austrian Robotics Workshop, 2014; D. Pieper, PhD thesis, Stanford, 1968.
-- *Reuses / builds on:* NT53; joint wrapping from NT54.
 
 **M23. Parallel-manipulator kinematics.** Stewart-Gough (leg-length IK, Newton FK) and Delta (per-arm closed-form IK, three-sphere FK).
 - *Algorithm / paper:* J.-P. Merlet, *Parallel Robots*, 2nd ed. (2006); R. Clavel (1990).

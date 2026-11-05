@@ -13,6 +13,7 @@ target_link_libraries(robotics.kinematics ${ROBOTICS_VISIBILITY}
 )
 
 target_sources(robotics.kinematics PRIVATE
+    AnalyticalIkOpw.hpp
     ChainPoseKinematics.hpp
     ChainTaskJacobian.hpp
     ContinuumKinematics.hpp
@@ -29,6 +30,7 @@ target_sources(robotics.kinematics PRIVATE
 )
 
 robotics_add_coverage_sources(robotics.kinematics
+    AnalyticalIkOpw.cpp
     ChainPoseKinematics.cpp
     ContinuumKinematics.cpp
     DenavitHartenberg.cpp

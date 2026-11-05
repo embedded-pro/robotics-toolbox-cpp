@@ -9,6 +9,7 @@ target_link_libraries(robotics.kinematics_test PUBLIC
 )
 
 target_sources(robotics.kinematics_test PRIVATE
+    TestAnalyticalIkOpw.cpp
     TestChainPoseKinematics.cpp
     TestContinuumKinematics.cpp
     TestDenavitHartenberg.cpp
