@@ -25,13 +25,14 @@ namespace kinematics
 
         using JointVector = math::Vector<T, Dof>;
         using Block = math::Matrix<T, Rows, Dof>;
+        using AxesArray = std::array<T, Axes>;
 
         explicit ManipulabilityIndex(const JacobianProvider<T, TaskDim, Dof>& jacobian);
 
         OPTIMIZE_FOR_SPEED T Compute(const JointVector& q) const;
         T ComputeRotational(const JointVector& q) const
         requires(TaskDim == 6);
-        std::array<T, Axes> EllipsoidAxes(const JointVector& q) const;
+        AxesArray EllipsoidAxes(const JointVector& q) const;
         T ConditionNumber(const JointVector& q) const;
         bool NearSingular(const JointVector& q, T epsilon) const;
 
@@ -65,12 +66,12 @@ namespace kinematics
     }
 
     template<typename T, std::size_t TaskDim, std::size_t Dof>
-    std::array<T, ManipulabilityIndex<T, TaskDim, Dof>::Axes> ManipulabilityIndex<T, TaskDim, Dof>::EllipsoidAxes(const JointVector& q) const
+    typename ManipulabilityIndex<T, TaskDim, Dof>::AxesArray ManipulabilityIndex<T, TaskDim, Dof>::EllipsoidAxes(const JointVector& q) const
     {
         solvers::SingularValueDecomposition<T, Rows, Dof> svd;
         svd.Decompose(TranslationalBlock(q));
 
-        std::array<T, Axes> axes{};
+        AxesArray axes{};
         for (std::size_t i = 0; i < Axes; ++i)
             axes[i] = svd.SingularValues()[i];
         return axes;
