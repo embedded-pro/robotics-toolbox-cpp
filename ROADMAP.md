@@ -126,7 +126,6 @@ existing `dynamics/` convention.
 | M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta)          | `kinematics`              | NT53, NT64  | ★★★★☆      |
 | M24 | Mobile-manipulator / nonholonomic-base kinematics               | `kinematics`              | M8, M14, W1 | ★★★★☆      |
 | M25 | Cable-driven tension distribution                               | `controllers/manipulator` | NT53, NT65  | ★★★★☆      |
-| M26 | Continuum / soft constant-curvature kinematics                  | `kinematics`              | NT53        | ★★★★☆      |
 | M27 | Time-optimal path parameterization (TOPP-RA)                    | `trajectory` (new)        | M29         | ★★★★★      |
 
 M2 (polynomial profile), M3 (trapezoidal profile), M4 (friction compensation), M6 (SE(3)) and M9
@@ -163,9 +162,6 @@ retired here.
 **M25. Cable-driven tension distribution.** Structure matrix from cable geometry, Pott's closed-form (improved) tension distribution within `[tMin, tMax]`, and an exact QP path for the workspace boundary.
 - *Algorithm / paper:* Pott, Bruckmann, Mikelsons (2009); A. Pott (2014).
 - *Reuses / builds on:* upstream `solvers::ActiveSetQp` (NT65) for the exact path.
-
-**M26. Continuum / soft constant-curvature kinematics.** Piecewise-constant-curvature FK and single-section IK.
-- *Algorithm / paper:* R. Webster, B. Jones, *Int. J. Robotics Research*, 29(13), 2010.
 
 ### Tier 5 — Hard / research-grade ★★★★★
 

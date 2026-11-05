@@ -89,7 +89,7 @@ prerequisites.
 ## Index
 
 ### `kinematics`
-`AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26)
+`AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24)
 
 ### `trajectory`
 `TimeOptimalPathParameterization` (M27)
