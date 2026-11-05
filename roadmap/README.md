@@ -98,4 +98,4 @@ prerequisites.
 `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
 
 ### `localization`
-`OdometryFusion` (E1) · `OccupancyGridMap` (E2) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
+`OdometryFusion` (E1) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)

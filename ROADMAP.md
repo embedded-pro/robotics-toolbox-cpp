@@ -307,7 +307,6 @@ Cross-family building blocks that several of the families below depend on.
 | #  | Component                                              | Target module  | Depends on       | Difficulty |
 |----|--------------------------------------------------------|----------------|------------------|------------|
 | E1 | Wheel + gyro odometry fusion (EKF on SE(2))            | `localization` | F1, NT66, NT74   | ★★★☆☆      |
-| E2 | Occupancy-grid mapping (log-odds, ray casting)         | `localization` | NT66             | ★★★☆☆      |
 | E3 | EKF landmark localization (known map, range–bearing)   | `localization` | F1, NT66, NT74   | ★★★☆☆      |
 | E4 | Monte Carlo localization                               | `localization` | NT70, E2, F1     | ★★★★☆      |
 | E5 | 2-D scan matching (point-to-point / point-to-line ICP) | `localization` | NT67, NT64, NT66 | ★★★★☆      |
@@ -315,10 +314,6 @@ Cross-family building blocks that several of the families below depend on.
 **E1. Odometry fusion.** EKF on `(x, y, θ, gyro bias)`: wheel speed and gyro rate drive the prediction, the wheel yaw rate is a χ²-gated bias measurement (a rejected update flags slip), and optional heading and position fixes share the same update.
 - *Algorithm / paper:* S. Thrun, W. Burgard, D. Fox, *Probabilistic Robotics* (2005), Ch. 5 and 7; J. Borenstein, L. Feng, "Gyrodometry," *ICRA* 1996.
 - *Reuses / builds on:* F1, NT66, NT74 (upstream `ExtendedKalmanFilter` cannot wrap residuals or gate).
-
-**E2. Occupancy-grid mapping.** Log-odds cell updates from range scans along Bresenham rays on a bounded grid.
-- *Algorithm / paper:* A. Elfes, *Computer*, 22(6), 1989; Thrun et al. (2005), Ch. 9.
-- *Reuses / builds on:* NT66.
 
 **E3. EKF landmark localization.** Pose tracking against a known landmark map with range–bearing measurements and gated data association.
 - *Algorithm / paper:* Thrun et al. (2005), Ch. 7.
