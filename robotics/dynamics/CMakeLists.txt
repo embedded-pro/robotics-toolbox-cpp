@@ -13,19 +13,25 @@ target_link_libraries(robotics.dynamics ${ROBOTICS_VISIBILITY}
 
 target_sources(robotics.dynamics PRIVATE
     ArticulatedBodyAlgorithm.hpp
+    CompositeRigidBodyAlgorithm.hpp
     EulerLagrangeDynamics.hpp
     EulerLagrangeSolver.hpp
+    ForwardDynamicsIntegrator.hpp
     NewtonEulerBody.hpp
     NewtonEulerSolver.hpp
     RecursiveNewtonEuler.hpp
     RevoluteJointLink.hpp
+    SpatialInertia.hpp
 )
 
 robotics_add_coverage_sources(robotics.dynamics
     ArticulatedBodyAlgorithm.cpp
+    CompositeRigidBodyAlgorithm.cpp
     EulerLagrangeSolver.cpp
+    ForwardDynamicsIntegrator.cpp
     NewtonEulerSolver.cpp
     RecursiveNewtonEuler.cpp
 )
 
 add_subdirectory(test)
+add_subdirectory(test_doubles)

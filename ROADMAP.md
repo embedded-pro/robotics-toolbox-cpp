@@ -91,7 +91,9 @@ docs; the current pin (`63c9b91`) includes them.
 
 The library already has the core of manipulator **modelling**: forward/inverse dynamics
 ([RNEA](robotics/dynamics/RecursiveNewtonEuler.hpp), [ABA](robotics/dynamics/ArticulatedBodyAlgorithm.hpp),
-[Euler-Lagrange](robotics/dynamics/EulerLagrangeSolver.hpp)), position forward kinematics with base and
+[Euler-Lagrange](robotics/dynamics/EulerLagrangeSolver.hpp)), the joint-space mass matrix
+([CRBA](robotics/dynamics/CompositeRigidBodyAlgorithm.hpp)), a fixed-step simulation step
+([ForwardDynamicsIntegrator](robotics/dynamics/ForwardDynamicsIntegrator.hpp)), position forward kinematics with base and
 tool offsets, and damped-least-squares [IK](robotics/kinematics/InverseKinematics.hpp). What is missing is
 the **full-pose kinematics, model plumbing, planning and control layer** that turns those models into a
 usable manipulator stack. Two current limitations gate many items below:
@@ -116,10 +118,7 @@ existing `dynamics/` convention.
 | #   | Component                                                       | Target module             | Depends on     | Difficulty |
 |-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
 | M1  | Generic joint link (prismatic, limits, armature)                | `dynamics` + `kinematics` | —              | ★☆☆☆☆      |
-| M5  | PD + gravity compensation control                               | `controllers/manipulator` | M29            | ★☆☆☆☆      |
 | M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —              | ★☆☆☆☆      |
-| M33 | Joint-space cubic spline through via points                     | `trajectory` (new)        | NT61           | ★☆☆☆☆      |
-| M28 | Composite Rigid Body Algorithm (mass matrix)                    | `dynamics`                | —              | ★★☆☆☆      |
 | M29 | Chain dynamics model (link chain → M, C, g, inverse dynamics)   | `dynamics`                | M28            | ★★☆☆☆      |
 | M30 | Chain pose kinematics (full-pose FK, frame chain)               | `kinematics`              | NT53           | ★★☆☆☆      |
 | M7  | Denavit-Hartenberg parameters (standard + modified)             | `kinematics`              | NT53, M30      | ★★☆☆☆      |
@@ -127,7 +126,6 @@ existing `dynamics/` convention.
 | M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | NT53, NT55     | ★★☆☆☆      |
 | M11 | Manipulability ellipsoid / Yoshikawa index                      | `kinematics`              | M8             | ★★☆☆☆      |
 | M14 | Redundancy resolution / null-space projection                   | `kinematics`              | M8, NT62       | ★★☆☆☆      |
-| M34 | Forward-dynamics integrator (simulation step)                   | `dynamics`                | NT58           | ★★☆☆☆      |
 | M12 | Computed-torque (inverse-dynamics) control                      | `controllers/manipulator` | M29            | ★★★☆☆      |
 | M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, NT64, M8 | ★★★☆☆      |
 | M15 | Product-of-Exponentials forward kinematics                      | `kinematics`              | NT53           | ★★★☆☆      |
@@ -154,21 +152,10 @@ retired here.
 **M1. Generic joint link.** Evolve `RevoluteJointLink` (compatibly, via trailing defaulted fields) into a link with a joint type (revolute/prismatic), joint limits and armature, and add the prismatic branches to FK, RNEA, ABA, CRBA and the Jacobian.
 - *Algorithm / paper:* J. J. Craig, *Introduction to Robotics: Mechanics and Control*, 4th ed., Ch. 3 and 6; Featherstone (2008), Ch. 4.
 
-**M5. PD + gravity compensation control.** The simplest globally-stable set-point regulator: `τ = Kp·e − Kd·q̇ + g(q)`.
-- *Algorithm / paper:* M. Takegaki, S. Arimoto, *ASME J. Dyn. Sys. Meas. Control*, 1981.
-- *Reuses / builds on:* `g(q)` from M29; optional friction feedforward from NT57.
-
 **M32. Inverse dynamics with an external tool wrench.** RNEA overload taking the environment's wrench on the tool; satisfies `τ(w) − τ(0) = −Jᵀw`.
 - *Algorithm / paper:* Luh, Walker, Paul (1980).
 
-**M33. Joint-space cubic spline through via points.** Timed via points to a C² joint trajectory, rest-to-rest by default; defines the shared `JointTrajectoryState`.
-- *Algorithm / paper:* Biagiotti & Melchiorri (2008), Ch. 4.
-- *Reuses / builds on:* upstream `math::CubicSpline` (NT61), which carries the tridiagonal solve.
-
 ### Tier 2 — Easy ★★☆☆☆
-
-**M28. Composite Rigid Body Algorithm.** `O(n²)` joint-space mass matrix, sharing the spatial algebra of ABA.
-- *Algorithm / paper:* Walker & Orin (1982); Featherstone (2008), Ch. 6.
 
 **M29. Chain dynamics model.** Adapter implementing `EulerLagrangeDynamics` (M via CRBA, `Cq̇` and `g` via RNEA) and a one-call `InverseDynamicsModel` for the controllers.
 - *Reuses / builds on:* RNEA, M28; optional friction model from NT57.
@@ -192,10 +179,6 @@ retired here.
 **M14. Redundancy resolution / null-space projection.** `q̇ = J⁺_λ ẋ + (I − J⁺J)·q̇₀` with an exact (undamped, rank-thresholded) projector, bound to the arm's task Jacobian.
 - *Algorithm / paper:* A. Liégeois, *IEEE Trans. SMC*, 7(12), 1977.
 - *Reuses / builds on:* upstream `solvers::DampedPseudoInverse` (NT62).
-
-**M34. Forward-dynamics integrator.** Fixed-step semi-implicit Euler / RK4 simulation step on ABA for model-in-the-loop tests.
-- *Algorithm / paper:* Hairer, Lubich, Wanner (2006); Featherstone (2008), Ch. 7.
-- *Reuses / builds on:* upstream `solvers::SemiImplicitEuler` (NT58) and `solvers::RungeKutta4`.
 
 ### Tier 3 — Moderate ★★★☆☆
 
@@ -460,17 +443,13 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Motion planning and collision
 
-| #  | Component                                                         | Target module | Depends on | Difficulty |
-|----|-------------------------------------------------------------------|---------------|------------|------------|
-| P1 | Primitive distance queries (point, segment, sphere, capsule, box) | `planning`    | —          | ★★☆☆☆      |
-| P2 | Artificial potential fields                                       | `planning`    | P1         | ★★☆☆☆      |
-| P3 | A* / Dijkstra on bounded occupancy grids                          | `planning`    | —          | ★★★☆☆      |
-| P4 | Self-collision checking for a link chain (capsule model)          | `planning`    | P1, M30    | ★★★☆☆      |
-| P5 | GJK + EPA convex distance and penetration                         | `planning`    | —          | ★★★★☆      |
-| P6 | RRT-Connect in joint space with a fixed node pool                 | `planning`    | P4         | ★★★★☆      |
-
-**P1. Primitive distances.** Closed-form closest points and signed distances (negative = penetration) between points, segments, spheres, capsules and oriented boxes, as core geometry plus radius.
-- *Algorithm / paper:* C. Ericson, *Real-Time Collision Detection* (2004), Ch. 5.
+| #  | Component                                                | Target module | Depends on | Difficulty |
+|----|----------------------------------------------------------|---------------|------------|------------|
+| P2 | Artificial potential fields                              | `planning`    | P1         | ★★☆☆☆      |
+| P3 | A* / Dijkstra on bounded occupancy grids                 | `planning`    | —          | ★★★☆☆      |
+| P4 | Self-collision checking for a link chain (capsule model) | `planning`    | P1, M30    | ★★★☆☆      |
+| P5 | GJK + EPA convex distance and penetration                | `planning`    | —          | ★★★★☆      |
+| P6 | RRT-Connect in joint space with a fixed node pool        | `planning`    | P4         | ★★★★☆      |
 
 **P2. Potential fields.** Quadratic-then-conic attraction and Khatib repulsion from obstacle proximity readings as a clamped task-space velocity; local minima are detected and reported.
 - *Algorithm / paper:* O. Khatib, *IJRR*, 5(1), 1986.
