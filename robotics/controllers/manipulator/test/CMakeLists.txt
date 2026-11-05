@@ -6,9 +6,11 @@ target_link_libraries(robotics.controllers.manipulator_test PUBLIC
     gmock_main
     robotics.controllers.manipulator
     robotics.dynamics_test_doubles
+    robotics.kinematics_test_doubles
 )
 
 target_sources(robotics.controllers.manipulator_test PRIVATE
     TestComputedTorqueControl.cpp
+    TestImpedanceControl.cpp
     TestPdGravityCompensation.cpp
 )

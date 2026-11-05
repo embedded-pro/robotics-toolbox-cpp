@@ -8,6 +8,8 @@ target_link_libraries(robotics.planning_test PUBLIC
 )
 
 target_sources(robotics.planning_test PRIVATE
+    TestGridSearch.cpp
     TestPotentialField.cpp
     TestPrimitiveDistance.cpp
+    TestSelfCollision.cpp
 )

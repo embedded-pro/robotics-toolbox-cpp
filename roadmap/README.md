@@ -23,7 +23,7 @@ All pseudocode respects the library constraints: **no heap**, bounded containers
 (no `Q15`/`Q31`). The generic signature keeps a future fixed-point specialisation cheap to add.
 
 The canonical worked example is
-[controllers/manipulator/ImpedanceControl](controllers/manipulator/ImpedanceControl/implementation.md).
+[controllers/manipulator/OperationalSpaceControl](controllers/manipulator/OperationalSpaceControl/implementation.md).
 
 Conventions shared by every spec: 6-vectors are ordered linear part first — twists `(v; ω)`, wrenches
 `(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md) (NT53), and planar
@@ -89,10 +89,7 @@ prerequisites.
 ## Index
 
 ### `kinematics`
-`PoseInverseKinematics` (M13) · `ProductOfExponentials` (M15) · `AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26)
-
-### `dynamics`
-`MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CoriolisMatrixAndRegressor` (M31)
+`AnalyticalIkOpw` (M21) · `ParallelManipulatorKinematics` (M23) · `MobileManipulatorKinematics` (M24) · `ContinuumKinematics` (M26)
 
 ### `trajectory`
 `TimeOptimalPathParameterization` (M27)
@@ -101,10 +98,10 @@ prerequisites.
 `PlanarOdometry` (F1) · `DifferentialDrive` (W1) · `CarLikeKinematics` (W2) · `OmnidirectionalKinematics` (W3) · `SkidSteerKinematics` (W4) · `PurePursuit` (W5) · `StanleyController` (W6) · `KanayamaController` (W7)
 
 ### `planning`
-`GridSearch` (P3) · `SelfCollision` (P4) · `ConvexCollision` (P5) · `RrtConnect` (P6) · `DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
+`ConvexCollision` (P5) · `RrtConnect` (P6) · `DubinsPath` (W8) · `DynamicWindowApproach` (W9) · `ReedsSheppPath` (W10)
 
 ### `localization`
 `OdometryFusion` (E1) · `OccupancyGridMap` (E2) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
 
 ### `controllers/manipulator`
-`ImpedanceControl` (M17) · `OperationalSpaceControl` (M18) · `HybridPositionForceControl` (M19) · `SlotineLiAdaptiveControl` (M20) · `CableTensionDistribution` (M25)
+`OperationalSpaceControl` (M18) · `HybridPositionForceControl` (M19) · `SlotineLiAdaptiveControl` (M20) · `CableTensionDistribution` (M25)

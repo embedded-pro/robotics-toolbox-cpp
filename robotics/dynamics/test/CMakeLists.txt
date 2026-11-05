@@ -11,10 +11,14 @@ target_link_libraries(robotics.dynamics_test PUBLIC
 target_sources(robotics.dynamics_test PRIVATE
     TestArticulatedBodyAlgorithm.cpp
     TestChainDynamicsModel.cpp
+    TestChainInertialRegressor.cpp
     TestCompositeRigidBodyAlgorithm.cpp
+    TestCoriolisMatrix.cpp
+    TestDynamicParameterIdentification.cpp
     TestEulerLagrangeSolver.cpp
     TestForwardDynamicsIntegrator.cpp
     TestJointLink.cpp
+    TestMomentumObserver.cpp
     TestNewtonEulerSolver.cpp
     TestRecursiveNewtonEuler.cpp
 )

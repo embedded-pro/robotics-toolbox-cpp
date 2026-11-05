@@ -117,23 +117,17 @@ existing `dynamics/` convention.
 
 ### Manipulator list (by priority)
 
-| #   | Component                                                       | Target module             | Depends on     | Difficulty |
-|-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
-| M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, NT64, M8 | ★★★☆☆      |
-| M15 | Product-of-Exponentials forward kinematics                      | `kinematics`              | NT53           | ★★★☆☆      |
-| M16 | Momentum-based collision-detection observer                     | `dynamics`                | M29, M31       | ★★★☆☆      |
-| M17 | Impedance control                                               | `controllers/manipulator` | M8, M29        | ★★★☆☆      |
-| M31 | Coriolis matrix and inertial-parameter regressor                | `dynamics`                | M28            | ★★★☆☆      |
-| M22 | Dynamic (base-parameter) identification                         | `dynamics`                | M31, NT63      | ★★★☆☆      |
-| M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29        | ★★★★☆      |
-| M19 | Hybrid position/force control                                   | `controllers/manipulator` | M8, M29        | ★★★★☆      |
-| M20 | Passivity-based adaptive control (Slotine-Li)                   | `controllers/manipulator` | M31            | ★★★★☆      |
-| M21 | Analytical IK for ortho-parallel 6R arms with a spherical wrist | `kinematics`              | NT53, NT54     | ★★★★☆      |
-| M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta)          | `kinematics`              | NT53, NT64     | ★★★★☆      |
-| M24 | Mobile-manipulator / nonholonomic-base kinematics               | `kinematics`              | M8, M14, W1    | ★★★★☆      |
-| M25 | Cable-driven tension distribution                               | `controllers/manipulator` | NT53, NT65     | ★★★★☆      |
-| M26 | Continuum / soft constant-curvature kinematics                  | `kinematics`              | NT53           | ★★★★☆      |
-| M27 | Time-optimal path parameterization (TOPP-RA)                    | `trajectory` (new)        | M29            | ★★★★★      |
+| #   | Component                                                       | Target module             | Depends on  | Difficulty |
+|-----|-----------------------------------------------------------------|---------------------------|-------------|------------|
+| M18 | Operational-space (task-space) control                          | `controllers/manipulator` | M8, M29     | ★★★★☆      |
+| M19 | Hybrid position/force control                                   | `controllers/manipulator` | M8, M29     | ★★★★☆      |
+| M20 | Passivity-based adaptive control (Slotine-Li)                   | `controllers/manipulator` | M31         | ★★★★☆      |
+| M21 | Analytical IK for ortho-parallel 6R arms with a spherical wrist | `kinematics`              | NT53, NT54  | ★★★★☆      |
+| M23 | Parallel-manipulator kinematics (Stewart-Gough, Delta)          | `kinematics`              | NT53, NT64  | ★★★★☆      |
+| M24 | Mobile-manipulator / nonholonomic-base kinematics               | `kinematics`              | M8, M14, W1 | ★★★★☆      |
+| M25 | Cable-driven tension distribution                               | `controllers/manipulator` | NT53, NT65  | ★★★★☆      |
+| M26 | Continuum / soft constant-curvature kinematics                  | `kinematics`              | NT53        | ★★★★☆      |
+| M27 | Time-optimal path parameterization (TOPP-RA)                    | `trajectory` (new)        | M29         | ★★★★★      |
 
 M2 (polynomial profile), M3 (trapezoidal profile), M4 (friction compensation), M6 (SE(3)) and M9
 (S-curve profile) moved to numerical-toolbox as NT55, NT56, NT57, NT53 and NT60; their numbers are
@@ -142,26 +136,6 @@ retired here.
 ### Tier 2 — Easy ★★☆☆☆
 
 ### Tier 3 — Moderate ★★★☆☆
-
-**M13. Full 6-DOF pose IK.** Damped least squares on the SE(3) log-map error with position/rotation weighting, adaptive damping, step and joint-limit clamping.
-- *Algorithm / paper:* S. R. Buss (2004); Nakamura & Hanafusa (1986); Chiaverini (1997).
-- *Reuses / builds on:* upstream `optimization::LevenbergMarquardt` (NT64) with a manipulability damping policy.
-
-**M15. Product-of-Exponentials forward kinematics.** Screw-theory FK and the space Jacobian, with conversion to the geometric Jacobian.
-- *Algorithm / paper:* Lynch & Park, *Modern Robotics*, Ch. 4.
-
-**M16. Momentum-based collision-detection observer.** External joint-torque estimate from the generalized-momentum residual, using `Cᵀq̇`.
-- *Algorithm / paper:* A. De Luca, A. Albu-Schäffer, S. Haddadin, G. Hirzinger, *IROS*, 2006.
-
-**M17. Impedance control.** Stiffness/damping impedance via `Jᵀ` (no force sensor), and inertia-shaping impedance with measured contact wrench via the task-space inertia.
-- *Algorithm / paper:* N. Hogan, *ASME J. Dyn. Sys. Meas. Control*, 1985.
-
-**M31. Coriolis matrix and inertial regressor.** Modified RNEA giving the Christoffel `C(q,q̇)q̇_r` (skew-symmetric `Ṁ − 2C`), `Cᵀq̇`, and the 10-parameter-per-link regressor.
-- *Algorithm / paper:* Echeandia & Wensing (2021); Niemeyer & Slotine (1991); Atkeson, An, Hollerbach (1986).
-
-**M22. Dynamic (base-parameter) identification.** Regressor rows streamed into a rank-revealing least-squares solve; the kept directions are the base parameters.
-- *Algorithm / paper:* Atkeson, An, Hollerbach (1986); Gautier & Khalil (1990).
-- *Reuses / builds on:* M31; upstream `estimators::IncrementalQrLeastSquares` (NT63).
 
 ### Tier 4 — Advanced ★★★★☆
 
@@ -401,19 +375,10 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Motion planning and collision
 
-| #  | Component                                                | Target module | Depends on | Difficulty |
-|----|----------------------------------------------------------|---------------|------------|------------|
-| P3 | A* / Dijkstra on bounded occupancy grids                 | `planning`    | —          | ★★★☆☆      |
-| P4 | Self-collision checking for a link chain (capsule model) | `planning`    | P1, M30    | ★★★☆☆      |
-| P5 | GJK + EPA convex distance and penetration                | `planning`    | —          | ★★★★☆      |
-| P6 | RRT-Connect in joint space with a fixed node pool        | `planning`    | P4         | ★★★★☆      |
-
-**P3. Grid search.** A* and Dijkstra on 2-D/3-D grids with per-cell costs from a callable, an indexed binary heap with decrease-key, 16-bit indices on small grids and the octile heuristic (no heap allocation).
-- *Algorithm / paper:* P. Hart, N. Nilsson, B. Raphael, *IEEE Trans. Systems Science and Cybernetics*, 4(2), 1968.
-
-**P4. Self-collision checking.** Joint-to-joint capsule per link from the M30 frame chain, pairwise P1 distances with an allowed-collision matrix (adjacent links by default), minimum distance and pair.
-- *Algorithm / paper:* Ericson (2004), Ch. 4–5.
-- *Reuses / builds on:* P1, M30.
+| #  | Component                                         | Target module | Depends on | Difficulty |
+|----|---------------------------------------------------|---------------|------------|------------|
+| P5 | GJK + EPA convex distance and penetration         | `planning`    | —          | ★★★★☆      |
+| P6 | RRT-Connect in joint space with a fixed node pool | `planning`    | P4         | ★★★★☆      |
 
 **P5. GJK + EPA.** Distance between convex shapes (sphere, capsule, box, bounded hull) from support functions, run on cores plus margins; penetration depth and normal by a bounded EPA, robust to tied supports.
 - *Algorithm / paper:* E. Gilbert, D. Johnson, S. Keerthi, *IEEE J. Robotics and Automation*, 4(2), 1988; G. van den Bergen, *Collision Detection in Interactive 3D Environments* (2003).
