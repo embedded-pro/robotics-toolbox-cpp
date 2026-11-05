@@ -40,8 +40,8 @@ this roadmap needs that upstream does not ship yet are specified and built upstr
 
 Generic algorithms live in numerical-toolbox-cpp and are referenced here as **NT** plus its
 master-list item number (NT53 is upstream item 53). A robotics item that depends on one needs a
-numerical-toolbox pin that ships it. NT53–NT65 have shipped upstream, and their links point to the upstream
-docs; the current pin (`63c9b91`) includes them.
+numerical-toolbox pin that ships it. NT53–NT66 have shipped upstream, and their links point to the upstream
+docs; the current pin (`dc147fb`) includes them.
 
 | #    | Component                                             | Upstream module      | Spec / doc                          | Needed by                                                                  |
 |------|-------------------------------------------------------|----------------------|-------------------------------------|----------------------------------------------------------------------------|
@@ -58,7 +58,7 @@ docs; the current pin (`63c9b91`) includes them.
 | NT63 | Incremental QR least squares (rank-revealing)         | `estimators/offline` | [IncrementalQrLeastSquares][nt63]   | M22                                                                        |
 | NT64 | Levenberg–Marquardt (retraction, pluggable damping)   | `optimization`       | [LevenbergMarquardt][nt64]          | M13, M23, E5, C2                                                           |
 | NT65 | Dense convex QP (Goldfarb–Idnani)                     | `solvers`            | [ActiveSetQp][nt65]                 | M25 (exact path), L6, G2, G3                                               |
-| NT66 | SE(2) transform, twists, exp/log, pose error          | `math`               | [SE2Transform][nt66] (spec)         | F1, W1–W10, M24, E1, E2, E3, E5                                            |
+| NT66 | SE(2) transform, twists, exp/log, pose error          | `math`               | [SE2Transform][nt66]                | F1, W1–W10, M24, E1, E2, E3, E5                                            |
 | NT67 | Kabsch / Umeyama point-set alignment                  | `solvers`            | [PointSetAlignment][nt67] (spec)    | E5, C1                                                                     |
 | NT68 | Lie-group Jacobians and ⊕/⊖ (SO(3), SE(3), SE(2))     | `math`               | [master list][ntrm], no spec yet    | C1 (and NT71)                                                              |
 | NT69 | Control allocation (redistributed pseudo-inverse, QP) | `controllers`        | [master list][ntrm], no spec yet    | A2, S3                                                                     |
@@ -82,7 +82,7 @@ docs; the current pin (`63c9b91`) includes them.
 [nt63]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/estimators/IncrementalQrLeastSquares.md
 [nt64]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/optimization/LevenbergMarquardt.md
 [nt65]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/solvers/ActiveSetQp.md
-[nt66]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/math/SE2Transform/implementation.md
+[nt66]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE2Transform.md
 [nt67]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/solvers/PointSetAlignment/implementation.md
 [nt70]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/filters/active/ParticleFilter/implementation.md
 [nt74]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/filters/active/ResidualKalmanUpdate/implementation.md
@@ -149,15 +149,10 @@ Cross-family building blocks that several of the families below depend on.
 
 | #  | Component                                                    | Target module | Depends on      | Difficulty |
 |----|--------------------------------------------------------------|---------------|-----------------|------------|
-| F1 | Planar odometry on SE(2) (exact arc integration)             | `mobile`      | NT66            | ★★☆☆☆      |
 | F2 | Online multi-axis trajectory generation (time-synchronized)  | `trajectory`  | NT73, M1        | ★★☆☆☆      |
 | F3 | Floating-base RNEA / ABA / CRBA                              | `dynamics`    | M28, NT53       | ★★★☆☆      |
 | F4 | Via-point blending (joint and Cartesian)                     | `trajectory`  | NT55, NT56, M10 | ★★★☆☆      |
 | F5 | Contact Jacobians and constrained (contact) forward dynamics | `dynamics`    | F3, M8          | ★★★★☆      |
-
-**F1. Planar odometry on SE(2).** Integrates a body twist `(vx, vy, ω)` over a sample period with the SE(2) exponential (exact constant-twist arc), shared by every wheeled model and the localization filters.
-- *Algorithm / paper:* R. Siegwart, I. Nourbakhsh, D. Scaramuzza, *Introduction to Autonomous Mobile Robots*, 2nd ed. (2011), Ch. 5.
-- *Reuses / builds on:* NT66.
 
 **F2. Online multi-axis trajectory generation.** Joint-space wrapper over the upstream online generator: per-joint limits from M1, recomputation every cycle, all joints time-synchronized to the slowest.
 - *Algorithm / paper:* T. Kröger, F. Wahl, *IEEE T-RO*, 26(1), 2010.
