@@ -403,15 +403,10 @@ Cross-family building blocks that several of the families below depend on.
 
 | #  | Component                                                | Target module | Depends on | Difficulty |
 |----|----------------------------------------------------------|---------------|------------|------------|
-| P2 | Artificial potential fields                              | `planning`    | P1         | ★★☆☆☆      |
 | P3 | A* / Dijkstra on bounded occupancy grids                 | `planning`    | —          | ★★★☆☆      |
 | P4 | Self-collision checking for a link chain (capsule model) | `planning`    | P1, M30    | ★★★☆☆      |
 | P5 | GJK + EPA convex distance and penetration                | `planning`    | —          | ★★★★☆      |
 | P6 | RRT-Connect in joint space with a fixed node pool        | `planning`    | P4         | ★★★★☆      |
-
-**P2. Potential fields.** Quadratic-then-conic attraction and Khatib repulsion from obstacle proximity readings as a clamped task-space velocity; local minima are detected and reported.
-- *Algorithm / paper:* O. Khatib, *IJRR*, 5(1), 1986.
-- *Reuses / builds on:* P1.
 
 **P3. Grid search.** A* and Dijkstra on 2-D/3-D grids with per-cell costs from a callable, an indexed binary heap with decrease-key, 16-bit indices on small grids and the octile heuristic (no heap allocation).
 - *Algorithm / paper:* P. Hart, N. Nilsson, B. Raphael, *IEEE Trans. Systems Science and Cybernetics*, 4(2), 1968.

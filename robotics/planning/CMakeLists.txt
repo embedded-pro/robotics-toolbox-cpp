@@ -11,10 +11,12 @@ target_link_libraries(robotics.planning ${ROBOTICS_VISIBILITY}
 )
 
 target_sources(robotics.planning PRIVATE
+    PotentialField.hpp
     PrimitiveDistance.hpp
 )
 
 robotics_add_coverage_sources(robotics.planning
+    PotentialField.cpp
     PrimitiveDistance.cpp
 )
 
