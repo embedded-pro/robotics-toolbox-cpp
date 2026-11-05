@@ -344,12 +344,8 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Motion planning and collision
 
-| #  | Component                                 | Target module | Depends on | Difficulty |
-|----|-------------------------------------------|---------------|------------|------------|
-| P5 | GJK + EPA convex distance and penetration | `planning`    | —          | ★★★★☆      |
-
-**P5. GJK + EPA.** Distance between convex shapes (sphere, capsule, box, bounded hull) from support functions, run on cores plus margins; penetration depth and normal by a bounded EPA, robust to tied supports.
-- *Algorithm / paper:* E. Gilbert, D. Johnson, S. Keerthi, *IEEE J. Robotics and Automation*, 4(2), 1988; G. van den Bergen, *Collision Detection in Interactive 3D Environments* (2003).
+| # | Component | Target module | Depends on | Difficulty |
+|---|-----------|---------------|------------|------------|
 
 ## Localization and mapping
 
