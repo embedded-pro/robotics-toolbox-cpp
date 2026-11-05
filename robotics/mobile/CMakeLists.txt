@@ -6,14 +6,17 @@ target_include_directories(robotics.mobile ${ROBOTICS_VISIBILITY}
 )
 
 target_link_libraries(robotics.mobile ${ROBOTICS_VISIBILITY}
+    infra.util
     numerical.math
 )
 
 target_sources(robotics.mobile PRIVATE
+    DifferentialDrive.hpp
     PlanarOdometry.hpp
 )
 
 robotics_add_coverage_sources(robotics.mobile
+    DifferentialDrive.cpp
     PlanarOdometry.cpp
 )
 

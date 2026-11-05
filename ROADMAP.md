@@ -174,7 +174,6 @@ Cross-family building blocks that several of the families below depend on.
 
 | #   | Component                                            | Target module | Depends on | Difficulty |
 |-----|------------------------------------------------------|---------------|------------|------------|
-| W1  | Differential-drive kinematics                        | `mobile`      | NT66       | ★☆☆☆☆      |
 | W2  | Car-like (Ackermann / kinematic bicycle) kinematics  | `mobile`      | NT66       | ★☆☆☆☆      |
 | W3  | Omnidirectional (mecanum / Swedish-wheel) kinematics | `mobile`      | NT66       | ★☆☆☆☆      |
 | W4  | Skid-steer kinematics with slip (ICR model)          | `mobile`      | W1         | ★★☆☆☆      |
@@ -184,10 +183,6 @@ Cross-family building blocks that several of the families below depend on.
 | W8  | Dubins shortest paths (+ car path type)              | `planning`    | NT66       | ★★☆☆☆      |
 | W9  | Dynamic window approach (local obstacle avoidance)   | `planning`    | W1, NT66   | ★★★☆☆      |
 | W10 | Reeds–Shepp shortest paths (forward and reverse)     | `planning`    | W8, NT54   | ★★★☆☆      |
-
-**W1. Differential-drive kinematics.** Body twist from wheel speeds and back, wheel-speed limits mapped to `(v, ω)` limits; the base model of M24.
-- *Algorithm / paper:* Siegwart et al. (2011), Ch. 3.
-- *Reuses / builds on:* NT66.
 
 **W2. Car-like kinematics.** Kinematic bicycle model with steering-angle and steering-rate limits, Ackermann wheel angles for the two front wheels.
 - *Algorithm / paper:* R. Rajamani, *Vehicle Dynamics and Control*, 2nd ed. (2012), Ch. 2.
