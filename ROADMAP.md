@@ -118,7 +118,6 @@ existing `dynamics/` convention.
 | M1  | Generic joint link (prismatic, limits, armature)                | `dynamics` + `kinematics` | —              | ★☆☆☆☆      |
 | M5  | PD + gravity compensation control                               | `controllers/manipulator` | M29            | ★☆☆☆☆      |
 | M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —              | ★☆☆☆☆      |
-| M33 | Joint-space cubic spline through via points                     | `trajectory` (new)        | NT61           | ★☆☆☆☆      |
 | M28 | Composite Rigid Body Algorithm (mass matrix)                    | `dynamics`                | —              | ★★☆☆☆      |
 | M29 | Chain dynamics model (link chain → M, C, g, inverse dynamics)   | `dynamics`                | M28            | ★★☆☆☆      |
 | M30 | Chain pose kinematics (full-pose FK, frame chain)               | `kinematics`              | NT53           | ★★☆☆☆      |
@@ -160,10 +159,6 @@ retired here.
 
 **M32. Inverse dynamics with an external tool wrench.** RNEA overload taking the environment's wrench on the tool; satisfies `τ(w) − τ(0) = −Jᵀw`.
 - *Algorithm / paper:* Luh, Walker, Paul (1980).
-
-**M33. Joint-space cubic spline through via points.** Timed via points to a C² joint trajectory, rest-to-rest by default; defines the shared `JointTrajectoryState`.
-- *Algorithm / paper:* Biagiotti & Melchiorri (2008), Ch. 4.
-- *Reuses / builds on:* upstream `math::CubicSpline` (NT61), which carries the tridiagonal solve.
 
 ### Tier 2 — Easy ★★☆☆☆
 

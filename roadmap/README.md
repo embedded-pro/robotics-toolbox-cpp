@@ -95,7 +95,7 @@ prerequisites.
 `GenericJointLink` (M1) · `MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CompositeRigidBodyAlgorithm` (M28) · `ChainDynamicsModel` (M29) · `CoriolisMatrixAndRegressor` (M31) · `RneaExternalWrench` (M32) · `ForwardDynamicsIntegrator` (M34)
 
 ### `trajectory`
-`CartesianSlerpInterpolation` (M10) · `TimeOptimalPathParameterization` (M27) · `CubicSplineTrajectory` (M33)
+`CartesianSlerpInterpolation` (M10) · `TimeOptimalPathParameterization` (M27)
 
 ### `mobile`
 `PlanarOdometry` (F1) · `DifferentialDrive` (W1) · `CarLikeKinematics` (W2) · `OmnidirectionalKinematics` (W3) · `SkidSteerKinematics` (W4) · `PurePursuit` (W5) · `StanleyController` (W6) · `KanayamaController` (W7)

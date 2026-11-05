@@ -7,8 +7,7 @@ is streamed with `Sample`.
 
 ## Data structures
 
-`JointTrajectoryState<T, Dof>` comes from `robotics/trajectory/TrajectoryTypes.hpp` (canonical
-definition: CubicSplineTrajectory spec → Data structures).
+`JointTrajectoryState<T, Dof>` comes from the shipped `robotics/trajectory/TrajectoryTypes.hpp`.
 
 ```cpp
 template<typename T, std::size_t Dof> using JointVector = math::Vector<T, Dof>
