@@ -93,10 +93,11 @@ The library already has the core of manipulator **modelling**: forward/inverse d
 ([RNEA](robotics/dynamics/RecursiveNewtonEuler.hpp), [ABA](robotics/dynamics/ArticulatedBodyAlgorithm.hpp),
 [Euler-Lagrange](robotics/dynamics/EulerLagrangeSolver.hpp)), the joint-space mass matrix
 ([CRBA](robotics/dynamics/CompositeRigidBodyAlgorithm.hpp)), a fixed-step simulation step
-([ForwardDynamicsIntegrator](robotics/dynamics/ForwardDynamicsIntegrator.hpp)), position forward kinematics with base and
+([ForwardDynamicsIntegrator](robotics/dynamics/ForwardDynamicsIntegrator.hpp)), the manipulator-equation adapter
+([ChainDynamicsModel](robotics/dynamics/ChainDynamicsModel.hpp)), position forward kinematics with base and
 tool offsets, and damped-least-squares [IK](robotics/kinematics/InverseKinematics.hpp). Full-pose
 kinematics and the geometric Jacobian have shipped (see the note below); what is missing is the
-**model plumbing, planning and control layer** that turns those models into a usable manipulator stack.
+**planning and control layer** that turns those models into a usable manipulator stack.
 
 > **Full-pose kinematics shipped.** Links are generic ([JointLink](robotics/dynamics/JointLink.hpp):
 > revolute or prismatic, limits, armature); [ChainPoseKinematics](robotics/kinematics/ChainPoseKinematics.hpp)
@@ -119,7 +120,6 @@ existing `dynamics/` convention.
 | #   | Component                                                       | Target module             | Depends on     | Difficulty |
 |-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
 | M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —              | ★☆☆☆☆      |
-| M29 | Chain dynamics model (link chain → M, C, g, inverse dynamics)   | `dynamics`                | M28            | ★★☆☆☆      |
 | M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | NT53, NT55     | ★★☆☆☆      |
 | M11 | Manipulability ellipsoid / Yoshikawa index                      | `kinematics`              | M8             | ★★☆☆☆      |
 | M14 | Redundancy resolution / null-space projection                   | `kinematics`              | M8, NT62       | ★★☆☆☆      |
@@ -150,9 +150,6 @@ retired here.
 - *Algorithm / paper:* Luh, Walker, Paul (1980).
 
 ### Tier 2 — Easy ★★☆☆☆
-
-**M29. Chain dynamics model.** Adapter implementing `EulerLagrangeDynamics` (M via CRBA, `Cq̇` and `g` via RNEA) and a one-call `InverseDynamicsModel` for the controllers.
-- *Reuses / builds on:* RNEA, M28; optional friction model from NT57.
 
 **M10. Cartesian path + orientation interpolation.** Straight-line position with SLERP orientation, one shared time law, twist feed-forward.
 - *Algorithm / paper:* Lynch & Park, Ch. 9; K. Shoemake, *SIGGRAPH* 1985.

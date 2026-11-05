@@ -9,6 +9,7 @@ target_link_libraries(robotics.dynamics_test PUBLIC
 
 target_sources(robotics.dynamics_test PRIVATE
     TestArticulatedBodyAlgorithm.cpp
+    TestChainDynamicsModel.cpp
     TestCompositeRigidBodyAlgorithm.cpp
     TestEulerLagrangeSolver.cpp
     TestForwardDynamicsIntegrator.cpp

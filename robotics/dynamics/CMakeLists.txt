@@ -13,10 +13,12 @@ target_link_libraries(robotics.dynamics ${ROBOTICS_VISIBILITY}
 
 target_sources(robotics.dynamics PRIVATE
     ArticulatedBodyAlgorithm.hpp
+    ChainDynamicsModel.hpp
     CompositeRigidBodyAlgorithm.hpp
     EulerLagrangeDynamics.hpp
     EulerLagrangeSolver.hpp
     ForwardDynamicsIntegrator.hpp
+    InverseDynamicsModel.hpp
     JointLink.hpp
     NewtonEulerBody.hpp
     NewtonEulerSolver.hpp
@@ -27,6 +29,7 @@ target_sources(robotics.dynamics PRIVATE
 
 robotics_add_coverage_sources(robotics.dynamics
     ArticulatedBodyAlgorithm.cpp
+    ChainDynamicsModel.cpp
     CompositeRigidBodyAlgorithm.cpp
     EulerLagrangeSolver.cpp
     ForwardDynamicsIntegrator.cpp
