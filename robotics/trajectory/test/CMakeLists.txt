@@ -9,5 +9,6 @@ target_link_libraries(robotics.trajectory_test PUBLIC
 )
 
 target_sources(robotics.trajectory_test PRIVATE
+    TestCartesianSlerpInterpolation.cpp
     TestCubicSplineTrajectory.cpp
 )

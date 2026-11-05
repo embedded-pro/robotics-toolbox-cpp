@@ -95,7 +95,7 @@ prerequisites.
 `MomentumObserver` (M16) · `DynamicParameterIdentification` (M22) · `CoriolisMatrixAndRegressor` (M31)
 
 ### `trajectory`
-`CartesianSlerpInterpolation` (M10) · `TimeOptimalPathParameterization` (M27)
+`TimeOptimalPathParameterization` (M27)
 
 ### `mobile`
 `PlanarOdometry` (F1) · `DifferentialDrive` (W1) · `CarLikeKinematics` (W2) · `OmnidirectionalKinematics` (W3) · `SkidSteerKinematics` (W4) · `PurePursuit` (W5) · `StanleyController` (W6) · `KanayamaController` (W7)
