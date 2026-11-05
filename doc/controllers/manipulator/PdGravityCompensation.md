@@ -8,7 +8,8 @@ Holding a manipulator at a commanded pose is the most common joint-control task:
 
 $$\tau = K_p\,(q_d - q) - K_d\,\dot{q} + g(q)$$
 
-Takegaki and Arimoto (1981) proved that this law drives the arm to **any** constant set-point $q_d$ from **any** initial state, for **any** symmetric positive-definite gains. It needs only $g(q)$, not the mass matrix or Coriolis terms, which makes it the cheapest model-based joint controller with a global stability guarantee. On a microcontroller it is a handful of multiply–adds per joint plus one gravity evaluation.
+Takegaki and Arimoto (1981) proved that this law drives the arm to **any** constant set-point $q_d$ from **any** initial state, for **any** symmetric positive-definite gains.
+It needs only $g(q)$, not the mass matrix or Coriolis terms, which makes it the cheapest model-based joint controller with a global stability guarantee. On a microcontroller it is a handful of multiply–adds per joint plus one gravity evaluation.
 
 ## Mathematical Theory
 
@@ -38,10 +39,10 @@ Dropping $g(q)$ leaves the equilibrium condition $K_p e_{ss} = g(q_d - e_{ss})$.
 
 ## Complexity Analysis
 
-| Case           | Time                   | Space       | Notes                                                          |
-|----------------|------------------------|-------------|----------------------------------------------------------------|
-| Full gains     | $O(n^2) + T_g$         | $O(n^2)$    | Two gain matrix–vector products plus one gravity evaluation    |
-| Diagonal gains | $O(n) + T_g$           | $O(n)$      | Joints decouple; $2n$ multiplies plus the gravity evaluation   |
+| Case           | Time           | Space    | Notes                                                        |
+|----------------|----------------|----------|--------------------------------------------------------------|
+| Full gains     | $O(n^2) + T_g$ | $O(n^2)$ | Two gain matrix–vector products plus one gravity evaluation  |
+| Diagonal gains | $O(n) + T_g$   | $O(n)$   | Joints decouple; $2n$ multiplies plus the gravity evaluation |
 
 $T_g$ is the cost of the gravity vector: $O(n)$ with a recursive Newton–Euler pass at zero velocity and acceleration, or a closed form for short chains.
 

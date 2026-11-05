@@ -20,7 +20,8 @@ Digital controllers update $\tau$ once per sample period $h$ and hold it in betw
 
 $$\dot{q}_{k+1} = \dot{q}_k + h\,\mathrm{FD}(q_k, \dot{q}_k, \tau_k), \qquad q_{k+1} = q_k + h\,\dot{q}_{k+1}$$
 
-The velocity is updated first and the **new** velocity moves the position. For separable mechanical systems (velocity-independent forces) the map is **symplectic**: it preserves phase-space area. By backward error analysis, it exactly conserves a modified energy $\tilde{H} = H + O(h)$. The true energy error therefore oscillates within an $O(h)$ band for exponentially long times instead of drifting (Hairer, Lubich, Wanner). The method is first-order accurate and costs one dynamics evaluation per step.
+The velocity is updated first and the **new** velocity moves the position. For separable mechanical systems (velocity-independent forces) the map is **symplectic**: it preserves phase-space area. By backward error analysis, it exactly conserves a modified energy $\tilde{H} = H + O(h)$.
+The true energy error therefore oscillates within an $O(h)$ band for exponentially long times instead of drifting (Hairer, Lubich, Wanner). The method is first-order accurate and costs one dynamics evaluation per step.
 
 Velocity-dependent terms of a manipulator (Coriolis, centrifugal) break exact separability. In practice the energy error stays bounded for the step sizes used in control simulation.
 
@@ -41,10 +42,10 @@ Each step also reports $\ddot{q}_k = \mathrm{FD}(q_k, \dot{q}_k, \tau_k)$ at the
 
 ## Complexity Analysis
 
-| Method              | Dynamics calls / step | Time / step | Space    | Accuracy (global) |
-|---------------------|-----------------------|-------------|----------|-------------------|
-| Semi-implicit Euler | 1 (+1 logged)         | $O(n)$      | $O(n)$   | $O(h)$, bounded energy error |
-| Runge–Kutta 4       | 4 (+1 logged)         | $O(n)$      | $O(n)$   | $O(h^4)$, slow energy drift  |
+| Method              | Dynamics calls / step | Time / step | Space  | Accuracy (global)            |
+|---------------------|-----------------------|-------------|--------|------------------------------|
+| Semi-implicit Euler | 1 (+1 logged)         | $O(n)$      | $O(n)$ | $O(h)$, bounded energy error |
+| Runge–Kutta 4       | 4 (+1 logged)         | $O(n)$      | $O(n)$ | $O(h^4)$, slow energy drift  |
 
 The logged acceleration costs one extra evaluation. Where cycles matter it can be dropped, or taken from the integrator's first stage.
 

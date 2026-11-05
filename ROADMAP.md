@@ -443,13 +443,13 @@ Cross-family building blocks that several of the families below depend on.
 
 ## Motion planning and collision
 
-| #  | Component                                                         | Target module | Depends on | Difficulty |
-|----|-------------------------------------------------------------------|---------------|------------|------------|
-| P2 | Artificial potential fields                                       | `planning`    | P1         | ★★☆☆☆      |
-| P3 | A* / Dijkstra on bounded occupancy grids                          | `planning`    | —          | ★★★☆☆      |
-| P4 | Self-collision checking for a link chain (capsule model)          | `planning`    | P1, M30    | ★★★☆☆      |
-| P5 | GJK + EPA convex distance and penetration                         | `planning`    | —          | ★★★★☆      |
-| P6 | RRT-Connect in joint space with a fixed node pool                 | `planning`    | P4         | ★★★★☆      |
+| #  | Component                                                | Target module | Depends on | Difficulty |
+|----|----------------------------------------------------------|---------------|------------|------------|
+| P2 | Artificial potential fields                              | `planning`    | P1         | ★★☆☆☆      |
+| P3 | A* / Dijkstra on bounded occupancy grids                 | `planning`    | —          | ★★★☆☆      |
+| P4 | Self-collision checking for a link chain (capsule model) | `planning`    | P1, M30    | ★★★☆☆      |
+| P5 | GJK + EPA convex distance and penetration                | `planning`    | —          | ★★★★☆      |
+| P6 | RRT-Connect in joint space with a fixed node pool        | `planning`    | P4         | ★★★★☆      |
 
 **P2. Potential fields.** Quadratic-then-conic attraction and Khatib repulsion from obstacle proximity readings as a clamped task-space velocity; local minima are detected and reported.
 - *Algorithm / paper:* O. Khatib, *IJRR*, 5(1), 1986.

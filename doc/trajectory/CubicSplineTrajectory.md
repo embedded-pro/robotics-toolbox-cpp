@@ -2,7 +2,9 @@
 
 ## Overview & Motivation
 
-Teach-in programs, planners and resampled optimal profiles hand a controller a list of **via points**: joint vectors $q_k$ that should be reached at times $t_k$. Stopping at every via point wastes time and excites the structure; fitting one high-order polynomial through all of them rings between the knots. A **cubic spline** is the standard middle ground. Between consecutive knots each joint follows a cubic polynomial, and the pieces join with continuous position, velocity **and** acceleration ($C^2$).
+Teach-in programs, planners and resampled optimal profiles hand a controller a list of **via points**: joint vectors $q_k$ that should be reached at times $t_k$.
+Stopping at every via point wastes time and excites the structure; fitting one high-order polynomial through all of them rings between the knots. A **cubic spline** is the standard middle ground.
+Between consecutive knots each joint follows a cubic polynomial, and the pieces join with continuous position, velocity **and** acceleration ($C^2$).
 
 Taking time as the abscissa makes the spline a trajectory directly. Its slope is the joint velocity and its curvature is the joint acceleration. Planning is a single linear-time pass, and every servo tick costs one interval search plus a cubic evaluation per joint. Both are bounded and deterministic, which suits embedded controllers.
 
@@ -37,11 +39,11 @@ Requests outside $[t_0, t_{K-1}]$ are clamped to the end states.
 
 ## Complexity Analysis
 
-| Phase       | Time              | Space          | Notes                                                    |
-|-------------|-------------------|----------------|----------------------------------------------------------|
-| Planning    | $O(nK)$           | $O(nK)$        | One tridiagonal factorization, $n$ back-substitutions    |
-| Sampling    | $O(\log K + n)$   | $O(1)$         | Binary search for the segment, then a cubic per joint    |
-| Storage     | —                 | $K(2 + 2n)$    | Knot times, spans, values and knot accelerations         |
+| Phase    | Time            | Space       | Notes                                                 |
+|----------|-----------------|-------------|-------------------------------------------------------|
+| Planning | $O(nK)$         | $O(nK)$     | One tridiagonal factorization, $n$ back-substitutions |
+| Sampling | $O(\log K + n)$ | $O(1)$      | Binary search for the segment, then a cubic per joint |
+| Storage  | —               | $K(2 + 2n)$ | Knot times, spans, values and knot accelerations      |
 
 Storage is sized by the compile-time capacity, so the memory footprint is fixed no matter how many via points a plan uses.
 

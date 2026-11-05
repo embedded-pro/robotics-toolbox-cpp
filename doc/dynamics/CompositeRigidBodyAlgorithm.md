@@ -57,11 +57,11 @@ projected on each ancestor axis gives $M_{ji} = M_{ij} = \hat{z}_j^T n$ for $j <
 
 ## Complexity Analysis
 
-| Phase              | Time      | Space    | Notes                                                             |
-|--------------------|-----------|----------|-------------------------------------------------------------------|
-| Rotations          | $O(n)$    | $O(n)$   | One axis–angle rotation per joint                                 |
-| Composite inertias | $O(n)$    | $O(n)$   | One inertia transform (a few $3 \times 3$ products) per joint     |
-| Columns            | $O(n^2)$  | $O(n^2)$ | $n(n-1)/2$ wrench transforms, $O(1)$ each, plus the $n \times n$ result |
+| Phase              | Time     | Space    | Notes                                                                   |
+|--------------------|----------|----------|-------------------------------------------------------------------------|
+| Rotations          | $O(n)$   | $O(n)$   | One axis–angle rotation per joint                                       |
+| Composite inertias | $O(n)$   | $O(n)$   | One inertia transform (a few $3 \times 3$ products) per joint           |
+| Columns            | $O(n^2)$ | $O(n^2)$ | $n(n-1)/2$ wrench transforms, $O(1)$ each, plus the $n \times n$ result |
 
 For short chains ($n \le 6$) the constant matters more than the order: CRBA's per-entry work is one $3 \times 3$ rotation and a cross product, far below a full inverse-dynamics sweep per column.
 

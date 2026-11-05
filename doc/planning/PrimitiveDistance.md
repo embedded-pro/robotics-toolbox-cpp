@@ -2,7 +2,8 @@
 
 ## Overview & Motivation
 
-Collision checking on a robot rarely uses the real link meshes. Arm links are wrapped in **capsules** (a sphere swept along a segment), grippers and heads in **spheres**, and tables, walls and fixtures in **oriented boxes**. These checks run every control cycle in self-collision avoidance, human–robot speed and separation monitoring, and reactive obstacle avoidance. They must be exact, constant-time, branch-light and allocation-free.
+Collision checking on a robot rarely uses the real link meshes. Arm links are wrapped in **capsules** (a sphere swept along a segment), grippers and heads in **spheres**, and tables, walls and fixtures in **oriented boxes**.
+These checks run every control cycle in self-collision avoidance, human–robot speed and separation monitoring, and reactive obstacle avoidance. They must be exact, constant-time, branch-light and allocation-free.
 
 The queries return the **closest points** on both shapes and a **signed distance**: positive when the shapes are apart, negative when they overlap, where the magnitude is the penetration depth. The signed value lets one smooth function serve both clearance monitoring and contact response.
 
@@ -46,12 +47,12 @@ A sphere against a box is the point query on its centre, rounded by the radius. 
 
 ## Complexity Analysis
 
-| Query                   | Time   | Space  | Notes                                                    |
-|-------------------------|--------|--------|----------------------------------------------------------|
-| Point–segment           | $O(1)$ | $O(1)$ | One division, one square root                            |
-| Segment–segment         | $O(1)$ | $O(1)$ | Up to three divisions, one square root, no iteration     |
-| Point–box, sphere–box   | $O(1)$ | $O(1)$ | One $3 \times 3$ rotation, three clamps                  |
-| Rounded pairs           | $O(1)$ | $O(1)$ | Core query plus one normalization                        |
+| Query                 | Time   | Space  | Notes                                                |
+|-----------------------|--------|--------|------------------------------------------------------|
+| Point–segment         | $O(1)$ | $O(1)$ | One division, one square root                        |
+| Segment–segment       | $O(1)$ | $O(1)$ | Up to three divisions, one square root, no iteration |
+| Point–box, sphere–box | $O(1)$ | $O(1)$ | One $3 \times 3$ rotation, three clamps              |
+| Rounded pairs         | $O(1)$ | $O(1)$ | Core query plus one normalization                    |
 
 There are no loops beyond the fixed three box axes, so timing is fully deterministic.
 
