@@ -40,7 +40,7 @@ namespace localization
         OPTIMIZE_FOR_SPEED void Predict(T speed, T gyroRate, T dt);
         filters::KalmanUpdateResult<T> UpdateWheelYawRate(T wheelYawRate, T gyroRate);
         filters::KalmanUpdateResult<T> UpdateHeading(T heading, T sigma);
-        filters::KalmanUpdateResult<T> UpdatePosition(const math::Vector2<T>& position, const math::SquareMatrix<T, 2>& covariance);
+        filters::KalmanUpdateResult<T> UpdatePosition(const math::Vector2<T>& position, const math::SquareMatrix<T, 2>& positionCovariance);
 
         math::SE2Transform<T> Pose() const;
         T GyroBias() const;
