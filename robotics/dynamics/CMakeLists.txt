@@ -32,3 +32,4 @@ robotics_add_coverage_sources(robotics.dynamics
 )
 
 add_subdirectory(test)
+add_subdirectory(test_doubles)

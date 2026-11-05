@@ -23,7 +23,7 @@ All pseudocode respects the library constraints: **no heap**, bounded containers
 (no `Q15`/`Q31`). The generic signature keeps a future fixed-point specialisation cheap to add.
 
 The canonical worked example is
-[controllers/manipulator/PdGravityCompensation](controllers/manipulator/PdGravityCompensation/implementation.md).
+[controllers/manipulator/ComputedTorqueControl](controllers/manipulator/ComputedTorqueControl/implementation.md).
 
 Conventions shared by every spec: 6-vectors are ordered linear part first — twists `(v; ω)`, wrenches
 `(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md) (NT53), and planar
@@ -107,4 +107,4 @@ prerequisites.
 `OdometryFusion` (E1) · `OccupancyGridMap` (E2) · `LandmarkLocalization` (E3) · `MonteCarloLocalization` (E4) · `ScanMatcher` (E5)
 
 ### `controllers/manipulator`
-`PdGravityCompensation` (M5) · `ComputedTorqueControl` (M12) · `ImpedanceControl` (M17) · `OperationalSpaceControl` (M18) · `HybridPositionForceControl` (M19) · `SlotineLiAdaptiveControl` (M20) · `CableTensionDistribution` (M25)
+`ComputedTorqueControl` (M12) · `ImpedanceControl` (M17) · `OperationalSpaceControl` (M18) · `HybridPositionForceControl` (M19) · `SlotineLiAdaptiveControl` (M20) · `CableTensionDistribution` (M25)

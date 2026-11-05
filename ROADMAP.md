@@ -117,7 +117,6 @@ existing `dynamics/` convention.
 | #   | Component                                                       | Target module             | Depends on     | Difficulty |
 |-----|-----------------------------------------------------------------|---------------------------|----------------|------------|
 | M1  | Generic joint link (prismatic, limits, armature)                | `dynamics` + `kinematics` | —              | ★☆☆☆☆      |
-| M5  | PD + gravity compensation control                               | `controllers/manipulator` | M29            | ★☆☆☆☆      |
 | M32 | Inverse dynamics with an external tool wrench                   | `dynamics`                | —              | ★☆☆☆☆      |
 | M29 | Chain dynamics model (link chain → M, C, g, inverse dynamics)   | `dynamics`                | M28            | ★★☆☆☆      |
 | M30 | Chain pose kinematics (full-pose FK, frame chain)               | `kinematics`              | NT53           | ★★☆☆☆      |
@@ -152,10 +151,6 @@ retired here.
 
 **M1. Generic joint link.** Evolve `RevoluteJointLink` (compatibly, via trailing defaulted fields) into a link with a joint type (revolute/prismatic), joint limits and armature, and add the prismatic branches to FK, RNEA, ABA, CRBA and the Jacobian.
 - *Algorithm / paper:* J. J. Craig, *Introduction to Robotics: Mechanics and Control*, 4th ed., Ch. 3 and 6; Featherstone (2008), Ch. 4.
-
-**M5. PD + gravity compensation control.** The simplest globally-stable set-point regulator: `τ = Kp·e − Kd·q̇ + g(q)`.
-- *Algorithm / paper:* M. Takegaki, S. Arimoto, *ASME J. Dyn. Sys. Meas. Control*, 1981.
-- *Reuses / builds on:* `g(q)` from M29; optional friction feedforward from NT57.
 
 **M32. Inverse dynamics with an external tool wrench.** RNEA overload taking the environment's wrench on the tool; satisfies `τ(w) − τ(0) = −Jᵀw`.
 - *Algorithm / paper:* Luh, Walker, Paul (1980).
