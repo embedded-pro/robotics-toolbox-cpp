@@ -122,7 +122,6 @@ existing `dynamics/` convention.
 | M10 | Cartesian path + orientation (SLERP) interpolation              | `trajectory` (new)        | NT53, NT55     | ★★☆☆☆      |
 | M11 | Manipulability ellipsoid / Yoshikawa index                      | `kinematics`              | M8             | ★★☆☆☆      |
 | M14 | Redundancy resolution / null-space projection                   | `kinematics`              | M8, NT62       | ★★☆☆☆      |
-| M12 | Computed-torque (inverse-dynamics) control                      | `controllers/manipulator` | M29            | ★★★☆☆      |
 | M13 | Full 6-DOF pose IK (position + orientation)                     | `kinematics`              | NT53, NT64, M8 | ★★★☆☆      |
 | M15 | Product-of-Exponentials forward kinematics                      | `kinematics`              | NT53           | ★★★☆☆      |
 | M16 | Momentum-based collision-detection observer                     | `dynamics`                | M29, M31       | ★★★☆☆      |
@@ -157,9 +156,6 @@ retired here.
 - *Reuses / builds on:* upstream `solvers::DampedPseudoInverse` (NT62).
 
 ### Tier 3 — Moderate ★★★☆☆
-
-**M12. Computed-torque (inverse-dynamics) control.** `τ = ID(q, q̇, q̈_d + Kd·ė + Kp·e)` in one `O(n)` call, yielding decoupled error dynamics.
-- *Algorithm / paper:* Spong et al., *Robot Modeling and Control*, Ch. 8; Luh, Walker, Paul (1980).
 
 **M13. Full 6-DOF pose IK.** Damped least squares on the SE(3) log-map error with position/rotation weighting, adaptive damping, step and joint-limit clamping.
 - *Algorithm / paper:* S. R. Buss (2004); Nakamura & Hanafusa (1986); Chiaverini (1997).

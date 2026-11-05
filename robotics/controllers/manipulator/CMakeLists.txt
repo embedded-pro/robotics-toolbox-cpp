@@ -11,10 +11,12 @@ target_link_libraries(robotics.controllers.manipulator ${ROBOTICS_VISIBILITY}
 )
 
 target_sources(robotics.controllers.manipulator PRIVATE
+    ComputedTorqueControl.hpp
     PdGravityCompensation.hpp
 )
 
 robotics_add_coverage_sources(robotics.controllers.manipulator
+    ComputedTorqueControl.cpp
     PdGravityCompensation.cpp
 )
 

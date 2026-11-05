@@ -41,7 +41,7 @@ project already defines those targets. Includes are namespaced by domain, e.g.
 | [Dynamics](doc/dynamics/README.md)                           | Euler-Lagrange, Newton-Euler, Recursive Newton-Euler (RNEA), Articulated Body Algorithm (ABA), Chain Dynamics Model, Composite Rigid Body Algorithm (CRBA), Forward-Dynamics Integration, Generic Joint Link |
 | [Planning](doc/planning/README.md)                           | Primitive Distance Queries                                                                                                                                                                                   |
 | [Trajectory](doc/trajectory/README.md)                       | Cubic Spline Trajectory                                                                                                                                                                                      |
-| [Manipulator Control](doc/controllers/manipulator/README.md) | PD Control with Gravity Compensation                                                                                                                                                                         |
+| [Manipulator Control](doc/controllers/manipulator/README.md) | PD Control with Gravity Compensation, Computed-Torque Control                                                                                                                                                |
 
 Each category page lists its algorithms with a brief description and links to the detailed
 documentation.
