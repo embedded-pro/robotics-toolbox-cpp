@@ -48,12 +48,12 @@ A collision is declared when any joint exceeds its threshold, $|r_i| > \bar{r}_i
 
 ## Complexity Analysis
 
-| Operation        | Time     | Space    | Notes                                            |
-|------------------|----------|----------|--------------------------------------------------|
-| `Update`         | $O(n^2)$ | $O(n^2)$ | Mass matrix and $C^T\dot{q}$ dominate            |
-| `Reset`          | $O(n^2)$ | $O(n)$   | One mass-matrix product                          |
-| `Collision`      | $O(n)$   | $O(1)$   | One comparison per joint                         |
-| Observer state   | —        | $O(n)$   | Initial momentum, integral and residual          |
+| Operation      | Time     | Space    | Notes                                   |
+|----------------|----------|----------|-----------------------------------------|
+| `Update`       | $O(n^2)$ | $O(n^2)$ | Mass matrix and $C^T\dot{q}$ dominate   |
+| `Reset`        | $O(n^2)$ | $O(n)$   | One mass-matrix product                 |
+| `Collision`    | $O(n)$   | $O(1)$   | One comparison per joint                |
+| Observer state | —        | $O(n)$   | Initial momentum, integral and residual |
 
 ## Step-by-Step Walkthrough
 
