@@ -144,6 +144,8 @@ namespace planning
         static ConvexProximity<T> Epa(const Shape& a, const Shape& b, const Simplex& seed);
         static bool BuildTetrahedron(const Shape& a, const Shape& b, const Simplex& seed, Polytope& polytope);
         static bool RaisesRank(const Polytope& polytope, const Vector3& point);
+        static void AppendIfIndependent(Polytope& polytope, const Vertex& vertex);
+        static void ToggleHorizonEdge(std::array<Edge, maxEdges>& horizon, std::size_t& edgeCount, const Edge& edge);
         static bool AddFace(Polytope& polytope, std::uint8_t i, std::uint8_t j, std::uint8_t k);
         static bool Expand(Polytope& polytope, const Vertex& support, T scale);
         static std::size_t ClosestFace(const Polytope& polytope);
@@ -415,20 +417,19 @@ namespace planning
     template<typename T, std::size_t MaxHullVertices, std::size_t MaxFaces>
     bool ConvexCollision<T, MaxHullVertices, MaxFaces>::BuildTetrahedron(const Shape& a, const Shape& b, const Simplex& seed, Polytope& polytope)
     {
-        for (std::size_t i = 0; i < seed.size && polytope.vertexCount < 4; ++i)
-            if (RaisesRank(polytope, seed.vertices[i].w))
-                polytope.vertices[polytope.vertexCount++] = seed.vertices[i];
+        for (std::size_t i = 0; i < seed.size; ++i)
+            AppendIfIndependent(polytope, seed.vertices[i]);
 
         constexpr T diagonal{ T{ 1 } / std::numbers::sqrt3_v<T> };
         const std::array<Vector3, 14> directions{ Vector3{ T{ 1 }, T{}, T{} }, Vector3{ T{ -1 }, T{}, T{} }, Vector3{ T{}, T{ 1 }, T{} }, Vector3{ T{}, T{ -1 }, T{} },
             Vector3{ T{}, T{}, T{ 1 } }, Vector3{ T{}, T{}, T{ -1 } }, Vector3{ diagonal, diagonal, diagonal }, Vector3{ diagonal, diagonal, -diagonal }, Vector3{ diagonal, -diagonal, diagonal },
             Vector3{ diagonal, -diagonal, -diagonal }, Vector3{ -diagonal, diagonal, diagonal }, Vector3{ -diagonal, diagonal, -diagonal }, Vector3{ -diagonal, -diagonal, diagonal },
             Vector3{ -diagonal, -diagonal, -diagonal } };
-        for (std::size_t i = 0; i < directions.size() && polytope.vertexCount < 4; ++i)
+        for (const auto& direction : directions)
         {
-            const auto support{ MinkowskiSupport(a, b, directions[i], SupportKind::Full) };
-            if (RaisesRank(polytope, support.w))
-                polytope.vertices[polytope.vertexCount++] = support;
+            if (polytope.vertexCount == 4)
+                break;
+            AppendIfIndependent(polytope, MinkowskiSupport(a, b, direction, SupportKind::Full));
         }
 
         if (polytope.vertexCount < 4)
@@ -486,31 +487,26 @@ namespace planning
         std::array<Edge, maxEdges> horizon{};
         std::size_t edgeCount{ 0 };
         std::size_t kept{ 0 };
-        for (std::size_t f = 0; f < polytope.faceCount; ++f)
+        const std::size_t faceCount{ polytope.faceCount };
+        for (std::size_t f = 0; f < faceCount; ++f)
         {
             const auto& face{ polytope.faces[f] };
             visible[f] = Dot(face.normal, Vector3{ support.w - polytope.vertices[face.index[0]].w }) > -relativeTolerance * scale;
-            kept += visible[f] ? 0 : 1;
-            for (std::size_t e = 0; visible[f] && e < 3; ++e)
+            if (!visible[f])
             {
-                const Edge edge{ face.index[e], face.index[(e + 1) % 3] };
-                std::size_t match{ edgeCount };
-                for (std::size_t h = 0; h < edgeCount; ++h)
-                    if (horizon[h].from == edge.to && horizon[h].to == edge.from)
-                        match = h;
-
-                if (match < edgeCount)
-                    horizon[match] = horizon[--edgeCount];
-                else
-                    horizon[edgeCount++] = edge;
+                ++kept;
+                continue;
             }
+
+            for (std::size_t e = 0; e < 3; ++e)
+                ToggleHorizonEdge(horizon, edgeCount, Edge{ face.index[e], face.index[(e + 1) % 3] });
         }
 
         if (polytope.vertexCount == maxVertices || kept + edgeCount > MaxFaces)
             return false;
 
         std::size_t slot{ 0 };
-        for (std::size_t f = 0; f < polytope.faceCount; ++f)
+        for (std::size_t f = 0; f < faceCount; ++f)
             if (!visible[f])
                 polytope.faces[slot++] = polytope.faces[f];
         polytope.faceCount = slot;
@@ -522,6 +518,27 @@ namespace planning
                 return false;
 
         return true;
+    }
+
+    template<typename T, std::size_t MaxHullVertices, std::size_t MaxFaces>
+    void ConvexCollision<T, MaxHullVertices, MaxFaces>::AppendIfIndependent(Polytope& polytope, const Vertex& vertex)
+    {
+        if (polytope.vertexCount < 4 && RaisesRank(polytope, vertex.w))
+            polytope.vertices[polytope.vertexCount++] = vertex;
+    }
+
+    template<typename T, std::size_t MaxHullVertices, std::size_t MaxFaces>
+    void ConvexCollision<T, MaxHullVertices, MaxFaces>::ToggleHorizonEdge(std::array<Edge, maxEdges>& horizon, std::size_t& edgeCount, const Edge& edge)
+    {
+        std::size_t match{ edgeCount };
+        for (std::size_t h = 0; h < edgeCount; ++h)
+            if (horizon[h].from == edge.to && horizon[h].to == edge.from)
+                match = h;
+
+        if (match < edgeCount)
+            horizon[match] = horizon[--edgeCount];
+        else
+            horizon[edgeCount++] = edge;
     }
 
     template<typename T, std::size_t MaxHullVertices, std::size_t MaxFaces>

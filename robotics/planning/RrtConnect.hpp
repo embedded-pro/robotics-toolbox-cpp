@@ -73,6 +73,7 @@ namespace planning
         static constexpr std::uint16_t root{ std::numeric_limits<std::uint16_t>::max() };
 
         static T Distance(const JointVector& a, const JointVector& b);
+        std::size_t PathIndex(T fraction) const;
 
         template<class IsFree>
         bool EdgeFree(const JointVector& from, const JointVector& to, IsFree& isFree) const;
@@ -145,15 +146,10 @@ namespace planning
     template<class Uniform, class IsFree>
     void RrtConnect<T, Dof, MaxNodes>::Shortcut(std::size_t attempts, Uniform&& uniform, IsFree&& isFree)
     {
-        const auto pick{ [this, &uniform]
-            {
-                return std::min(static_cast<std::size_t>(uniform() * static_cast<T>(pathLength)), pathLength - 1);
-            } };
-
         for (std::size_t attempt = 0; attempt < attempts && pathLength > 2; ++attempt)
         {
-            auto first{ pick() };
-            auto last{ pick() };
+            auto first{ PathIndex(uniform()) };
+            auto last{ PathIndex(uniform()) };
             if (last < first)
                 std::swap(first, last);
             if (last - first < 2 || !EdgeFree(path[first], path[last], isFree))
@@ -180,6 +176,12 @@ namespace planning
     std::size_t RrtConnect<T, Dof, MaxNodes>::NodeCount() const
     {
         return trees[0].size + trees[1].size;
+    }
+
+    template<typename T, std::size_t Dof, std::size_t MaxNodes>
+    std::size_t RrtConnect<T, Dof, MaxNodes>::PathIndex(T fraction) const
+    {
+        return std::min(static_cast<std::size_t>(fraction * static_cast<T>(pathLength)), pathLength - 1);
     }
 
     template<typename T, std::size_t Dof, std::size_t MaxNodes>

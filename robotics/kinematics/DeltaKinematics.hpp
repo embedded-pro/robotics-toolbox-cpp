@@ -39,16 +39,15 @@ namespace kinematics
         std::optional<T> ArmAngle(std::size_t arm, const math::Vector3<T>& effector) const;
         math::Vector3<T> ShiftedElbow(std::size_t arm, T angle) const;
 
+        static constexpr std::array<T, 3> cosPhi{ T{ 1 }, T{ -0.5f }, T{ -0.5f } };
+        static constexpr std::array<T, 3> sinPhi{ T{}, std::numbers::sqrt3_v<T> / T{ 2 }, -std::numbers::sqrt3_v<T> / T{ 2 } };
+
         DeltaGeometry<T> geometry;
-        std::array<T, 3> cosPhi;
-        std::array<T, 3> sinPhi;
     };
 
     template<typename T>
     DeltaKinematics<T>::DeltaKinematics(const DeltaGeometry<T>& geometry)
         : geometry{ geometry }
-        , cosPhi{ T{ 1 }, -T{ 0.5f }, -T{ 0.5f } }
-        , sinPhi{ T{}, std::numbers::sqrt3_v<T> / T{ 2 }, -std::numbers::sqrt3_v<T> / T{ 2 } }
     {}
 
     template<typename T>

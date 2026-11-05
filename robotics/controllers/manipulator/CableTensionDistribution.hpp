@@ -36,7 +36,10 @@ namespace controllers
 
     private:
         using Program = solvers::QuadraticProgram<T, NumCables, WrenchDim, 2 * NumCables>;
+        using FixedMask = std::array<bool, NumCables>;
 
+        bool SolveFree(const StructureMatrix& structure, const FixedMask& fixed, const WrenchVector& remaining, TensionVector& tensions) const;
+        std::optional<std::size_t> WorstViolation(const FixedMask& fixed, const TensionVector& tensions) const;
         T Violation(T tension) const;
 
         AnchorArray baseAnchors;
@@ -83,52 +86,64 @@ namespace controllers
         if (!structure)
             return std::nullopt;
 
-        std::array<bool, NumCables> fixed{};
-        std::size_t freeCables{ NumCables };
+        FixedMask fixed{};
         WrenchVector remaining{ wrench };
         TensionVector tensions{};
-
-        while (freeCables >= WrenchDim)
+        for (std::size_t freeCables = NumCables; freeCables >= WrenchDim; --freeCables)
         {
-            StructureMatrix active{ *structure };
-            TensionVector centre{};
-            for (std::size_t i = 0; i < NumCables; ++i)
-            {
-                centre[i] = fixed[i] ? T{} : tMid;
-                for (std::size_t r = 0; r < WrenchDim; ++r)
-                    active.at(r, i) = fixed[i] ? T{} : active.at(r, i);
-            }
-
-            const auto multipliers{ solvers::TrySolveSystem(math::SquareMatrix<T, WrenchDim>{ active * active.Transpose() }, WrenchVector{ remaining - active * centre }) };
-            if (!multipliers)
+            if (!SolveFree(*structure, fixed, remaining, tensions))
                 return std::nullopt;
 
-            const TensionVector correction{ active.Transpose() * *multipliers };
-            std::size_t worst{ 0 };
-            T worstViolation{ T{ -1 } };
-            for (std::size_t i = 0; i < NumCables; ++i)
-            {
-                if (fixed[i])
-                    continue;
-                tensions[i] = tMid + correction[i];
-                if (Violation(tensions[i]) > worstViolation)
-                {
-                    worst = i;
-                    worstViolation = Violation(tensions[i]);
-                }
-            }
-
-            if (worstViolation <= T{})
+            const auto worst{ WorstViolation(fixed, tensions) };
+            if (!worst)
                 return tensions;
 
-            tensions[worst] = std::clamp(tensions[worst], tMin, tMax);
-            fixed[worst] = true;
-            --freeCables;
+            tensions[*worst] = std::clamp(tensions[*worst], tMin, tMax);
+            fixed[*worst] = true;
             for (std::size_t r = 0; r < WrenchDim; ++r)
-                remaining[r] -= structure->at(r, worst) * tensions[worst];
+                remaining[r] -= structure->at(r, *worst) * tensions[*worst];
         }
 
         return std::nullopt;
+    }
+
+    template<typename T, std::size_t NumCables, std::size_t WrenchDim>
+    bool CableTensionDistribution<T, NumCables, WrenchDim>::SolveFree(const StructureMatrix& structure, const FixedMask& fixed, const WrenchVector& remaining, TensionVector& tensions) const
+    {
+        StructureMatrix active{ structure };
+        TensionVector centre{};
+        for (std::size_t i = 0; i < NumCables; ++i)
+        {
+            centre[i] = fixed[i] ? T{} : tMid;
+            for (std::size_t r = 0; r < WrenchDim; ++r)
+                active.at(r, i) = fixed[i] ? T{} : active.at(r, i);
+        }
+
+        const auto multipliers{ solvers::TrySolveSystem(math::SquareMatrix<T, WrenchDim>{ active * active.Transpose() }, WrenchVector{ remaining - active * centre }) };
+        if (!multipliers)
+            return false;
+
+        const TensionVector correction{ active.Transpose() * *multipliers };
+        for (std::size_t i = 0; i < NumCables; ++i)
+            tensions[i] = fixed[i] ? tensions[i] : tMid + correction[i];
+        return true;
+    }
+
+    template<typename T, std::size_t NumCables, std::size_t WrenchDim>
+    std::optional<std::size_t> CableTensionDistribution<T, NumCables, WrenchDim>::WorstViolation(const FixedMask& fixed, const TensionVector& tensions) const
+    {
+        std::optional<std::size_t> worst{};
+        T worstViolation{};
+        for (std::size_t i = 0; i < NumCables; ++i)
+        {
+            const T violation{ fixed[i] ? T{} : Violation(tensions[i]) };
+            if (violation > worstViolation)
+            {
+                worst = i;
+                worstViolation = violation;
+            }
+        }
+        return worst;
     }
 
     template<typename T, std::size_t NumCables, std::size_t WrenchDim>
