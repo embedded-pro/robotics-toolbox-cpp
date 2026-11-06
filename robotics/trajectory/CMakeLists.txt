@@ -9,17 +9,21 @@ target_link_libraries(robotics.trajectory ${ROBOTICS_VISIBILITY}
     infra.util
     numerical.math
     numerical.motion_profiles
+    robotics.dynamics
 )
 
 target_sources(robotics.trajectory PRIVATE
     CartesianSlerpInterpolation.hpp
     CubicSplineTrajectory.hpp
+    TimeOptimalPathParameterization.hpp
     TrajectoryTypes.hpp
 )
 
 robotics_add_coverage_sources(robotics.trajectory
     CartesianSlerpInterpolation.cpp
     CubicSplineTrajectory.cpp
+    TimeOptimalPathParameterization.cpp
 )
 
 add_subdirectory(test)
+add_subdirectory(test_doubles)

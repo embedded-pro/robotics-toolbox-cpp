@@ -96,7 +96,7 @@ The library already has the core of manipulator **modelling**: forward/inverse d
 ([ForwardDynamicsIntegrator](robotics/dynamics/ForwardDynamicsIntegrator.hpp)), the manipulator-equation adapter
 ([ChainDynamicsModel](robotics/dynamics/ChainDynamicsModel.hpp)), position forward kinematics with base and
 tool offsets, and damped-least-squares [IK](robotics/kinematics/InverseKinematics.hpp). Full-pose
-kinematics and the geometric Jacobian have shipped (see the note below); what is missing is the
+kinematics and the geometric Jacobian have shipped (see the note below), and so has the
 **planning and control layer** that turns those models into a usable manipulator stack.
 
 > **Full-pose kinematics shipped.** Links are generic ([JointLink](robotics/dynamics/JointLink.hpp):
@@ -117,24 +117,12 @@ existing `dynamics/` convention.
 
 ### Manipulator list (by priority)
 
-| #   | Component                                    | Target module      | Depends on | Difficulty |
-|-----|----------------------------------------------|--------------------|------------|------------|
-| M27 | Time-optimal path parameterization (TOPP-RA) | `trajectory` (new) | M29        | ★★★★★      |
+All manipulator items have shipped: see [Manipulator Control](doc/controllers/manipulator/README.md),
+[Kinematics](doc/kinematics/README.md), [Dynamics](doc/dynamics/README.md) and [Trajectory](doc/trajectory/README.md).
 
 M2 (polynomial profile), M3 (trapezoidal profile), M4 (friction compensation), M6 (SE(3)) and M9
 (S-curve profile) moved to numerical-toolbox as NT55, NT56, NT57, NT53 and NT60; their numbers are
 retired here.
-
-### Tier 2 — Easy ★★☆☆☆
-
-### Tier 3 — Moderate ★★★☆☆
-
-### Tier 4 — Advanced ★★★★☆
-
-### Tier 5 — Hard / research-grade ★★★★★
-
-**M27. Time-optimal path parameterization (TOPP-RA).** Minimum-time traversal of a fixed path under joint velocity and torque limits via reachability analysis (two-variable LPs per grid stage, solved locally by Fourier–Motzkin elimination).
-- *Algorithm / paper:* J. Bobrow, S. Dubowsky, J. Gibson, *IJRR*, 4(3), 1985; H. Pham, Q.-C. Pham, "A New Approach to Time-Optimal Path Parameterization Based on Reachability Analysis," *IEEE T-RO*, 34(3), 2018.
 
 ---
 
