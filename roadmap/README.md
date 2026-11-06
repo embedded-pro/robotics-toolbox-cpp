@@ -3,8 +3,8 @@
 Design-level pseudocode for proposed components in [../ROADMAP.md](../ROADMAP.md).
 These are **specifications, not compilable code** — they describe *what* to build and *how*
 the algorithm works, so an implementer can produce the real templated C++ afterwards. Every manipulator
-(M), wheeled-robot (W), localization (E) and planning (P) item has a spec, as does F1; the other families
-(F, A, L, S, G, C, H) are ROADMAP entries only, and their specs are added here family by family.
+(M), wheeled-robot (W), localization (E) and planning (P) item, and F1, has shipped from a spec here; the
+other families (F, A, L, S, G, C, H) are ROADMAP entries only, and their specs are added here family by family.
 
 ## Convention
 
@@ -22,8 +22,9 @@ All pseudocode respects the library constraints: **no heap**, bounded containers
 `template<typename T>` interface that is validated and instantiated for **`float`** only
 (no `Q15`/`Q31`). The generic signature keeps a future fixed-point specialisation cheap to add.
 
-The canonical worked example is
-[trajectory/TimeOptimalPathParameterization](trajectory/TimeOptimalPathParameterization/implementation.md).
+No spec is pending. The last one, M27, shipped as
+[TimeOptimalPathParameterization](../doc/trajectory/TimeOptimalPathParameterization.md); its spec files stay in the
+git history as the canonical worked example.
 
 Conventions shared by every spec: 6-vectors are ordered linear part first — twists `(v; ω)`, wrenches
 `(f; n)` — as fixed by upstream [math/SE3Transform](https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE3Transform.md) (NT53), and planar
@@ -88,5 +89,4 @@ prerequisites.
 
 ## Index
 
-### `trajectory`
-`TimeOptimalPathParameterization` (M27)
+No spec is pending.
