@@ -288,13 +288,7 @@ All planning items have shipped: see [Planning](doc/planning/README.md).
 
 ## Localization and mapping
 
-| #  | Component                | Target module  | Depends on   | Difficulty |
-|----|--------------------------|----------------|--------------|------------|
-| E4 | Monte Carlo localization | `localization` | NT70, E2, F1 | ★★★★☆      |
-
-**E4. Monte Carlo localization.** Particle-filter localization in an occupancy grid with the odometry motion model and a likelihood-field sensor model (two-pass chamfer distance map); samplers injected by the caller.
-- *Algorithm / paper:* F. Dellaert, D. Fox, W. Burgard, S. Thrun, *ICRA* 1999.
-- *Reuses / builds on:* NT70, E2, F1.
+All localization items have shipped: see [Localization & Mapping](doc/localization/README.md).
 
 ## Calibration
 

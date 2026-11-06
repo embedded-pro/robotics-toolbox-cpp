@@ -9,6 +9,7 @@ target_link_libraries(robotics.localization_test PUBLIC
 
 target_sources(robotics.localization_test PRIVATE
     TestLandmarkLocalization.cpp
+    TestMonteCarloLocalization.cpp
     TestOccupancyGridMap.cpp
     TestOdometryFusion.cpp
     TestScanMatcher.cpp
