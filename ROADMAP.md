@@ -41,7 +41,7 @@ this roadmap needs that upstream does not ship yet are specified and built upstr
 Generic algorithms live in numerical-toolbox-cpp and are referenced here as **NT** plus its
 master-list item number (NT53 is upstream item 53). A robotics item that depends on one needs a
 numerical-toolbox pin that ships it. NT53–NT67 and NT74 have shipped upstream, and their links point to the
-upstream docs; the current pin (`f773d31`) includes them.
+upstream docs; the current pin (`182e068`) includes them.
 
 | #    | Component                                             | Upstream module      | Spec / doc                        | Needed by                                                                  |
 |------|-------------------------------------------------------|----------------------|-----------------------------------|----------------------------------------------------------------------------|
