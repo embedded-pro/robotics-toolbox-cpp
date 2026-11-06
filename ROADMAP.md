@@ -288,18 +288,13 @@ All planning items have shipped: see [Planning](doc/planning/README.md).
 
 ## Localization and mapping
 
-| #  | Component                                              | Target module  | Depends on       | Difficulty |
-|----|--------------------------------------------------------|----------------|------------------|------------|
-| E4 | Monte Carlo localization                               | `localization` | NT70, E2, F1     | ★★★★☆      |
-| E5 | 2-D scan matching (point-to-point / point-to-line ICP) | `localization` | NT67, NT64, NT66 | ★★★★☆      |
+| #  | Component                | Target module  | Depends on   | Difficulty |
+|----|--------------------------|----------------|--------------|------------|
+| E4 | Monte Carlo localization | `localization` | NT70, E2, F1 | ★★★★☆      |
 
 **E4. Monte Carlo localization.** Particle-filter localization in an occupancy grid with the odometry motion model and a likelihood-field sensor model (two-pass chamfer distance map); samplers injected by the caller.
 - *Algorithm / paper:* F. Dellaert, D. Fox, W. Burgard, S. Thrun, *ICRA* 1999.
 - *Reuses / builds on:* NT70, E2, F1.
-
-**E5. Scan matching.** Iterative closest point between consecutive laser scans or against a map: point-to-point (Kabsch) or point-to-line (Levenberg–Marquardt), outlier rejection and degeneracy detection.
-- *Algorithm / paper:* P. Besl, N. McKay, *IEEE T-PAMI*, 14(2), 1992; A. Censi, *ICRA* 2008.
-- *Reuses / builds on:* NT67, NT64, NT66.
 
 ## Calibration
 

@@ -11,4 +11,5 @@ target_sources(robotics.localization_test PRIVATE
     TestLandmarkLocalization.cpp
     TestOccupancyGridMap.cpp
     TestOdometryFusion.cpp
+    TestScanMatcher.cpp
 )
