@@ -16,6 +16,7 @@ target_link_libraries(robotics.localization ${ROBOTICS_VISIBILITY}
 
 target_sources(robotics.localization PRIVATE
     LandmarkLocalization.hpp
+    MonteCarloLocalization.hpp
     OccupancyGridMap.hpp
     OdometryFusion.hpp
     ScanMatcher.hpp
@@ -23,6 +24,7 @@ target_sources(robotics.localization PRIVATE
 
 robotics_add_coverage_sources(robotics.localization
     LandmarkLocalization.cpp
+    MonteCarloLocalization.cpp
     OccupancyGridMap.cpp
     OdometryFusion.cpp
     ScanMatcher.cpp
