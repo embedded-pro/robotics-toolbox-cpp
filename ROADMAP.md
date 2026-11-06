@@ -40,8 +40,8 @@ this roadmap needs that upstream does not ship yet are specified and built upstr
 
 Generic algorithms live in numerical-toolbox-cpp and are referenced here as **NT** plus its
 master-list item number (NT53 is upstream item 53). A robotics item that depends on one needs a
-numerical-toolbox pin that ships it. NT53–NT67 and NT74 have shipped upstream, and their links point to the
-upstream docs; the current pin (`182e068`) includes them.
+numerical-toolbox pin that ships it. NT53–NT67, NT70 and NT74 have shipped upstream, and their links point to the
+upstream docs; the current pin (`6080be4`) includes them.
 
 | #    | Component                                             | Upstream module      | Spec / doc                        | Needed by                                                                  |
 |------|-------------------------------------------------------|----------------------|-----------------------------------|----------------------------------------------------------------------------|
@@ -62,7 +62,7 @@ upstream docs; the current pin (`182e068`) includes them.
 | NT67 | Kabsch / Umeyama point-set alignment                  | `solvers`            | [PointSetAlignment][nt67]         | E5, C1                                                                     |
 | NT68 | Lie-group Jacobians and ⊕/⊖ (SO(3), SE(3), SE(2))     | `math`               | [master list][ntrm], no spec yet  | C1 (and NT71)                                                              |
 | NT69 | Control allocation (redistributed pseudo-inverse, QP) | `controllers`        | [master list][ntrm], no spec yet  | A2, S3                                                                     |
-| NT70 | Particle filter (bounded, systematic resampling)      | `filters/active`     | [ParticleFilter][nt70] (spec)     | E4                                                                         |
+| NT70 | Particle filter (bounded, systematic resampling)      | `filters/active`     | [ParticleFilter][nt70]            | E4                                                                         |
 | NT71 | Error-state EKF on Lie groups                         | `filters/active`     | [master list][ntrm], no spec yet  | L5                                                                         |
 | NT72 | Minimum-derivative (min-snap) piecewise polynomials   | `motion_profiles`    | [master list][ntrm], no spec yet  | A7                                                                         |
 | NT73 | Online jerk-limited trajectory from arbitrary state   | `motion_profiles`    | [master list][ntrm], no spec yet  | F2                                                                         |
@@ -84,7 +84,7 @@ upstream docs; the current pin (`182e068`) includes them.
 [nt65]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/solvers/ActiveSetQp.md
 [nt66]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/math/SE2Transform.md
 [nt67]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/solvers/PointSetAlignment.md
-[nt70]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/roadmap/filters/active/ParticleFilter/implementation.md
+[nt70]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/filters/active/ParticleFilter.md
 [nt74]: https://github.com/embedded-pro/numerical-toolbox-cpp/blob/main/doc/filters/active/ResidualKalmanUpdate.md
 
 ## Robot manipulators & other manipulator types
