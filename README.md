@@ -55,7 +55,7 @@ The entire documentation set is also published as a single book — read it onli
 PDF from the [Releases page](https://github.com/embedded-pro/robotics-toolbox-cpp/releases/latest). Both are generated automatically from `doc/`
 (cover, Summary/table of contents, one chapter per category, consolidated references, back cover).
 
-Build it locally with [Pandoc](https://pandoc.org) + XeLaTeX installed:
+Build it locally with [Pandoc](https://pandoc.org) + XeLaTeX installed, or in the [`embedded-devcontainer-documentation`](https://hub.docker.com/r/gabrielfrasantos/embedded-devcontainer-documentation) container image that CI uses:
 
 ```bash
 python scripts/build-booklet.py --format all   # writes build/booklet/{RoboticsToolbox.pdf,index.html}
