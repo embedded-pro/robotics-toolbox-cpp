@@ -77,7 +77,29 @@ namespace dynamics
         return math::Abs(math::DotProduct(link.jointAxis, link.jointAxis) - T(1)) < T(1e-3);
     }
 
+    template<typename T>
+    math::SquareMatrix<T, 3> ParallelAxisInertia(T mass, const math::Vector<T, 3>& offset)
+    {
+        return (math::SquareMatrix<T, 3>::Identity() * math::DotProduct(offset, offset) - offset * offset.Transpose()) * mass;
+    }
+
+    template<typename T>
+    JointLink<T> AttachRigidBody(JointLink<T> link, T mass, const math::Vector<T, 3>& centre, const math::SquareMatrix<T, 3>& inertia)
+    {
+        const T total{ link.mass + mass };
+        if (!(total > T{}))
+            return link;
+
+        const math::Vector<T, 3> combined{ (link.jointToCoM * link.mass + centre * mass) * (T{ 1 } / total) };
+        link.inertia = link.inertia + ParallelAxisInertia(link.mass, link.jointToCoM - combined) + inertia + ParallelAxisInertia(mass, centre - combined);
+        link.mass = total;
+        link.jointToCoM = combined;
+        return link;
+    }
+
 #ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD
     extern template struct JointLink<float>;
+    extern template math::SquareMatrix<float, 3> ParallelAxisInertia<float>(float, const math::Vector<float, 3>&);
+    extern template JointLink<float> AttachRigidBody<float>(JointLink<float>, float, const math::Vector<float, 3>&, const math::SquareMatrix<float, 3>&);
 #endif
 }

@@ -48,6 +48,18 @@ For revolute joints this is the familiar axis–torque projection; for prismatic
 - **Offsets**: every transform to the parent uses $r_i(q)$, which grows with a prismatic joint's displacement.
 - **Inertia**: the armature adds only to the joint's own diagonal entry of the mass matrix and to the articulated inertia $D_i = S_i^T I^A_i S_i + J_{a,i}$. It changes neither kinematics nor gravity.
 
+### Attaching a Rigid Body
+
+A payload, a tool or a motor housing rides on a link and moves with it, so it becomes part of the link. A body of mass $m_b$, centre $c_b$ and rotational inertia $\bar{I}_b$ about its own centre, all in the link frame, merges with the link into one rigid body:
+
+$$m = m_i + m_b, \qquad c = \frac{m_i c_i + m_b c_b}{m}$$
+
+Each inertia moves to the common centre by the parallel-axis theorem, $\bar{I}(d) = m\left(d^T d\,\mathbf{I}_3 - d\,d^T\right)$ for a mass $m$ offset by $d$:
+
+$$\bar{I} = \bar{I}_i + m_i\left(\lVert d_i \rVert^2 \mathbf{I}_3 - d_i d_i^T\right) + \bar{I}_b + m_b\left(\lVert d_b \rVert^2 \mathbf{I}_3 - d_b d_b^T\right), \qquad d_i = c_i - c,\; d_b = c_b - c$$
+
+The merged link's inertia about any point, its joint origin included, is the sum of the two bodies' inertias about that point, so the dynamics see exactly the combined body. A merge with no mass at all leaves the link unchanged.
+
 ## Complexity Analysis
 
 | Operation        | Time   | Space  | Notes                                                 |
@@ -55,6 +67,7 @@ For revolute joints this is the familiar axis–torque projection; for prismatic
 | Joint transform  | $O(1)$ | $O(1)$ | One axis–angle rotation (revolute) or one scaled add  |
 | Motion subspace  | $O(1)$ | $O(1)$ | Selects the angular or linear channel                 |
 | Per-link storage | —      | $O(1)$ | Type byte, four limit scalars and one armature scalar |
+| Body attachment  | $O(1)$ | $O(1)$ | Two parallel-axis terms and one weighted centre       |
 
 The recursions keep their order: $O(n)$ for forward kinematics, inverse dynamics and forward dynamics, and $O(n^2)$ for the mass matrix.
 
@@ -72,11 +85,14 @@ where the second term is the Coriolis contribution. The slider force is $\tau_1 
 
 **Armature.** A uniform $1$ kg, $1$ m rod with $0.2$ kg·m² of armature has effective inertia $\tfrac13 + 0.2 = 0.533$ kg·m² about its joint, in the inverse dynamics, the forward dynamics and the mass matrix alike.
 
+**Attached point mass.** A $1$ kg point mass at the joint origin and a $1$ kg payload $1$ m along $z$ merge into $2$ kg centred at $0.5$ m. Each mass sits $0.5$ m from the new centre, so the merged inertia about it is $2 \cdot 1 \cdot 0.5^2 = 0.5$ kg·m² about $x$ and $y$ and zero about $z$.
+
 ## Pitfalls & Edge Cases
 
 - **Forgetting the Coriolis term**: a slider riding on a rotating link feels $2\omega \times \hat{z}\dot{q}$. Revolute-only code that is "extended" by swapping the projection silently drops it.
 - **Projecting the wrong channel**: prismatic joints must project the force, not the moment. A torque projection on a prismatic joint returns a meaningless value with the right units.
 - **Non-unit axes**: a non-unit axis scales the rotation angle of a revolute joint and the displacement of a prismatic one. Normalize axes when the model is built.
+- **Attached inertia about the wrong point**: the body's inertia must be about its own centre and in the link frame. An inertia about the flange, or in the tool frame, counts the parallel-axis term twice or rotates the tensor away from the link's axes.
 - **Limits are not enforced by the dynamics**: limits are data for planners, inverse kinematics and safety layers. Inverse and forward dynamics never clamp.
 - **Armature units**: kg·m² for revolute joints and kg for prismatic joints. Reflected inertia scales with the square of the gear ratio, so a small rotor behind a 100:1 gearbox easily outweighs a light link.
 - **Singular models**: a prismatic joint whose outboard mass is zero and has no armature gives $D_i = 0$; forward dynamics through it is undefined.
