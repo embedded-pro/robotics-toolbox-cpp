@@ -36,6 +36,7 @@ namespace planning
         void Allow(std::size_t i, std::size_t j);
         void Disallow(std::size_t i, std::size_t j);
         bool IsAllowed(std::size_t i, std::size_t j) const;
+        void AllowTouching(const Frames& reference, T margin);
 
         OPTIMIZE_FOR_SPEED SelfCollisionResult<T> Check(const Frames& frames, T margin) const;
         Capsule<T> LinkCapsule(const Frames& frames, std::size_t link) const;
@@ -73,6 +74,15 @@ namespace planning
     bool SelfCollision<T, NumLinks>::IsAllowed(std::size_t i, std::size_t j) const
     {
         return (allowed[i] & Bit(j)) != 0;
+    }
+
+    template<typename T, std::size_t NumLinks>
+    void SelfCollision<T, NumLinks>::AllowTouching(const Frames& reference, T margin)
+    {
+        for (std::size_t i = 0; i < NumLinks; ++i)
+            for (std::size_t j = i + 1; j < NumLinks; ++j)
+                if (!IsAllowed(i, j) && PrimitiveDistance<T>::CapsuleCapsule(LinkCapsule(reference, i), LinkCapsule(reference, j)).distance < margin)
+                    Allow(i, j);
     }
 
     template<typename T, std::size_t NumLinks>

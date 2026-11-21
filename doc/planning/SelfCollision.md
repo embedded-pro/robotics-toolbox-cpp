@@ -34,6 +34,8 @@ where the **allowed set** $\mathcal{A}$ excludes pairs that need no check.
 Adjacent links share a joint, so their capsules always touch, and they are allowed by default. Further pairs belong in $\mathcal{A}$ when joint limits keep them permanently apart, or when the coarse model makes them permanently overlap (a housing over its neighbour).
 A permanent false positive would otherwise hide every real collision behind it. The allowed set is a symmetric bit matrix, so membership is a single test.
 
+The pairs that overlap by construction can be found from the model itself: evaluate every pair not yet allowed at a reference configuration where the arm is known to be clear, such as its home pose, and allow those closer than the margin there. Whatever touches in a pose that is safe by definition touches because of the coarse geometry, not because of a collision.
+
 ### Margin
 
 The configuration is flagged as colliding when $d_{\min} < m$. A positive margin $m$ absorbs model error, sensor latency and the motion between checks. At tool speed $v$ and control period $\Delta t$, use at least $m \ge v\,\Delta t$.
@@ -56,6 +58,7 @@ A planar four-link arm has link lengths $(0.4, 0.8, 0.7, 0.5)$ m and radii $(0.1
 
 ## Pitfalls & Edge Cases
 
+- **Reference pose that is not clear**: allowing the pairs that touch at a reference configuration trusts that configuration. A reference pose with a genuine overlap hides that collision for good.
 - **Coarse geometry**: joint-to-joint capsules miss offset parts such as elbow housings, cables and tools. Enlarge the radius, or add extra frames that model those parts as separate capsules.
 - **Over-allowing**: every allowed pair is a blind spot. Justify each one with joint limits or permanent overlap, never just to silence a warning.
 - **Crossing cores**: once two core segments intersect, the penetration depth is only a lower bound and the closest points are arbitrary. Treat any negative value as a collision rather than trusting its magnitude.

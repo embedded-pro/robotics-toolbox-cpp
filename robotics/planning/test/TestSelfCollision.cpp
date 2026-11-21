@@ -104,3 +104,12 @@ TEST_F(TestSelfCollision, adjacent_pairs_are_allowed_by_default)
 
     EXPECT_EQ(model.Check(Planar(0.0f, 0.0f, 0.0f, 0.0f), 0.0f).checkedPairs, 4u);
 }
+
+TEST_F(TestSelfCollision, allow_touching_allows_only_the_pairs_within_the_margin_at_the_reference_pose)
+{
+    model.AllowTouching(Planar(0.0f, 2.4f, 2.4f, 0.5f), 0.0f);
+
+    EXPECT_TRUE(model.IsAllowed(0, 2));
+    EXPECT_FALSE(model.IsAllowed(0, 3));
+    EXPECT_FALSE(model.IsAllowed(1, 3));
+}
