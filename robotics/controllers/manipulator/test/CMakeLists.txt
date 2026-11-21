@@ -12,6 +12,7 @@ target_link_libraries(robotics.controllers.manipulator_test PUBLIC
 target_sources(robotics.controllers.manipulator_test PRIVATE
     TestCableTensionDistribution.cpp
     TestComputedTorqueControl.cpp
+    TestCoupledDamping.cpp
     TestHybridPositionForceControl.cpp
     TestImpedanceControl.cpp
     TestOperationalSpaceControl.cpp
