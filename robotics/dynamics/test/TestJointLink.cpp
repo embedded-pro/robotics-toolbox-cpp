@@ -98,3 +98,44 @@ TEST_F(TestJointLink, armature_adds_to_diagonal_inertia)
     EXPECT_NEAR(acceleration[0], qDDot, math::Tolerance<float>());
     EXPECT_NEAR(M.at(0, 0), rodInertia + armature, math::Tolerance<float>());
 }
+
+TEST_F(TestJointLink, attaching_a_point_mass_moves_the_centre_and_adds_its_parallel_axis_inertia)
+{
+    const Link link{ 1.0f, Matrix3{}, z, Vector3{}, Vector3{} };
+
+    const auto merged{ dynamics::AttachRigidBody(link, 1.0f, z, Matrix3{}) };
+
+    EXPECT_NEAR(merged.mass, 2.0f, math::Tolerance<float>());
+    ExpectNear(merged.jointToCoM, Vector3{ 0.0f, 0.0f, 0.5f });
+    for (std::size_t row = 0; row < 3; ++row)
+        for (std::size_t column = 0; column < 3; ++column)
+            EXPECT_NEAR(merged.inertia.at(row, column), row == column && row != 2 ? 0.5f : 0.0f, math::Tolerance<float>());
+}
+
+TEST_F(TestJointLink, attaching_a_body_keeps_the_inertia_about_the_joint_the_sum_of_both)
+{
+    const Matrix3 linkInertia{ { 0.003f, 0.0002f, -0.0001f }, { 0.0002f, 0.004f, 0.0003f }, { -0.0001f, 0.0003f, 0.0015f } };
+    const Matrix3 bodyInertia{ { 0.0004f, -0.00005f, 0.0f }, { -0.00005f, 0.0003f, 0.00002f }, { 0.0f, 0.00002f, 0.0002f } };
+    const Vector3 linkCentre{ 0.01f, 0.0f, 0.08f };
+    const Vector3 bodyCentre{ 0.02f, -0.01f, 0.1f };
+    const Link link{ 1.2f, linkInertia, z, offset, linkCentre };
+
+    const auto merged{ dynamics::AttachRigidBody(link, 0.4f, bodyCentre, bodyInertia) };
+
+    const Matrix3 expected{ linkInertia + dynamics::ParallelAxisInertia(1.2f, linkCentre) + bodyInertia + dynamics::ParallelAxisInertia(0.4f, bodyCentre) };
+    const Matrix3 actual{ merged.inertia + dynamics::ParallelAxisInertia(merged.mass, merged.jointToCoM) };
+    for (std::size_t row = 0; row < 3; ++row)
+        for (std::size_t column = 0; column < 3; ++column)
+            EXPECT_NEAR(actual.at(row, column), expected.at(row, column), math::Tolerance<float>());
+    ExpectNear(merged.jointToCoM, (linkCentre * 1.2f + bodyCentre * 0.4f) * (1.0f / 1.6f));
+}
+
+TEST_F(TestJointLink, attaching_a_massless_body_to_a_massless_link_leaves_it_unchanged)
+{
+    const Link link{ 0.0f, Matrix3{}, z, offset, x };
+
+    const auto merged{ dynamics::AttachRigidBody(link, 0.0f, z, Matrix3{}) };
+
+    EXPECT_EQ(merged.mass, 0.0f);
+    ExpectNear(merged.jointToCoM, x);
+}
