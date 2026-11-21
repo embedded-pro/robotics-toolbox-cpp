@@ -86,6 +86,7 @@ A KUKA KR6 R700 sixx has $a_1 = 0.025$, $a_2 = -0.035$, $b = 0$, $c_1 = 0.400$, 
 
 ## Connections to Other Algorithms
 
+- [Nearest Inverse-Kinematics Solution](NearestSolution.md): picks, among the eight candidates, the one within the joint limits nearest the current joints.
 - [Pose Inverse Kinematics](PoseInverseKinematics.md): the iterative alternative for arbitrary geometries.
 - [Denavit-Hartenberg Parameters](DenavitHartenberg.md): the frame-based description that OPW avoids.
 - [Manipulability Index](ManipulabilityIndex.md): measures how close each returned configuration is to a singularity.

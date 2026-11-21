@@ -19,6 +19,7 @@ target_sources(robotics.kinematics_test PRIVATE
     TestInverseKinematics.cpp
     TestManipulabilityIndex.cpp
     TestMobileManipulatorKinematics.cpp
+    TestNearestSolution.cpp
     TestPoseInverseKinematics.cpp
     TestProductOfExponentials.cpp
     TestRedundancyResolution.cpp
