@@ -4,7 +4,9 @@
 
 An impedance or PD controller makes each joint behave as a spring of stiffness $K_i$ and a damper. On a single mass the damper that gives damping ratio $\zeta$ is $2\zeta\sqrt{K m}$. A robot arm is not a set of independent masses: its mass matrix couples the joints, and the shoulder and elbow move each other.
 
-A diagonal damper sized from each joint's own inertia ignores that coupling. The fast coupled mode of two strongly coupled joints, whose inertia is much smaller than either joint's own, is then damped far beyond what a sampled controller can deliver, and it oscillates; a light wrist next to heavy proximal joints suffers the same way. Shaping the damper with the mass matrix itself gives every mode of the arm a sensible damping ratio, while each joint keeps the damping its own spring and inertia call for.
+A diagonal damper sized from each joint's own inertia ignores that coupling.
+The fast coupled mode of two strongly coupled joints, whose inertia is much smaller than either joint's own, is then damped far beyond what a sampled controller can deliver, and it oscillates; a light wrist next to heavy proximal joints suffers the same way.
+Shaping the damper with the mass matrix itself gives every mode of the arm a sensible damping ratio, while each joint keeps the damping its own spring and inertia call for.
 
 ## Mathematical Theory
 
