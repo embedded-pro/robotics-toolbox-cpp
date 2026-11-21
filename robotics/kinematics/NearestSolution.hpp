@@ -93,7 +93,10 @@ namespace kinematics
     }
 
 #ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD
+    extern template std::optional<math::Vector<float, 2>> WrapIntoLimits<float, 2>(const math::Vector<float, 2>&, const math::Vector<float, 2>&, const JointLimitArray<float, 2>&);
     extern template std::optional<math::Vector<float, 6>> WrapIntoLimits<float, 6>(const math::Vector<float, 6>&, const math::Vector<float, 6>&, const JointLimitArray<float, 6>&);
+    extern template NearestSolutionResult<float, 2> NearestSolution<float, 2, 3>(const std::array<std::optional<math::Vector<float, 2>>, 3>&, const math::Vector<float, 2>&,
+        const JointLimitArray<float, 2>&);
     extern template NearestSolutionResult<float, 6> NearestSolution<float, 6, 8>(const std::array<std::optional<math::Vector<float, 6>>, 8>&, const math::Vector<float, 6>&,
         const JointLimitArray<float, 6>&);
 #endif
