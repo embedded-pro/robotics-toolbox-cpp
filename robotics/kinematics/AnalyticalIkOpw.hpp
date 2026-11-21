@@ -5,6 +5,7 @@
 #include "numerical/math/Math.hpp"
 #include "numerical/math/Matrix.hpp"
 #include "numerical/math/SE3Transform.hpp"
+#include "robotics/kinematics/NearestSolution.hpp"
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -56,6 +57,7 @@ namespace kinematics
 
         OPTIMIZE_FOR_SPEED OpwSolutions<T> Solve(const math::SE3Transform<T>& flange) const;
         math::SE3Transform<T> Forward(const JointVector& q) const;
+        NearestSolutionResult<T, 6> SolveNearest(const math::SE3Transform<T>& flange, const JointVector& current, const JointLimitArray<T, 6>& limits) const;
 
     private:
         using Matrix3 = math::Matrix3<T>;
@@ -145,6 +147,17 @@ namespace kinematics
         }
 
         return solutions;
+    }
+
+    template<typename T>
+    NearestSolutionResult<T, 6> AnalyticalIkOpw<T>::SolveNearest(const math::SE3Transform<T>& flange, const JointVector& current, const JointLimitArray<T, 6>& limits) const
+    {
+        const auto solutions{ Solve(flange) };
+        std::array<std::optional<JointVector>, 8> candidates{};
+        for (std::size_t slot = 0; slot < solutions.size(); ++slot)
+            if (solutions[slot].has_value())
+                candidates[slot] = solutions[slot]->q;
+        return NearestSolution(candidates, current, limits);
     }
 
     template<typename T>
