@@ -19,6 +19,7 @@ target_sources(robotics.dynamics PRIVATE
     CompositeRigidBodyAlgorithm.hpp
     CoriolisMatrix.hpp
     DynamicParameterIdentification.hpp
+    EffectiveJointInertia.hpp
     EulerLagrangeDynamics.hpp
     EulerLagrangeSolver.hpp
     ForwardDynamicsIntegrator.hpp
@@ -41,6 +42,7 @@ robotics_add_coverage_sources(robotics.dynamics
     CompositeRigidBodyAlgorithm.cpp
     CoriolisMatrix.cpp
     DynamicParameterIdentification.cpp
+    EffectiveJointInertia.cpp
     EulerLagrangeSolver.cpp
     ForwardDynamicsIntegrator.cpp
     JointLink.cpp
