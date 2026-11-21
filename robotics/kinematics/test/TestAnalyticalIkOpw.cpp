@@ -217,3 +217,17 @@ TEST_F(TestAnalyticalIkOpw, unreachable_target_returns_no_solution)
     for (const auto& solution : foldedOnShoulder.Solve(Translate(0.0f, 0.0f, 0.75f)))
         EXPECT_FALSE(solution.has_value());
 }
+
+TEST_F(TestAnalyticalIkOpw, solve_nearest_picks_the_solution_at_the_current_joints)
+{
+    kinematics::JointLimitArray<float, 6> limits{};
+    for (auto& limit : limits)
+        limit = { -pi, pi };
+
+    const auto result{ ik.SolveNearest(ik.Forward(qTrue), qTrue, limits) };
+
+    ASSERT_EQ(result.status, kinematics::SolutionStatus::found);
+    ASSERT_TRUE(result.q.has_value());
+    for (std::size_t i = 0; i < 6; ++i)
+        EXPECT_NEAR((*result.q)[i], qTrue[i], 1e-3f);
+}
