@@ -1,5 +1,5 @@
 ---
-description: "Refactor a pre-roadmap robotics/ algorithm to reuse shared math/ utilities, add coverage-build infra, and simplify/dedupe tests — preserving existing Q15/Q31 support. Behavior-preserving."
+description: "Refactor a pre-roadmap robotics/ algorithm to reuse shared math/ utilities, add coverage-build infra, and simplify/dedupe tests. Float-only, behavior-preserving."
 tools: [read, edit, search, execute, todo]
 handoffs:
   - label: "Review Changes"
@@ -17,7 +17,7 @@ change unless required to remove duplication.
 
 1. Read the target `.hpp`, its `test/Test*.cpp`, and `doc/<domain>/<Name>.md`.
 2. Find duplication: logic that already exists in `numerical/math/`
-   (`CompilerOptimizations.hpp`, `Tolerance.hpp`, `ComplexNumber.hpp`, `QNumber.hpp`,
+   (`CompilerOptimizations.hpp`, `Tolerance.hpp`, `ComplexNumber.hpp`,
    `RecursiveBuffer.hpp`, `Statistics.hpp`, …) or scaffolding repeated across `test/` files
    (e.g. `CalculateMagnitude`, twiddle-factor mocks — emulate `PowerDensitySpectrumTestSupport.hpp`).
 3. Replace the duplicated logic with the shared utility; delete the local copy.
@@ -50,4 +50,4 @@ Every algorithm in this repository is float-only: `static_assert(std::is_floatin
 ## What NOT to do
 - No behavior/API change beyond removing duplication.
 - No new abstractions except extracting one that is already repeated.
-- Don't touch unrelated algorithms; don't strip `Q15`/`Q31`.
+- Don't touch unrelated algorithms.
