@@ -1,7 +1,7 @@
 # Testing Strategy — Algorithm Metrics
 
 The library's test strategy: every algorithm is validated against the **mathematical invariants of
-its family**, not golden output. This is the reference for the `unit-tester` agent (and humans) when
+its family**, not golden output. This is the reference for the `unit-tester` skill (and humans) when
 writing **unit tests** for `robotics/`. It answers one question per algorithm: *which mathematical
 properties must a correct implementation satisfy, and how do we assert them?*
 
@@ -18,8 +18,8 @@ kinematics needs geometric/round-trip metrics, dynamics needs cross-method and c
 trajectories need boundary/limit metrics, controllers need closed-loop metrics. Without this, tests
 drift toward shallow "golden output" snapshots that pass while the math is wrong.
 
-Canonical rules still apply ([AGENTS.md](AGENTS.md), [testing.instructions.md](.github/instructions/testing.instructions.md)):
-`TEST_F` on `float`, one behaviour per test, no redundant cases, **no heap in tests**, assert with
+Canonical rules still apply ([AGENTS.md](AGENTS.md)):
+`TEST_F` on `float`, one behaviour per test, no redundant cases, assert with
 `EXPECT_NEAR` + `math::Tolerance<float>()` against reference values.
 
 ## How the agent uses this
