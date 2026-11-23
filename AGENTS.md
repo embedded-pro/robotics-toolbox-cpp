@@ -1,103 +1,122 @@
-# Robotics Toolbox — Agent Rules (canonical)
+# robotics-toolbox-cpp — Agent Rules
 
-Single source of truth for **Claude and Copilot**. `CLAUDE.md` and
-`.github/copilot-instructions.md` point here. Code-file specifics load on demand from
-`.github/instructions/`. Deployment recipe: `roadmap/DEPLOYMENT.md`.
+<!-- shared:begin 0.3.0 sha256:9aee198041110762 -->
+Canonical rules for Claude, Copilot and sub-agents. Sections marked *(shared)* come from embedded-pro/embedded-agent-kit:
+edit them there, not here. *(repo)* sections belong to this repository. *Exceptions* overrides a shared rule.
 
-Robotics algorithms library for resource-constrained embedded systems: robot manipulators today
-(kinematics, dynamics, trajectories, manipulator control); mobile, aerial, legged and marine families
-are planned in `ROADMAP.md`. Real-time, deterministic, no heap. The shared numerical
-primitives (`math`, `solvers`, …) are consumed from
-[numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp) via `FetchContent`
-and included as `numerical/<domain>/…`.
+## Behaviour *(shared)*
 
-## Numeric policy — FLOAT-ONLY (current)
+- **Be as terse as possible.** No preamble, summary or narration. Report file paths and pass/fail.
+- Everything you write — code, docs, agent files, PR text — uses the fewest words that stay unambiguous.
+- Prose (docs, comments, agent files, commit and PR text) follows ASD-STE100 Simplified Technical English:
+  one word, one meaning; active voice; one instruction per sentence; sentences ≤ 20 words (procedures) or ≤ 25 (descriptions).
+- Ambiguous request: ask. Clear request: act.
+- Do only what was asked. No unrelated refactors, no extra features.
+- Batch reads, don't re-read, prefer targeted edits.
+- Never change a shared section. Add a deviation to *Exceptions* only when the user approves it.
 
-- New algorithms are **float-only**. Write generic `template<typename T>`, add
-  `static_assert(std::is_floating_point_v<T>, "...")`, and **instantiate/test `float` only**.
-- Do **NOT** implement `Q15`/`Q31` now. The generic `T` keeps a fixed-point specialisation cheap later.
-- `std::numbers::pi_v<float>` — never hardcode constants.
+## Workflow *(shared)*
 
-## Memory — no heap
+1. Multi-file or architectural change: update the design document first. Get approval before you write code.
+2. Read *Domain* and *Build*. Read each `.github/instructions/*.instructions.md` whose `applyTo` matches a file you change.
+3. Find the nearest existing pattern. Follow it.
+4. Per behaviour: write a failing test, write the minimum code that passes it, refactor with all tests green.
+5. Add each new file to its `CMakeLists.txt`.
+6. Update the documentation for each behavioural change.
+7. Run the *Build* commands until build and tests pass. Never disable, skip or weaken a test to get green.
+8. Non-trivial change: run the `reviewer` agent, or ask the user to run it. Fix each CRITICAL and WARNING finding.
+9. Report changed files, build pass/fail, test pass/fail.
+
+## Memory *(shared)*
+
+Scope: production code. Tests and host tools may use the heap.
 
 - Forbidden: `new`/`delete`/`malloc`/`free`, `make_unique`/`make_shared`,
-  `std::vector`/`string`/`deque`/`list`/`map`/`set`.
+  `std::vector`/`string`/`deque`/`list`/`map`/`set`, recursion.
 - Use: `infra::BoundedVector<T>::WithMaxSize<N>`, `infra::BoundedString::WithStorage<N>`,
-  `infra::BoundedDeque<T>::WithMaxSize<N>`, `infra::BoundedList<T>::WithMaxSize<N>`,
-  `std::array<T,N>`, `std::optional<T>`. Stack/static only. No recursion. **Tests too.**
+  `infra::BoundedDeque`, `infra::BoundedList`/`IntrusiveList`, `std::array`, `std::optional`, `std::variant`.
 
-## Embedded optimizations
+## Interfaces & errors *(shared)*
 
-- **No `#pragma GCC optimize` and no `optimize` attribute**, in headers or sources. GCC does not
-  inline a callee whose optimization options differ from its caller's, so options set per header or
-  per function turn every small helper on a hot path into an out-of-line call; an unscoped pragma in
-  a header also leaks fast-math into every including translation unit.
-- The optimization level and floating-point model belong to the consumer and apply to whole
-  translation units. For embedded targets: `-O2` or `-O3` with `-ffast-math -fno-finite-math-only`.
-- `OPTIMIZE_FOR_SPEED` (from `numerical/math/CompilerOptimizations.hpp`) on hot paths
-  (`Filter/Compute/Update/Solve/Step`). Pure interfaces exempt. With
-  `NumericalToolbox_ENABLE_OPTIMIZATIONS` it forces inlining (`always_inline`, `hot`, `inline`);
-  without it, it expands to nothing.
-- Use `math::IsFinite` for finiteness checks: a consumer may still build with `-ffinite-math-only`.
+- No virtual destructors: each adds a deleting destructor and thunks to flash.
+  Interface = pure virtual methods + `protected: ~I() = default;` (non-virtual).
+- Public `virtual ~Base() = default;` only on a base destroyed through a base pointer:
+  `delete`/`std::unique_ptr<Base>`, `infra::PolymorphicVariant<Base, ...>`, `infra::OptionalForPolymorphicObjects<Base, ...>`.
+  Put it on that base, not on every interface.
+- Not needed for `std::variant`, `std::optional<Concrete>`, `infra::SharedPtr`: they destroy the concrete type.
+- No exceptions. `std::optional`, `bool` or status enum; `really_assert` for preconditions. Never swallow an error.
+- Constructor injection; no global state.
 
-## Style
+## Optimisation *(shared)*
 
-- Allman braces, 4-space indent, `.clang-format` authoritative.
-- Brace-init `{}` everywhere. PascalCase types/methods, camelCase members, lowercase namespaces.
-- Functions ≤ ~30 lines. `const`/`constexpr`-correct. Fixed-width ints. Full descriptive names.
-- **No comments** except license headers, `NOLINT`, and a brief note on genuinely non-obvious math.
+- No `#pragma GCC optimize`, no `optimize` attribute: GCC won't inline across differing options.
+  The consumer sets flags per translation unit.
+- `OPTIMIZE_FOR_SPEED` only on hot functions defined in a header.
+- Hot paths: no heap, no virtual dispatch, no blocking.
 
-## Interfaces & errors
+## Style *(shared)*
 
-- Interfaces = pure virtual classes with a `protected:`, non-virtual `~I() = default` — **never** a `virtual` or `= 0` destructor. A virtual one puts a deleting destructor in every vtable, which links `operator delete`/`free` into heap-free firmware.
-- Concrete classes declare no destructor unless they need one. Never own or delete through an interface pointer (no `std::unique_ptr<I>`): hold the concrete type, pass `I&`.
-- No exceptions. Use `std::optional<T>` or status enums. `assert`/`really_assert` for preconditions.
-- SOLID + DIP: constructor injection; depend on abstractions. RAII. No virtual calls in real-time paths.
+- `.clang-format` is authoritative. Allman, 4 spaces, `{}` init.
+- PascalCase types/methods; camelCase members and enum values; lowercase namespaces.
+  No `I` prefix; implementations end in `Impl`.
+- `#pragma once` only.
+- Fixed-width integers. `const`/`constexpr`-correct. Functions ≤ 30 lines (hard limit 50).
+- Comments: non-obvious *why* only, one line. No `TODO`/`FIXME`, commented-out code, or restating the code.
+  Fix or delete a comment the change makes stale.
 
-## Namespaces
+## Testing *(shared)*
 
-`dynamics`, `kinematics`, and new: `trajectory`, `controllers` (manipulator control). Planned by the
-roadmap families: `mobile`, `aerial`, `legged`, `marine`, `grasping`, `planning`, `localization`,
-`calibration`, `safety`. Shared primitives keep their upstream namespaces (`math`, `solvers`, …) from
-numerical-toolbox; generic algorithms belong there, not here.
+- `TEST_F` for fixtures, `TYPED_TEST` for types, plain `TEST()` for stateless checks.
+- `StrictMock` only. `EXPECT_NEAR` with explicit tolerance. Fixture in an anonymous namespace, macros outside.
+- Heap allowed in tests.
 
-## Kinematics & dynamics conventions
+## Documentation *(shared)*
 
-- 6-vectors are ordered **linear part first**: twists `(v; ω)`, wrenches `(f; n)`; the geometric
-  Jacobian has linear rows first (upstream `math::SE3Transform`, roadmap NT53/M8). Featherstone `(ω; v)` ordering stays internal to the
-  recursive dynamics algorithms.
-- Orientation errors use the SE(3) logarithm (`PoseError`), never angle subtraction.
-- The tool frame and the base mounting offset are explicit kinematic parameters — never derived from a
-  center of mass.
-- Controllers receive dynamics and Jacobians through small interfaces (`EulerLagrangeDynamics`,
-  `InverseDynamicsModel`, `JacobianProvider`); hard real-time code may bind the concrete types instead.
-- Spatial fixtures in tests must exercise non-parallel axes and gravity across the joint axes.
+- Update docs before or with any behavioural change.
+- One fact, one place: link, never restate.
+- Visuals: Mermaid or ASCII.
+<!-- shared:end -->
 
-## Testing
+## Domain *(repo)*
 
-- GoogleTest. **`TEST_F` on `float`** — no `TYPED_TEST`, no multi-type. **Never plain `TEST()`**.
-- **`StrictMock` only** (no `NiceMock`/bare). Fixture + aliases in an anonymous namespace; macros outside it.
-- **No redundant tests** — implement exactly the spec's enumerated cases, one behavior per test,
-  Arrange/Act/Assert, `EXPECT_NEAR` + `math::Tolerance<float>()`. No heap.
-- **Coverage ≥ 90 %** — measured by SonarQube. Every new algorithm must reach this threshold
-  before merge; CI fails below it.
+- Robotics algorithms for embedded targets: manipulator kinematics, dynamics, trajectories and control.
+  `ROADMAP.md` lists the planned families (mobile, aerial, legged, marine).
+- Source root: `robotics/`. Namespaces: `kinematics`, `dynamics`, `trajectory`, `controllers`.
+  Planned: `mobile`, `aerial`, `legged`, `marine`, `grasping`, `planning`, `localization`, `calibration`, `safety`.
+- `math`, `solvers` and other shared primitives come from numerical-toolbox-cpp through `FetchContent`, included as
+  `numerical/<domain>/…`. A generic algorithm goes there, not here.
+- `simulator/` is a host-only Qt tool. *Memory* does not apply to it.
+- Float only: `template<typename T>` with `static_assert(std::is_floating_point_v<T>)`. Instantiate and test `float`.
+  No `Q15`/`Q31`. Use `std::numbers::pi_v<float>`, never a literal.
+- `OPTIMIZE_FOR_SPEED` on `Compute`, `Filter`, `Calculate`, `Solve`, `Update` and `Step`. Embedded consumers build
+  with `-O2`/`-O3 -ffast-math -fno-finite-math-only`; check finiteness with `math::IsFinite`.
+- Hold the concrete type and pass `I&`. Never own an object through an interface pointer.
+- 6-vectors put the linear part first: twists `(v; ω)`, wrenches `(f; n)`, Jacobian linear rows first.
+  Featherstone `(ω; v)` order stays inside the recursive dynamics algorithms.
+- Orientation error: SE(3) logarithm (`PoseError`), never angle subtraction.
+- Tool frame and base mounting offset are explicit kinematic parameters, never derived from a center of mass.
+- Controllers get dynamics and Jacobians through small interfaces (`EulerLagrangeDynamics`, `InverseDynamicsModel`,
+  `JacobianProvider`). Hard real-time code may bind the concrete types.
+- Tests: `TEST_F` on `float`, no `TYPED_TEST`. `EXPECT_NEAR` with `math::Tolerance<float>()`. Exactly the cases of
+  the spec. Spatial fixtures use non-parallel axes and gravity across the joint axes. Properties to assert:
+  `TESTING.md`. Coverage ≥ 90 % (SonarQube gate).
+- CMake: `robotics_add_header_library(<target>)`, `robotics_add_coverage_sources(<target> <Name>.cpp)`,
+  `${ROBOTICS_VISIBILITY}`. Coverage `.cpp`: `template class <Name><float, ...>;`; header bottom:
+  `extern template` inside `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
+- Docs: design-first `doc/<domain>/<Name>.md` per `doc/TEMPLATE.md`: math, behaviour, complexity, pitfalls.
+  No code, class names or usage. Add new algorithms to `doc/<domain>/README.md`.
+- Deploy a roadmap spec: `roadmap/DEPLOYMENT.md` (`algo-implementer` skill). Write tests: `unit-tester` skill.
+  Bring an old algorithm up to date: `modernizer` agent.
 
-## CMake (robotics/ targets)
+## Build *(repo)*
 
-- `robotics_add_header_library(<target>)`, `robotics_add_coverage_sources(<target> <Name>.cpp)`,
-  `${ROBOTICS_VISIBILITY}`.
-- Coverage `.cpp`: `template class <Name><float, ...>;`. `extern template` guarded by
-  `#ifdef ROBOTICS_TOOLBOX_COVERAGE_BUILD`.
+```bash
+cmake --preset host && cmake --build --preset host
+ctest --preset host
+```
 
-## Docs
+`host` builds the Qt simulator. Without Qt6, use the `host-single-Debug` configure, build and test presets.
 
-Design-first `doc/<domain>/<Name>.md` per `doc/TEMPLATE.md`. Math/theory/complexity/pitfalls —
-no code, no class names, no usage examples. Update `doc/<domain>/README.md` when adding a new algorithm.
+## Exceptions *(repo)*
 
-## Assistant behavior — be terse
-
-- Minimal prose. No preamble/postamble, no restating the plan, no summaries unless asked.
-- Report results as file paths + pass/fail. Don't narrate routine tool calls.
-- Don't re-read files already read; batch reads; prefer targeted edits.
-- Build: `cmake --preset host && cmake --build --preset host` · Test: `ctest --preset host`
-  (the `host` preset builds the Qt simulator; without Qt6 use the `host-single-Debug` presets).
+- No plain `TEST()`: MegaLinter's cppcheck reports a syntax error on it. Use `TEST_F`.

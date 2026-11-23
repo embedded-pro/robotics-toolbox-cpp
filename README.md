@@ -89,10 +89,9 @@ under [roadmap/](roadmap/README.md); generic algorithms go to numerical-toolbox-
 ## Testing
 
 Every algorithm is validated against the **mathematical invariants of its family** — not golden
-output. Tests are `TEST_F` on `float`, no heap, one behaviour per test, asserted against independent
+output. Tests are `TEST_F` on `float`, one behaviour per test, asserted against independent
 reference values. The per-family metric strategy is documented in **[TESTING.md](TESTING.md)**;
-framework rules live in
-[.github/instructions/testing.instructions.md](.github/instructions/testing.instructions.md).
+framework rules live in [AGENTS.md](AGENTS.md).
 
 Build & test locally:
 
