@@ -3,7 +3,7 @@
 ## Overview & Motivation
 
 Dubins paths assume a car that only drives forward. Real cars, forklifts and tractors reverse: parallel parking, three-point turns and docking all rely on it. Reeds and Shepp (1990) extended Dubins' result to a car that may drive **both forwards and backwards** at a bounded curvature.
-The shortest path is then one of **48 words** of at most five segments, arcs at the minimum turning radius or straight lines, with at most two **cusps** (changes of direction).
+The shortest path is then one of **48 words** of at most five segments, with at most two **cusps** (changes of direction). Each segment is an arc at the minimum turning radius or a straight line.
 
 The extension matters for planning beyond parking. Because the car can back up, a small change of the goal only changes the shortest path a little. The Reeds–Shepp length is therefore **continuous** in the goal pose, and it is never longer than the Dubins length. That makes it the preferred distance metric and local connector for sampling planners of car-like robots.
 
@@ -19,7 +19,15 @@ Each segment has a signed length: positive drives forwards, negative reverses. T
 
 ### Base Formulas
 
-Eight closed-form base formulas cover the path families, named after the paper's equations: two $CSC$ words (8.1 LSL and 8.2 LSR), one $C|C|C$ word (8.3), two $CC|CC$ words (8.7 and 8.8), two $C|C_{\pi/2}SC$ words (8.9 and 8.10) and one $C|C_{\pi/2}SC_{\pi/2}|C$ word (8.11). Here $|$ marks a cusp and $C_{\pi/2}$ a quarter-turn arc. For LSL, for example:
+Eight closed-form base formulas cover the path families, named after the paper's equations:
+
+- two $CSC$ words (8.1 LSL and 8.2 LSR);
+- one $C|C|C$ word (8.3);
+- two $CC|CC$ words (8.7 and 8.8);
+- two $C|C_{\pi/2}SC$ words (8.9 and 8.10);
+- one $C|C_{\pi/2}SC_{\pi/2}|C$ word (8.11).
+
+Here $|$ marks a cusp and $C_{\pi/2}$ a quarter-turn arc. For LSL, for example:
 
 $$(u, t) = \operatorname{polar}(x - \sin\varphi,\; y - 1 + \cos\varphi), \qquad v = \operatorname{wrap}(\varphi - t)$$
 
@@ -61,7 +69,7 @@ From the origin facing along $x$, with $\rho = 1$ m:
 4. **Reversed quarter turn**: to $(-2, 1, \pi/2)$, an LSRL that reverses $0.730$, $0.236$ and a quarter turn, then drives forward $0.730$, $3.266$ m in total. The best $C|C|C$ alternative is only $0.0006$ m longer.
 5. **Three arcs with a cusp**: to $(-1, -1, 0.5)$, LRL with $0.166$ forward, then $0.966$ and $0.632$ in reverse, $1.764$ m in total.
 6. **Turning around**: reversing the heading on the spot takes three arcs of $\pi/3$ (forward, reverse, forward), $\pi$ m in total.
-7. **Sanity relations**: over 80 goals around a rotated start with $\rho = 1.5$ m, every path is no longer than its Dubins counterpart, has the same length in both directions and reaches its goal.
+7. **Sanity relations**: the test uses 80 goals around a rotated start with $\rho = 1.5$ m. Every path is no longer than its Dubins counterpart, has the same length in both directions and reaches its goal.
 
 ## Pitfalls & Edge Cases
 

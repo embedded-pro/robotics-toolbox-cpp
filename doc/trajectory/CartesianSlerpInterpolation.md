@@ -2,7 +2,7 @@
 
 ## Overview & Motivation
 
-Many tool motions are specified in Cartesian space rather than joint space: move straight along a weld seam, insert a peg along its axis, approach a part without sweeping through the fixture. A joint-space spline between the end poses produces a curved, unpredictable tool path.
+Many tool motions are specified in Cartesian space rather than joint space. Examples: move straight along a weld seam, insert a peg along its axis, approach a part without sweeping through the fixture. A joint-space spline between the end poses produces a curved, unpredictable tool path.
 A **Cartesian path** keeps the tool on a straight line, while its orientation rotates steadily from the start attitude to the goal attitude.
 
 Orientation is the subtle part. Interpolating rotation matrices or Euler angles element-wise leaves the rotation group or produces uneven, gimbal-dependent motion.
@@ -21,7 +21,7 @@ $$p(s) = p_0 + s\,(p_1 - p_0), \qquad v = \dot{s}\,(p_1 - p_0)$$
 
 ### Orientation
 
-With unit quaternions $q_0$, $q_1$ of the start and goal rotations, sign-fixed so that $q_0 \cdot q_1 \ge 0$ (both $q$ and $-q$ represent the same rotation, and the sign picks the short arc):
+Let $q_0$, $q_1$ be the unit quaternions of the start and goal rotations. They are sign-fixed so that $q_0 \cdot q_1 \ge 0$ (both $q$ and $-q$ represent the same rotation, and the sign picks the short arc):
 
 $$q(s) = \frac{\sin\left((1-s)\Omega\right)}{\sin\Omega}\,q_0 + \frac{\sin(s\Omega)}{\sin\Omega}\,q_1, \qquad \cos\Omega = q_0 \cdot q_1$$
 
@@ -50,7 +50,7 @@ From the identity attitude at the origin to a $90°$ rotation about $z$ at $(1, 
 2. At $t = 0.5$: the position is $(0.5, 0, 0)$, and SLERP gives $q = (\cos 22.5°, 0, 0, \sin 22.5°) = (0.92388, 0, 0, 0.38268)$, a $45°$ rotation.
 3. The twist is constant: $v = (1, 0, 0)$ m/s and $\omega = (0, 0, \pi/2)$ rad/s.
 4. With a goal of $270°$ about $z$, the quaternions have a negative dot product. After the sign fix the arc goes $-90°$, the midpoint is $-45°$ and $\omega = (0, 0, -\pi/2)$.
-5. With a rest-to-rest quintic law over $2$ s, $\dot{s}(1) = 15/16 = 0.9375$, so the mid-path twist is $(0.9375, 0, 0;\ 0, 0, 1.4726)$, and both the velocity and the angular velocity vanish at the ends.
+5. With a rest-to-rest quintic law over $2$ s, $\dot{s}(1) = 15/16 = 0.9375$, so the mid-path twist is $(0.9375, 0, 0;\ 0, 0, 1.4726)$. Both the velocity and the angular velocity vanish at the ends.
 
 ## Pitfalls & Edge Cases
 

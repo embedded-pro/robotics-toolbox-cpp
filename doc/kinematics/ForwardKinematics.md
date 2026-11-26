@@ -2,7 +2,7 @@
 
 ## Overview & Motivation
 
-Forward Kinematics computes the 3D Cartesian positions of all joints of a serial kinematic chain, plus the tool (end-effector) point, given the joint angles. For a chain of $n$ revolute joints it produces $n + 1$ position vectors — the origin of every joint followed by the tool point — in $O(n)$ time.
+Forward Kinematics computes the 3D Cartesian positions of all joints of a serial kinematic chain, plus the tool (end-effector) point, given the joint angles. For a chain of $n$ revolute joints it produces $n + 1$ position vectors in $O(n)$ time. These are the origin of every joint followed by the tool point.
 
 This is the geometric foundation for visualization, collision detection, workspace analysis and Jacobian-based inverse kinematics. It answers the question: "given these joint angles, where is each joint, and where is the tool, in the base frame?"
 
@@ -13,7 +13,7 @@ This is the geometric foundation for visualization, collision detection, workspa
 Each link $i$ carries:
 
 - $\hat{z}_i$ — the unit joint axis, expressed in the link frame;
-- $r_i$ — the position of joint $i$'s origin expressed in the frame of the preceding link (for the first joint, in the base frame — this is the base mounting offset).
+- $r_i$ — the position of joint $i$'s origin expressed in the frame of the preceding link. For the first joint, it is in the base frame; this is the base mounting offset.
 
 The tool point is described separately by a constant offset $t$ expressed in the frame of the last link. The tool point is a purely kinematic parameter: it is unrelated to where the last link's center of mass happens to be.
 
@@ -27,7 +27,7 @@ where each factor is the rotation by angle $q_k$ about $\hat{z}_k$, obtained fro
 
 $$R(\hat{u}, \theta) = \cos\theta\,\mathbf{I}_3 + (1 - \cos\theta)\,\hat{u}\hat{u}^T + \sin\theta\,[\hat{u}]_\times$$
 
-The product is taken left to right because every axis is expressed in its own link frame: $^{0}R_{i}$ maps vectors written in link $i$ coordinates into base coordinates. Rotations are right-handed: a positive angle about $\hat{y}$ carries $\hat{x}$ towards $-\hat{z}$.
+The product is taken left to right because every axis is expressed in its own link frame. The matrix $^{0}R_{i}$ maps vectors written in link $i$ coordinates into base coordinates. Rotations are right-handed: a positive angle about $\hat{y}$ carries $\hat{x}$ towards $-\hat{z}$.
 
 ### Prismatic Joints
 
@@ -55,16 +55,16 @@ Consider a 2-link arm with $y$-axis joints, joint 2 located $1$ along $\hat{x}$ 
 
 ## Pitfalls & Edge Cases
 
-- **Base offset**: the first joint's offset is a real mounting offset; ignoring it shifts every result by a constant vector and makes inverse kinematics converge to the wrong joint angles.
-- **Tool point**: the tool offset must be supplied explicitly. Approximating it from the center of mass (e.g. "twice the center-of-mass distance") is only correct for uniform links and is wrong for typical robot links whose motors sit near the joints.
-- **Composition order**: multiplying the joint rotations in the wrong order produces correct results for parallel axes (planar arms) but wrong results as soon as the axes differ.
+- **Base offset**: the first joint's offset is a real mounting offset. Ignoring it shifts every result by a constant vector and makes inverse kinematics converge to the wrong joint angles.
+- **Tool point**: the tool offset must be supplied explicitly. Approximating it from the center of mass (e.g. "twice the center-of-mass distance") is only correct for uniform links. It is wrong for typical robot links whose motors sit near the joints.
+- **Composition order**: multiplying the joint rotations in the wrong order produces correct results for parallel axes (planar arms). The results are wrong as soon as the axes differ.
 - **Non-unit axes**: Rodrigues' formula assumes a unit axis; a non-unit axis silently scales the rotation.
 - **Zero-length links**: consecutive joints collapse onto the same point, which is valid but makes the corresponding Jacobian columns dependent.
 - **Floating-point only**: the trigonometric evaluation is unsuitable for fixed-point types.
 
 ## Variants & Generalizations
 
-- **Planar vs. spatial chains**: in purely planar manipulators all axes are parallel and the rotations reduce to 2D trigonometry, but the algorithmic structure (one pass accumulating transforms) is the same.
+- **Planar vs. spatial chains**: in purely planar manipulators all axes are parallel and the rotations reduce to 2D trigonometry. The algorithmic structure (one pass accumulating transforms) is the same.
 - **Full pose**: returning $^{0}R_{n-1}$ together with $p_{\text{tool}}$ gives the complete tool pose needed for orientation control.
 - **Different parameterizations**: Denavit–Hartenberg, modified DH, or product-of-exponentials formulations all recursively compose rigid transforms along the chain.
 - **Multiple end-effectors**: for branched chains the routine runs per branch, reusing shared prefixes.

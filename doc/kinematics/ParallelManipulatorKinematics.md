@@ -2,10 +2,10 @@
 
 ## Overview & Motivation
 
-A **parallel manipulator** connects its moving platform to the base through several kinematic chains at once. Load is shared between the legs, so parallel robots are stiff, light and fast: flight simulators and machining hexapods use the **Stewart–Gough platform**, and pick-and-place lines use the **Delta robot** at several hundred picks per minute.
+A **parallel manipulator** connects its moving platform to the base through several kinematic chains at once. The legs share the load, so parallel robots are stiff, light and fast. Flight simulators and machining hexapods use the **Stewart–Gough platform**. Pick-and-place lines use the **Delta robot** at several hundred picks per minute.
 
 Their kinematics mirror serial arms. **Inverse** kinematics, from platform pose to actuator values, is easy: each leg is independent. **Forward** kinematics is hard in general, with many assembly modes and no closed form for the hexapod.
-This module provides closed-form inverse kinematics for both mechanisms, the hexapod's leg Jacobian with Newton forward kinematics on SE(3), and closed-form forward kinematics for the Delta.
+This module provides closed-form inverse kinematics for both mechanisms. It also provides the hexapod's leg Jacobian with Newton forward kinematics on SE(3), and closed-form forward kinematics for the Delta.
 
 ## Mathematical Theory
 
@@ -15,7 +15,7 @@ Six prismatic legs connect base anchors $b_i$ (base frame) to platform anchors $
 
 $$\ell_i = \left\| R\,p_i + p - b_i \right\|$$
 
-**Leg Jacobian.** With the unit leg vector $n_i$ and the rotated anchor $a_i = R\,p_i$, the leg rates for a platform twist $(v; \omega)$, expressed in the base frame at the platform origin, are
+**Leg Jacobian.** Let $n_i$ be the unit leg vector and $a_i = R\,p_i$ the rotated anchor. The leg rates for a platform twist $(v; \omega)$, expressed in the base frame at the platform origin, are
 
 $$\dot{\ell}_i = n_i^T v + (a_i \times n_i)^T \omega, \qquad \dot{\ell} = J\begin{bmatrix} v \\ \omega \end{bmatrix}$$
 

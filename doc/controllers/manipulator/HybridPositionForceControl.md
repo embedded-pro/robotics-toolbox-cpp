@@ -54,10 +54,10 @@ Purely kinematic hybrid control, which maps the selected errors through $J^{-1}$
 
 A planar task ($m = 2$) uses $S = \operatorname{diag}(1, 0)$: axis 0 is motion-controlled and axis 1 force-controlled. The gains are $K_p = 100$, $K_d = 20$, $K_f = 2$, $K_i = 5$ and $K_{df} = 3$, with $\Delta t = 1$ ms.
 
-1. **Motion axis**: a position error of $0.05$ m and a velocity error of $0.2$ m/s on axis 0 give $100 \cdot 0.05 + 20 \cdot 0.2 = 9$ N there and nothing on axis 1.
+1. **Motion axis**: a position error of $0.05$ m and a velocity error of $0.2$ m/s on axis 0. They give $100 \cdot 0.05 + 20 \cdot 0.2 = 9$ N there and nothing on axis 1.
 2. **Force axis**: $f_d = 5$ N, a measured $3$ N and $0.4$ m/s of motion along axis 1 give $5 + 2 \cdot 2 + 5 \cdot 2 \cdot 0.001 - 3 \cdot 0.4 = 7.81$ N.
 3. **Cross terms masked**: a position error on the force axis and a force error on the motion axis produce no torque at all.
-4. **Rotated constraint**: with $R_c = \begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix}$, the base-$y$ position error drives the motion loop, the base-$x$ error falls on the force axis and is ignored, and the force loop pushes along base $-x$. The resulting wrench is $(-9.01, 10)$ N.
+4. **Rotated constraint**: with $R_c = \begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix}$, the base-$y$ position error drives the motion loop. The base-$x$ error falls on the force axis and is ignored. The force loop pushes along base $-x$. The resulting wrench is $(-9.01, 10)$ N.
 5. **Anti-windup**: a persistent $10$ N force error saturates the integral at its limit of $1$, so the force term settles at $10 + 2 \cdot 10 + 5 \cdot 1 = 35$ N.
 
 ## Pitfalls & Edge Cases

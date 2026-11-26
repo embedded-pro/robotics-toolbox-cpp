@@ -2,7 +2,7 @@
 
 ## Overview & Motivation
 
-Every wheeled robot estimates where it is by **dead reckoning**: it integrates its measured body velocity, from wheel encoders and sometimes a gyro, into a pose. The result drifts, but it is smooth, fast and always available, and it feeds every localization filter as the prediction step.
+Every wheeled robot estimates where it is by **dead reckoning**. It integrates its measured body velocity, from wheel encoders and sometimes a gyro, into a pose. The result drifts, but it is smooth, fast and always available, and it feeds every localization filter as the prediction step.
 
 The usual way to integrate, Euler or Runge–Kutta on $(\dot{x}, \dot{y}, \dot{\theta})$, treats the heading as constant within a step. When the robot turns, that biases the position. A constant body twist held for one period moves the robot along a **circular arc**. Integrating with the SE(2) exponential lands exactly on that arc, so turning inside a step introduces no error.
 
@@ -14,7 +14,7 @@ With the pose $T_k \in SE(2)$ and the body twist $\xi = (v_x, v_y, \omega)$ held
 
 $$T_{k+1} = T_k \exp(\xi\,\Delta t)$$
 
-The exponential moves the body by $V(\omega\Delta t)\,(v_x, v_y)\,\Delta t$ in its own frame and turns it by $\omega\Delta t$. For $\omega = 0$ it is a straight segment. The update is exact for any step size as long as the twist is constant, so one step of $2\pi$ s along a radius-2 arc gives the same pose as a thousand small steps.
+The exponential moves the body by $V(\omega\Delta t)\,(v_x, v_y)\,\Delta t$ in its own frame and turns it by $\omega\Delta t$. For $\omega = 0$ it is a straight segment. The update is exact for any step size as long as the twist is constant. Thus one step of $2\pi$ s along a radius-2 arc gives the same pose as a thousand small steps.
 
 ### Encoder Increments
 

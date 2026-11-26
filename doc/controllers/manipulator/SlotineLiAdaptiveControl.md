@@ -4,7 +4,7 @@
 
 Model-based controllers such as computed torque cancel the arm's dynamics with a model. When the masses and inertias are wrong (an unknown payload, a tool change, worn cables), the cancellation is imperfect and tracking errors appear.
 
-The **Slotine–Li adaptive controller** (1987) removes the need for accurate parameters. It uses the fact that the rigid-body dynamics are linear in the inertial parameters, and it adjusts a parameter estimate online, driven by the tracking error. The tracking error converges to zero **globally** for any initial estimate, while the parameters stay bounded.
+The **Slotine–Li adaptive controller** (1987) removes the need for accurate parameters. It uses the fact that the rigid-body dynamics are linear in the inertial parameters. The tracking error drives an online adjustment of a parameter estimate. The tracking error converges to zero **globally** for any initial estimate, while the parameters stay bounded.
 It needs no joint-acceleration measurement and no inversion of the estimated mass matrix. It is the classic example of passivity-based adaptive control.
 
 ## Mathematical Theory

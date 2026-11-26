@@ -44,7 +44,7 @@ Dropping $g(q)$ leaves the equilibrium condition $K_p e_{ss} = g(q_d - e_{ss})$.
 | Full gains     | $O(n^2) + T_g$ | $O(n^2)$ | Two gain matrix–vector products plus one gravity evaluation  |
 | Diagonal gains | $O(n) + T_g$   | $O(n)$   | Joints decouple; $2n$ multiplies plus the gravity evaluation |
 
-$T_g$ is the cost of the gravity vector: $O(n)$ with a recursive Newton–Euler pass at zero velocity and acceleration, or a closed form for short chains.
+$T_g$ is the cost of the gravity vector. It is $O(n)$ with a recursive Newton–Euler pass at zero velocity and acceleration, or a closed form for short chains.
 
 ## Step-by-Step Walkthrough
 
@@ -68,7 +68,7 @@ At the set-point at rest, the spring and damping terms vanish and $\tau = g(q_d)
 
 ## Variants & Generalizations
 
-- **Desired gravity compensation**: use $g(q_d)$ instead of $g(q)$. It is cheaper, since it can be precomputed per set-point, and it is still globally stable when $K_p$ exceeds the Lipschitz constant of $g$ (Tomei, 1991).
+- **Desired gravity compensation**: use $g(q_d)$ instead of $g(q)$. It is cheaper, since it can be precomputed per set-point. It is still globally stable when $K_p$ exceeds the Lipschitz constant of $g$ (Tomei, 1991).
 - **PID + gravity**: integral action rejects constant model errors. Stability becomes semi-global and needs gain conditions.
 - **Task-space PD + gravity**: $\tau = J^T(K_p \tilde{x} - K_d \dot{x}) + g(q)$ regulates the end-effector pose instead, the basis of impedance control without inertia shaping.
 - **Saturated PD + gravity**: bounded spring functions (e.g. $\tanh$) keep commands within actuator limits while preserving global stability.

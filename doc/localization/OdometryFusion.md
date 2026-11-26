@@ -38,7 +38,7 @@ Both yaw rates measure the same true rotation, so their difference observes the 
 
 ### Slip Detection
 
-When the wheels slip, for example spinning on a smooth floor or with a stuck caster, the wheel yaw rate disagrees with the gyroscope far beyond its noise. The normalised innovation squared then exceeds the χ²(1) gate. The update is rejected, the state is untouched, and the returned status lets the caller flag the slip.
+The wheels can slip, for example spinning on a smooth floor or with a stuck caster. The wheel yaw rate then disagrees with the gyroscope far beyond its noise. The normalised innovation squared then exceeds the χ²(1) gate. The update is rejected, the state is untouched, and the returned status lets the caller flag the slip.
 
 ## Complexity Analysis
 
@@ -51,11 +51,11 @@ When the wheels slip, for example spinning on a smooth floor or with a stuck cas
 
 ## Step-by-Step Walkthrough
 
-Noise floor $0.01$ m/s, speed gain $5$ %, gyroscope noise $0.01$ rad/s, bias random walk $10^{-4}$, wheel yaw-rate noise $0.02$ rad/s, slip gate $6.63$ (99 %), starting at the origin with variances $(0.01, 0.01, 0.01, 0.0025)$:
+Noise floor $0.01$ m/s, speed gain $5$ %, gyroscope noise $0.01$ rad/s, bias random walk $10^{-4}$. Wheel yaw-rate noise $0.02$ rad/s, slip gate $6.63$ (99 %). The filter starts at the origin with variances $(0.01, 0.01, 0.01, 0.0025)$:
 
 1. **Straight drive**: one metre at $1$ m/s. The along-track variance barely grows, but the cross-track variance doubles to $0.0206$ through the heading uncertainty, which itself grows to $0.0125$ from the bias.
 2. **Arc**: $1$ m/s and $0.5$ rad/s for $2$ s end at $(1.683, 0.919, 1.0)$, exactly the SE(2) exponential of the twist.
-3. **Standstill**: a gyroscope with a $0.02$ rad/s bias, compared with the zero wheel yaw rate at $100$ Hz, gives a bias estimate of $0.019992$ after $5$ s. The heading error stays below $10^{-4}$ rad instead of drifting to $0.1$ rad.
+3. **Standstill**: a gyroscope has a $0.02$ rad/s bias. Compared with the zero wheel yaw rate at $100$ Hz, it gives a bias estimate of $0.019992$ after $5$ s. The heading error stays below $10^{-4}$ rad instead of drifting to $0.1$ rad.
 4. **Slip**: the wheels report $1$ rad/s while the gyroscope reads zero. The NIS is $333$, far beyond the gate, so the update is rejected.
 5. **Heading across $\pm\pi$**: an estimate of $3.1$ rad corrected by a compass reading of $-3.1$ rad moves through the seam to $-3.117$ rad.
 6. **Position fix**: a GNSS fix at $(0.1, -0.05)$ with the same variance as the estimate pulls the position halfway and halves its variance, with NIS $0.625$.

@@ -2,7 +2,7 @@
 
 ## Overview & Motivation
 
-The Euler-Lagrange equations provide a systematic way to derive the equations of motion for mechanical systems from energy principles. Instead of tracking forces on each body (as in Newton's method), they express dynamics in terms of *generalized coordinates* $q$ and the system's kinetic and potential energy.
+The Euler-Lagrange equations provide a systematic way to derive the equations of motion for mechanical systems from energy principles. They do not track forces on each body (as in Newton's method). Instead, they express dynamics in terms of *generalized coordinates* $q$ and the system's kinetic and potential energy.
 
 For a robotic manipulator or any articulated mechanism with $n$ degrees of freedom, the Euler-Lagrange formulation yields a compact matrix equation:
 
@@ -106,12 +106,12 @@ For a 2-DOF arm with equal links ($m_1 = m_2 = 1\,\text{kg}$, $l_1 = l_2 = 1\,\t
 
 ## Pitfalls & Edge Cases
 
-- **Mass-matrix conditioning**: The joint-space mass matrix of a physically valid model is always symmetric positive definite, including at kinematic singularities (those make the *task-space* inertia singular, not $M$).
-  Its conditioning is governed by the inertia ratio between proximal and distal links — a heavy shoulder with a light wrist gives a large condition number.
+- **Mass-matrix conditioning**: The joint-space mass matrix of a physically valid model is always symmetric positive definite. This includes kinematic singularities (those make the *task-space* inertia singular, not $M$).
+  The inertia ratio between proximal and distal links governs its conditioning. A heavy shoulder with a light wrist gives a large condition number.
   A Cholesky factorization exploits the symmetry; Gaussian elimination with partial pivoting also works.
 - **Fixed-point arithmetic**: Dynamics values (torques, accelerations) typically exceed the $[-1, 1)$ range of Q15/Q31 formats. Use `float` unless inputs are carefully scaled.
 - **Coriolis computation**: Many matrices $C(q,\dot{q})$ produce the same vector $C(q,\dot{q})\dot{q}$, but only the Christoffel-symbol choice makes $\dot{M} - 2C$ skew-symmetric.
-  Working with the vector $C(q,\dot{q})\dot{q}$ (as forward and inverse dynamics do) is independent of that choice; controllers that need the matrix itself (passivity-based and adaptive control, momentum observers) must use the Christoffel form.
+  Working with the vector $C(q,\dot{q})\dot{q}$ (as forward and inverse dynamics do) is independent of that choice. Controllers that need the matrix itself (passivity-based and adaptive control, momentum observers) must use the Christoffel form.
 - **Energy consistency**: The exact equations conserve energy for free motion whatever factorization of $C$ is used, because $\dot{q}^T(\dot{M} - 2C)\dot{q} = 0$ holds for every valid one. Energy drift observed in simulation comes from the integrator (step size and method), not from the model.
 - **Units**: Be explicit about whether angles are in radians (standard) and torques in N·m.
 
@@ -135,8 +135,8 @@ For a 2-DOF arm with equal links ($m_1 = m_2 = 1\,\text{kg}$, $l_1 = l_2 = 1\,\t
 
 ## Connections to Other Algorithms
 
-- **Recursive Newton-Euler** ([RecursiveNewtonEuler.md](RecursiveNewtonEuler.md)) and **Articulated Body Algorithm** ([ArticulatedBodyAlgorithm.md](ArticulatedBodyAlgorithm.md)): compute the same $\tau$ and $\ddot{q}$ in $O(n)$ from a link description;
-  RNEA also supplies $g(q)$ (zero velocity and acceleration) and $C(q,\dot{q})\dot{q}$ (zero acceleration, zero gravity), which is how a link-based model can implement this formulation.
+- **Recursive Newton-Euler** ([RecursiveNewtonEuler.md](RecursiveNewtonEuler.md)) and **Articulated Body Algorithm** ([ArticulatedBodyAlgorithm.md](ArticulatedBodyAlgorithm.md)): compute the same $\tau$ and $\ddot{q}$ in $O(n)$ from a link description.
+  RNEA also supplies $g(q)$ (zero velocity and acceleration) and $C(q,\dot{q})\dot{q}$ (zero acceleration, zero gravity). This is how a link-based model can implement this formulation.
 - The following live in [numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp):
   - **Linear solvers** (Gaussian elimination, Cholesky): solve $M\ddot{q} = f$ in forward dynamics.
   - **LQR / DARE**: linearizing the manipulator equation around an operating point gives the $(A, B)$ matrices for optimal state feedback.

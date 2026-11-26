@@ -2,9 +2,9 @@
 
 ## Overview & Motivation
 
-A mobile robot needs a map to plan collision-free motion and to localise itself. The **occupancy grid** (Moravec and Elfes, 1985) is the simplest and most widely used representation: the plane is divided into square cells, and each cell holds the probability that it is occupied.
+A mobile robot needs a map to plan collision-free motion and to localise itself. The **occupancy grid** (Moravec and Elfes, 1985) is the simplest and most widely used representation. It divides the plane into square cells, and each cell holds the probability that it is occupied.
 
-The grid is built from range scans taken at known sensor poses. Every beam passes through free space and ends on an obstacle, so the cells it crosses become more likely free and its end cell more likely occupied. Storing probabilities as **log odds** turns each Bayesian update into a single addition, and walking each beam with **Bresenham's line algorithm** needs only integer arithmetic.
+The grid is built from range scans taken at known sensor poses. Every beam passes through free space and ends on an obstacle. Thus the cells it crosses become more likely free, and its end cell more likely occupied. Storing probabilities as **log odds** turns each Bayesian update into a single addition, and walking each beam with **Bresenham's line algorithm** needs only integer arithmetic.
 That makes the update cheap enough for a microcontroller.
 
 ## Mathematical Theory
@@ -27,7 +27,7 @@ Readings at or beyond the maximum range have no reliable end point. They only cl
 
 ### Clamping
 
-Each cell is clamped to $[l_{\min}, l_{\max}]$. Without the clamp, a cell observed thousands of times would need thousands of contrary observations to change, so the map could not follow doors opening or people moving.
+Each cell is clamped to $[l_{\min}, l_{\max}]$. Without the clamp, a cell observed thousands of times would need thousands of contrary observations to change. The map could then not follow doors opening or people moving.
 
 ### Ray Traversal
 
@@ -45,7 +45,7 @@ A 360-beam scan at 4 m and 5 cm resolution updates about 29 000 cells. A 10 m by
 
 ## Step-by-Step Walkthrough
 
-A 1 m by 1 m grid at 10 cm resolution, with the sensor at the centre of cell $(0, 0)$, $l_{\text{occ}} = 0.85$, $l_{\text{free}} = -0.4$, a clamp of $[-2, 3.5]$ and a maximum range of 4 m:
+A 1 m by 1 m grid has 10 cm resolution. The sensor is at the centre of cell $(0, 0)$. The setup uses $l_{\text{occ}} = 0.85$, $l_{\text{free}} = -0.4$, a clamp of $[-2, 3.5]$ and a maximum range of 4 m:
 
 1. **Axis beam**: a 0.5 m reading straight ahead clears cells $(0, 0)$ to $(4, 0)$ and marks $(5, 0)$ occupied.
 2. **Shallow beam**: a reading ending at $(0.75, 0.35)$ crosses $(0,0)$, $(1,0)$, $(2,1)$, $(3,1)$, $(4,2)$, $(5,2)$ and $(6,3)$, and hits $(7,3)$.

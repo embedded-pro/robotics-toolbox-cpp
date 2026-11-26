@@ -2,10 +2,10 @@
 
 ## Overview & Motivation
 
-A global planner gives a mobile robot a route through a known map, but people, carts and furniture that moved since the map was built must be avoided on the fly. The **dynamic window approach** (Fox, Burgard and Thrun, 1997) is a classic reactive local planner for this. It runs every control cycle and directly selects the next velocity command.
+A global planner gives a mobile robot a route through a known map. People, carts and furniture that moved since the map was built must be avoided on the fly. The **dynamic window approach** (Fox, Burgard and Thrun, 1997) is a classic reactive local planner for this. It runs every control cycle and directly selects the next velocity command.
 
 It searches in **velocity space** rather than in position space. Only the speeds and turn rates the motors can reach within one control period are considered (the *dynamic window*), so every candidate is physically achievable. Each candidate is then checked against the obstacles along its circular arc.
-The candidates the robot could still stop for are scored on progress towards the goal, distance to obstacles and speed, and the best one is commanded.
+The candidates the robot could still stop for are scored on progress towards the goal, distance to obstacles and speed. The best one is commanded.
 
 ## Mathematical Theory
 
@@ -58,7 +58,7 @@ An $11 \times 21$ grid against a 360-beam scan is about 83 000 arc tests per cyc
 
 ## Step-by-Step Walkthrough
 
-A disc robot of radius $0.2$ m with $v \le 1$ m/s, $|\omega| \le 2$ rad/s, $a = 1$ m/s², $\alpha = 3$ rad/s², a $0.25$ s period, a $1$ s prediction, a $2$ m clearance cap, weights $(1, 1, 0.5)$ and a $5 \times 11$ grid:
+A disc robot has radius $0.2$ m, $v \le 1$ m/s, $|\omega| \le 2$ rad/s, $a = 1$ m/s² and $\alpha = 3$ rad/s². The planner uses a $0.25$ s period, a $1$ s prediction, a $2$ m clearance cap, weights $(1, 1, 0.5)$ and a $5 \times 11$ grid:
 
 1. **Straight clearance**: driving straight, an obstacle at $(2, 0.1)$ is touched after $2 - \sqrt{0.03} = 1.827$ m. One behind the robot never is.
 2. **Turning clearance**: on the unit circle ($v = \omega = 1$), an obstacle at $(1, 1)$ is touched after $\pi/2 - \arccos 0.98 = 1.370$ m.

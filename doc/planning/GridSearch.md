@@ -2,7 +2,7 @@
 
 ## Overview & Motivation
 
-Mobile robots, drones and manipulators often plan on a **grid**: an occupancy map from a laser scanner, a costmap with inflated obstacles, or a voxel map of the workspace. Shortest paths on such grids are the backbone of global planners. They feed local controllers with waypoints and give reference routes for sampling planners.
+Mobile robots, drones and manipulators often plan on a **grid**. Examples are an occupancy map from a laser scanner, a costmap with inflated obstacles, or a voxel map of the workspace. Shortest paths on such grids are the backbone of global planners. They feed local controllers with waypoints and give reference routes for sampling planners.
 
 **Dijkstra's algorithm** expands cells in order of their cost from the start and finds optimal paths. **A\*** adds an admissible heuristic, an optimistic estimate of the remaining cost, so it expands cells towards the goal first. It returns the same optimal cost while visiting far fewer cells.
 This implementation keeps all its storage in fixed-size arrays sized by the grid. It uses an indexed binary heap with decrease-key, and reads cell costs through a callable, so any map representation plugs in without copying.
@@ -36,7 +36,7 @@ $h_{\text{full}}$ is the exact octile distance on an empty grid of unit cost, an
 
 ### Corner Cutting
 
-By default a diagonal step is rejected when any cell it sweeps past is blocked: the two side cells of a planar diagonal, or the six intermediate cells of a 3-D diagonal. Otherwise the path would clip obstacle corners with any real robot footprint.
+By default a diagonal step is rejected when any cell it sweeps past is blocked. These cells are the two side cells of a planar diagonal, or the six intermediate cells of a 3-D diagonal. Otherwise the path would clip obstacle corners with any real robot footprint.
 
 ## Complexity Analysis
 
@@ -51,7 +51,7 @@ By default a diagonal step is rejected when any cell it sweeps past is blocked: 
 
 An $8 \times 6$ map has a wall at $x = 4$ for $y = 0$ to $4$, leaving a gap at $y = 5$. All free cells cost $1$, and the query runs from $(1,1)$ to $(6,1)$.
 
-1. **8-connected A\*.** The path climbs diagonally to $(3,3)$, runs up to the gap, crosses at $(4,5)$, steps diagonally down to $(6,4)$ and descends to the goal: 11 cells, cost $7 + 3\sqrt{2} = 11.243$. Dijkstra returns the same cost.
+1. **8-connected A\*.** The path climbs diagonally to $(3,3)$, runs up to the gap, crosses at $(4,5)$, steps diagonally down to $(6,4)$ and descends to the goal. The path has 11 cells, cost $7 + 3\sqrt{2} = 11.243$. Dijkstra returns the same cost.
 2. **Effort.** A\* expands 29 cells, Dijkstra 39. With 4-connectivity, the cost is $13$ over 14 cells, with 27 versus 40 expansions.
 3. **Weighted cells.** On a free map where cells $x \in \{3, 4\}$, $y \le 2$ cost $5$, the straight route would cost $13$. The optimal path detours through $y = 3$ instead: $(1,1), (2,2), (3,3), (4,3), (5,2), (6,1)$, for $4\sqrt{2} + 1 = 6.657$. A\* expands 10 cells and Dijkstra 37.
 4. **No path.** Closing the gap, or placing the goal on the wall, returns no result, and path extraction reports zero cells.

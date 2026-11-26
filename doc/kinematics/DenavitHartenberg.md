@@ -3,9 +3,9 @@
 ## Overview & Motivation
 
 A serial arm can be described link by link with arbitrary offsets and axes. The **Denavit–Hartenberg (DH)** convention instead attaches frames to the links by a fixed rule, so every joint–link pair is captured by just **four numbers** $(a, \alpha, d, \theta)$.
-DH tables are the lingua franca of industrial robotics: manufacturers publish them, textbooks tabulate classic arms such as the PUMA-560, and calibration methods identify their errors. One of the four numbers is the joint variable: $\theta$ for a revolute joint, $d$ for a prismatic one.
+DH tables are the lingua franca of industrial robotics. Manufacturers publish them, textbooks tabulate classic arms such as the PUMA-560, and calibration methods identify their errors. One of the four numbers is the joint variable: $\theta$ for a revolute joint, $d$ for a prismatic one.
 
-From a DH table the model produces the tool pose and the frame chain (joint origins, axes and types in the base frame), so the same geometric Jacobian and every task-space algorithm built on it work on DH-described arms unchanged.
+From a DH table the model produces the tool pose and the frame chain (joint origins, axes and types in the base frame). Thus the same geometric Jacobian and every task-space algorithm built on it work on DH-described arms unchanged.
 
 ## Mathematical Theory
 

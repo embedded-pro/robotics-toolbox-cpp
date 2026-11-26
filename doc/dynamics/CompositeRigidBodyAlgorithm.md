@@ -56,7 +56,7 @@ For a prismatic joint the unit motion is $(0; \hat{z}_i)$, so the column wrench 
 ### Properties
 
 - $M$ is symmetric, and positive definite whenever every composite body has non-zero inertia about its joint axis.
-- $M$ does not depend on the first joint angle when the base is fixed and gravity is ignored: rotating the whole chain about $\hat{z}_0$ is a symmetry of the kinetic energy.
+- $M$ does not depend on the first joint angle when the base is fixed and gravity is ignored. Rotating the whole chain about $\hat{z}_0$ is a symmetry of the kinetic energy.
 - $\tfrac12 \dot{q}^T M \dot{q}$ equals the sum of the links' kinetic energies $\tfrac12(m_i \|v_{c,i}\|^2 + \omega_i^T \bar{I}_i \omega_i)$.
 
 ## Complexity Analysis
@@ -67,7 +67,7 @@ For a prismatic joint the unit motion is $(0; \hat{z}_i)$, so the column wrench 
 | Composite inertias | $O(n)$   | $O(n)$   | One inertia transform (a few $3 \times 3$ products) per joint           |
 | Columns            | $O(n^2)$ | $O(n^2)$ | $n(n-1)/2$ wrench transforms, $O(1)$ each, plus the $n \times n$ result |
 
-For short chains ($n \le 6$) the constant matters more than the order: CRBA's per-entry work is one $3 \times 3$ rotation and a cross product, far below a full inverse-dynamics sweep per column.
+For short chains ($n \le 6$) the constant matters more than the order. CRBA's per-entry work is one $3 \times 3$ rotation and a cross product. This is far below a full inverse-dynamics sweep per column.
 
 ## Step-by-Step Walkthrough
 
@@ -84,7 +84,7 @@ These are the textbook closed-form entries of the planar two-link arm.
 
 - **Inertia frame**: the link tensor must be about the centre of mass, in the link frame. Supplying it about the joint origin double-counts the parallel-axis term.
 - **Exact symmetry**: computing both triangles independently leaves round-off asymmetry that can upset a Cholesky factorization. Write each off-diagonal value once into both positions.
-- **Singular mass matrix**: a composite body with zero inertia about its axis (a point mass on the axis, or a massless distal chain) makes $M$ singular. Forward dynamics through $M^{-1}$ then fails, so add reflected rotor inertia (armature) on the diagonal for real actuators.
+- **Singular mass matrix**: consider a composite body with zero inertia about its axis (a point mass on the axis, or a massless distal chain). It makes $M$ singular. Forward dynamics through $M^{-1}$ then fails, so add reflected rotor inertia (armature) on the diagonal for real actuators.
 - **Conditioning**: light distal links next to heavy proximal ones give condition numbers of $10^3$–$10^5$. Solve $M\ddot{q} = b$ with a Cholesky factorization, never an explicit inverse.
 - **Non-unit axes**: the rotation formula assumes unit joint axes, and the projections scale with the axis norm.
 

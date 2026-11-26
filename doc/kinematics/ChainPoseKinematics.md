@@ -9,8 +9,8 @@ Every Jacobian-based algorithm also needs each joint's **axis** and **origin** i
 - impedance and operational-space control;
 - manipulability analysis.
 
-Chain pose kinematics computes all of this in the same single pass over the chain. It returns the full tool pose, a rigid transform in SE(3), together with a **frame chain**: the origin, axis and type of every joint in the base frame.
-The frame chain is model-independent, so a Jacobian routine consumes it without knowing whether the arm was described link by link, by Denavit–Hartenberg parameters or by screw axes.
+Chain pose kinematics computes all of this in the same single pass over the chain. It returns the full tool pose, a rigid transform in SE(3), together with a **frame chain**. The frame chain holds the origin, axis and type of every joint in the base frame.
+The frame chain is model-independent. A Jacobian routine consumes it without knowing how the arm was described: link by link, by Denavit–Hartenberg parameters or by screw axes.
 
 ## Mathematical Theory
 
@@ -48,7 +48,7 @@ The single pass costs the same order as position-only kinematics; the extra work
 
 ## Step-by-Step Walkthrough
 
-An arm with a $z$-axis base joint raised $0.2$ m, then two $y$-axis joints offset $0.5$ m up and $0.4$ m along $x$, and a tool $0.3$ m along the last link's $x$. Take $q = (\pi/2, \pi/2, 0)$:
+An arm has a $z$-axis base joint raised $0.2$ m. Then come two $y$-axis joints offset $0.5$ m up and $0.4$ m along $x$, and a tool $0.3$ m along the last link's $x$. Take $q = (\pi/2, \pi/2, 0)$:
 
 1. Joint 0: axis $a_0 = \hat{z}$, origin $o_0 = (0, 0, 0.2)$. Fold in $R_z(\pi/2)$.
 2. Joint 1: axis $a_1 = R_z(\pi/2)\,\hat{y} = (-1, 0, 0)$, origin $o_1 = o_0 + R_z(\pi/2)(0, 0, 0.5) = (0, 0, 0.7)$. Fold in $R_y(\pi/2)$.

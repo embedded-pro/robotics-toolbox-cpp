@@ -22,7 +22,8 @@ whose semi-axes are the singular values $\sigma_1 \ge \sigma_2 \ge \dots$ of $B$
 
 $$w = \sqrt{\det(B B^T)} = \prod_i \sigma_i \quad (r \le n), \qquad w = \sqrt{\det(B^T B)} \quad (r > n)$$
 
-With more task rows than joints, $B B^T$ has rank at most $n$ and its determinant is identically zero. $\sqrt{\det(B^T B)}$ is then the volume of the $n$-dimensional ellipsoid the arm actually spans. For a square block, $w = |\det B|$. In both cases $w = 0$ exactly at a singularity.
+With more task rows than joints, $B B^T$ has rank at most $n$ and its determinant is identically zero.
+The value $\sqrt{\det(B^T B)}$ is then the volume of the $n$-dimensional ellipsoid the arm actually spans. For a square block, $w = |\det B|$. In both cases $w = 0$ exactly at a singularity.
 
 ### Units
 

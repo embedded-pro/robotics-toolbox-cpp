@@ -4,7 +4,7 @@
 
 Position control makes a robot as stiff as possible: any deviation from the commanded trajectory is fought with full actuator effort. That is the wrong behaviour as soon as the tool touches something. A small position error against a rigid surface produces huge forces, and a person bumping into the arm meets a wall.
 
-**Impedance control** (Hogan, 1985) regulates the **relationship** between motion and force instead of either alone. The tool behaves like a programmable mass–spring–damper attached to the desired pose: it follows the trajectory in free space and yields with a chosen stiffness on contact.
+**Impedance control** (Hogan, 1985) regulates the **relationship** between motion and force instead of either alone. The tool behaves like a programmable mass–spring–damper attached to the desired pose. It follows the trajectory in free space and yields with a chosen stiffness on contact.
 This is the basis of polishing, assembly, hand guiding and safe human–robot collaboration.
 
 Two variants are provided:
@@ -65,12 +65,12 @@ With $M_d = \Lambda(q)$ the contact-wrench terms cancel, and the law reduces to 
 
 ## Step-by-Step Walkthrough
 
-A planar task ($m = 2$) with $K = \operatorname{diag}(500, 300)$ N/m, $D = \operatorname{diag}(40, 30)$ N·s/m and $M_d = \operatorname{diag}(2, 1.5)$ kg drives a Cartesian two-axis plant with mass $\operatorname{diag}(1, 2)$ kg and gravity load $(0, 19.62)$ N.
+A planar task ($m = 2$) has $K = \operatorname{diag}(500, 300)$ N/m, $D = \operatorname{diag}(40, 30)$ N·s/m and $M_d = \operatorname{diag}(2, 1.5)$ kg. It drives a Cartesian two-axis plant with mass $\operatorname{diag}(1, 2)$ kg and gravity load $(0, 19.62)$ N.
 
 1. **Free-space law.** With $J = I$, $e = (0.05, -0.05)$ m, $\dot{e} = (-0.1, 0.15)$ m/s and gravity torque $g$, the stiffness/damping torque is $K e + D\dot{e} + g = (25 - 4, -15 + 4.5) + g$.
 2. **Jacobian transpose.** With $J = \begin{bmatrix} 1 & 0.5 \\ 0 & 2 \end{bmatrix}$, the task wrench $K e = (25, -15)$ maps to joint torques $J^T K e = (25, -17.5)$.
 3. **Static contact.** A constant wrench $f_{\text{ext}} = (3, -4)$ N pushes the tool, which settles at $x - x_d = K^{-1} f_{\text{ext}} = (0.006, -0.0133)$ m with zero velocity.
-4. **Rendered inertia.** With inertia shaping, the plant's deflection after a step contact follows the target system $M_d\ddot{\tilde{x}} + D\dot{\tilde{x}} + K\tilde{x} = f_{\text{ext}}$ to within $10^{-5}$ m over the whole transient, although the plant's own mass differs from $M_d$.
+4. **Rendered inertia.** With inertia shaping, the plant's deflection after a step contact follows the target system $M_d\ddot{\tilde{x}} + D\dot{\tilde{x}} + K\tilde{x} = f_{\text{ext}}$. It stays within $10^{-5}$ m over the whole transient, although the plant's own mass differs from $M_d$.
 
 ## Pitfalls & Edge Cases
 

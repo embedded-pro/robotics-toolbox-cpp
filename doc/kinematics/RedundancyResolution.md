@@ -2,7 +2,7 @@
 
 ## Overview & Motivation
 
-A manipulator is **redundant** for a task when it has more joints than the task has dimensions, such as a 7-joint arm positioning and orienting its tool (6 dimensions), or any 4+ joint arm doing a pure positioning task (3). The extra freedom forms a continuous family of joint motions that leave the tool still: the elbow can swing while the hand holds a cup.
+A manipulator is **redundant** for a task when it has more joints than the task has dimensions. Examples are a 7-joint arm positioning and orienting its tool (6 dimensions), or any 4+ joint arm doing a pure positioning task (3). The extra freedom forms a continuous family of joint motions that leave the tool still: the elbow can swing while the hand holds a cup.
 
 Redundancy resolution uses that freedom deliberately. The joint velocity is split into a **primary** part that achieves the commanded tool velocity and a **secondary** part confined to the Jacobian's null space. The secondary part pursues another objective without disturbing the tool:
 
@@ -31,7 +31,7 @@ With the SVD $J = U \Sigma V^T$ and singular values $\sigma_i$:
 $$J^{+}_{\lambda} = \sum_i \frac{\sigma_i}{\sigma_i^2 + \lambda^2}\, v_i u_i^T, \qquad P = \mathbf{I} - \sum_{\sigma_i > \epsilon\,\sigma_1} v_i v_i^T$$
 
 The damped gain $\sigma/(\sigma^2 + \lambda^2)$ never exceeds $1/(2\lambda)$, so joint rates stay bounded as $\sigma_{\min} \to 0$.
-The projector is built **undamped** from the rank-thresholded singular vectors, which keeps it an exact orthogonal projector: symmetric, idempotent and invisible to the task for any $\lambda$. The damped $\mathbf{I} - J^{+}_{\lambda}J$ is not, and leaks secondary motion into the tool.
+The projector is built **undamped** from the rank-thresholded singular vectors, which keeps it an exact orthogonal projector. It is symmetric, idempotent and invisible to the task for any $\lambda$. The damped $\mathbf{I} - J^{+}_{\lambda}J$ is not, and leaks secondary motion into the tool.
 
 ### Task Accuracy Under Damping
 

@@ -2,9 +2,9 @@
 
 ## Overview & Motivation
 
-The **product-of-exponentials (PoE)** formula describes a serial arm by one **screw axis** per joint, all written once in the base frame at the home configuration, plus the tool pose at home. Denavit–Hartenberg needs per-link frames placed by convention. PoE needs none: every joint is just a line in space (revolute) or a direction (prismatic), read directly off a drawing or a CAD model.
+The **product-of-exponentials (PoE)** formula describes a serial arm by one **screw axis** per joint, plus the tool pose at home. All screw axes are written once in the base frame at the home configuration. Denavit–Hartenberg needs per-link frames placed by convention. PoE needs none: every joint is just a line in space (revolute) or a direction (prismatic), read directly off a drawing or a CAD model.
 
-Forward kinematics becomes a product of matrix exponentials, the screw axes give the **space Jacobian** with almost no extra work, and the formulation degrades gracefully where DH is ill-conditioned (nearly parallel axes). It is the language of modern robotics texts (Lynch and Park, Murray–Li–Sastry) and the basis of screw-theoretic calibration and dynamics.
+Forward kinematics becomes a product of matrix exponentials. The screw axes give the **space Jacobian** with almost no extra work. The formulation degrades gracefully where DH is ill-conditioned (nearly parallel axes). It is the language of modern robotics texts (Lynch and Park, Murray–Li–Sastry) and the basis of screw-theoretic calibration and dynamics.
 
 ## Mathematical Theory
 

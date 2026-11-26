@@ -2,10 +2,10 @@
 
 ## Overview & Motivation
 
-Odometry drifts without bound. To keep a robot localised over hours, its pose must be corrected against fixed features of the environment: reflectors on warehouse walls, fiducial markers, poles or trees.
-When the positions of these **landmarks** are known and a sensor (laser scanner, camera, radar) measures their **range and bearing**, an extended Kalman filter tracks the pose accurately at very low cost.
+Odometry drifts without bound. To keep a robot localised over hours, its pose must be corrected against fixed features of the environment. Examples are reflectors on warehouse walls, fiducial markers, poles or trees.
+The positions of these **landmarks** can be known, and a sensor (laser scanner, camera, radar) can measure their **range and bearing**. An extended Kalman filter then tracks the pose accurately at very low cost.
 
-Each motion step composes the odometry increment with noise that grows with distance and rotation. Each observation is matched to a landmark, either by a known identity or by the smallest Mahalanobis distance, then checked against a χ² gate and applied with the bearing residual wrapped. Matching is also called data association, and the gate is what rejects spurious detections.
+Each motion step composes the odometry increment with noise that grows with distance and rotation. Each observation is matched to a landmark, either by a known identity or by the smallest Mahalanobis distance. It is then checked against a χ² gate and applied with the bearing residual wrapped. Matching is also called data association, and the gate is what rejects spurious detections.
 
 ## Mathematical Theory
 

@@ -27,7 +27,7 @@ The pose of the link frame relative to its parent depends on the joint variable:
 
 $$\text{revolute: } \left(R(\hat{z}_i, q_i),\; r_i\right), \qquad \text{prismatic: } \left(\mathbf{I}_3,\; r_i + \hat{z}_i\, q_i\right)$$
 
-A revolute joint rotates the frame about a fixed origin. A prismatic joint translates the origin along a fixed direction without rotating the frame, so its axis may be read in either the parent or the link frame.
+A revolute joint rotates the frame about a fixed origin. A prismatic joint translates the origin along a fixed direction without rotating the frame. Thus its axis may be read in either the parent or the link frame.
 
 ### Motion Subspace
 
@@ -35,7 +35,7 @@ In spatial notation (angular part first), a one-degree-of-freedom joint moves al
 
 $$S_i = \begin{bmatrix} s_{\omega,i} \\ s_{v,i} \end{bmatrix} = \begin{cases} (\hat{z}_i;\ 0) & \text{revolute} \\ (0;\ \hat{z}_i) & \text{prismatic} \end{cases}$$
 
-The joint contributes the velocity $S_i \dot{q}_i$ to its link, and the actuator torque or force is the projection of the transmitted wrench onto the same subspace:
+The joint contributes the velocity $S_i \dot{q}_i$ to its link. The actuator torque or force is the projection of the transmitted wrench onto the same subspace:
 
 $$\tau_i = s_{\omega,i}^T n_i + s_{v,i}^T f_i + J_{a,i}\,\ddot{q}_i$$
 
@@ -50,7 +50,7 @@ For revolute joints this is the familiar axis–torque projection; for prismatic
 
 ### Attaching a Rigid Body
 
-A payload, a tool or a motor housing rides on a link and moves with it, so it becomes part of the link. A body of mass $m_b$, centre $c_b$ and rotational inertia $\bar{I}_b$ about its own centre, all in the link frame, merges with the link into one rigid body:
+A payload, a tool or a motor housing rides on a link and moves with it, so it becomes part of the link. Take a body of mass $m_b$, centre $c_b$ and rotational inertia $\bar{I}_b$ about its own centre, all in the link frame. It merges with the link into one rigid body:
 
 $$m = m_i + m_b, \qquad c = \frac{m_i c_i + m_b c_b}{m}$$
 
@@ -58,7 +58,7 @@ Each inertia moves to the common centre by the parallel-axis theorem, $\bar{I}(d
 
 $$\bar{I} = \bar{I}_i + m_i\left(\lVert d_i \rVert^2 \mathbf{I}_3 - d_i d_i^T\right) + \bar{I}_b + m_b\left(\lVert d_b \rVert^2 \mathbf{I}_3 - d_b d_b^T\right), \qquad d_i = c_i - c,\; d_b = c_b - c$$
 
-The merged link's inertia about any point, its joint origin included, is the sum of the two bodies' inertias about that point, so the dynamics see exactly the combined body. A merge with no mass at all leaves the link unchanged.
+The merged link's inertia about any point, its joint origin included, is the sum of the two bodies' inertias about that point. Thus the dynamics see exactly the combined body. A merge with no mass at all leaves the link unchanged.
 
 ## Complexity Analysis
 
@@ -83,9 +83,9 @@ $$\tau_0 = m r^2 \dot{\omega} + 2 m r \dot{r} \omega = 0.2 + 0.9 = 1.1\ \text{N�
 
 where the second term is the Coriolis contribution. The slider force is $\tau_1 = m(\ddot{r} - r\omega^2) = -1.85$ N, which is the centripetal pull.
 
-**Armature.** A uniform $1$ kg, $1$ m rod with $0.2$ kg·m² of armature has effective inertia $\tfrac13 + 0.2 = 0.533$ kg·m² about its joint, in the inverse dynamics, the forward dynamics and the mass matrix alike.
+**Armature.** A uniform $1$ kg, $1$ m rod with $0.2$ kg·m² of armature has effective inertia $\tfrac13 + 0.2 = 0.533$ kg·m² about its joint. This value applies in the inverse dynamics, the forward dynamics and the mass matrix alike.
 
-**Attached point mass.** A $1$ kg point mass at the joint origin and a $1$ kg payload $1$ m along $z$ merge into $2$ kg centred at $0.5$ m. Each mass sits $0.5$ m from the new centre, so the merged inertia about it is $2 \cdot 1 \cdot 0.5^2 = 0.5$ kg·m² about $x$ and $y$ and zero about $z$.
+**Attached point mass.** A $1$ kg point mass sits at the joint origin, and a $1$ kg payload sits $1$ m along $z$. They merge into $2$ kg centred at $0.5$ m. Each mass sits $0.5$ m from the new centre. Thus the merged inertia about it is $2 \cdot 1 \cdot 0.5^2 = 0.5$ kg·m² about $x$ and $y$ and zero about $z$.
 
 ## Pitfalls & Edge Cases
 

@@ -4,8 +4,8 @@
 
 The Recursive Newton-Euler Algorithm (RNEA) is the most efficient method for computing **inverse dynamics** of serial kinematic chains (robot arms, manipulators). Given joint positions, velocities, and desired accelerations, it computes the required joint torques in $O(n)$ time — linear in the number of links.
 
-This contrasts with evaluating the Euler-Lagrange equations directly: a straightforward Lagrangian evaluation grows as $O(n^4)$, and even with a precomputed mass matrix the product $M(q)\ddot{q}$ alone is $O(n^2)$.
-Hollerbach's comparative study (1980) puts the recursive Newton-Euler formulation at $150n - 48$ multiplications and $131n - 48$ additions — 852 and 738 for a 6-DOF arm — against tens of thousands of multiplications for the direct Lagrangian form.
+This contrasts with evaluating the Euler-Lagrange equations directly. A straightforward Lagrangian evaluation grows as $O(n^4)$. Even with a precomputed mass matrix, the product $M(q)\ddot{q}$ alone is $O(n^2)$.
+Hollerbach's comparative study (1980) puts the recursive Newton-Euler formulation at $150n - 48$ multiplications and $131n - 48$ additions. For a 6-DOF arm these are 852 and 738. The direct Lagrangian form needs tens of thousands of multiplications.
 
 The algorithm has two passes over the kinematic chain:
 
@@ -26,7 +26,7 @@ A serial chain of $n$ rigid bodies (links) connected by revolute or prismatic jo
 - $r_{p \to j}^{(i)} \in \mathbb{R}^3$ — position of joint $i$ in the parent (link $i-1$) frame
 - $r_{j \to c}^{(i)} \in \mathbb{R}^3$ — position of the center of mass in the link $i$ frame
 
-The rotation matrix $R_i(q_i)$ transforms vectors from link $i$ frame to parent frame, computed via Rodrigues' formula from the joint angle $q_i$ and joint axis $\hat{z}_i$.
+The rotation matrix $R_i(q_i)$ transforms vectors from link $i$ frame to parent frame. Rodrigues' formula computes it from the joint angle $q_i$ and joint axis $\hat{z}_i$.
 
 ### Forward Pass — Velocity and Acceleration Propagation
 
@@ -69,7 +69,7 @@ The joint effort projects the force instead of the moment, $\tau_{q_i} = \hat{z}
 
 ### External Tool Wrench
 
-When the environment pushes on the tool with a wrench $(f_e; n_e)$ (base frame, moment about the tool point), with the tool point $t$ given in the last link frame,, the last link receives that wrench in addition to its inertial load. Rotated into the last link frame and moved to its joint origin:
+The environment can push on the tool with a wrench $(f_e; n_e)$ (base frame, moment about the tool point). The tool point $t$ is given in the last link frame. The last link then receives that wrench in addition to its inertial load. Rotated into the last link frame and moved to its joint origin:
 
 $$f_e' = {}^{0}R_{n-1}^T f_e, \qquad n_e' = {}^{0}R_{n-1}^T n_e + t \times f_e'$$
 
@@ -92,7 +92,7 @@ where $[\hat{u}]_\times$ is the skew-symmetric matrix of $\hat{u}$.
 | Per-link backward pass | $O(1)$ | $O(1)$ | Cross products and additions                    |
 | Rotation matrix        | $O(1)$ | $O(1)$ | Rodrigues' formula: trig functions + 3×3 matrix |
 
-Compared to evaluating inverse dynamics through an explicit mass matrix ($O(n^2)$ to form and apply) or a direct Lagrangian evaluation ($O(n^4)$), RNEA's linear cost dominates for every practical $n$; for $n = 6$ it needs 852 multiplications and 738 additions (Hollerbach, 1980).
+Inverse dynamics through an explicit mass matrix costs $O(n^2)$ to form and apply. A direct Lagrangian evaluation costs $O(n^4)$. RNEA's linear cost dominates both for every practical $n$. For $n = 6$ it needs 852 multiplications and 738 additions (Hollerbach, 1980).
 
 ## Step-by-Step Walkthrough
 
@@ -148,7 +148,7 @@ This matches $I_{\text{end}} \cdot \ddot{q} = \frac{ml^2}{3} \cdot 1 = 0.667$.
 
 - **Newton-Euler** ([NewtonEuler.md](NewtonEuler.md)): RNEA applies the single-body Newton-Euler equations recursively across the chain. The per-link force/torque computation is identical.
 - **Euler-Lagrange** ([EulerLagrange.md](EulerLagrange.md)): Both compute the same dynamics ($M\ddot{q} + C\dot{q} + g = \tau$) but RNEA is $O(n)$, whereas working through $M(q)$ costs at least $O(n^2)$. RNEA is preferred for computation; Euler-Lagrange for analytical derivation.
-- **Linear solvers** ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)): When RNEA is used for forward dynamics, the mass matrix built column by column is factorized (Cholesky, since it is symmetric positive definite) and solved.
+- **Linear solvers** ([numerical-toolbox-cpp](https://github.com/embedded-pro/numerical-toolbox-cpp)): When RNEA is used for forward dynamics, the mass matrix is built column by column. It is then factorized (Cholesky, since it is symmetric positive definite) and solved.
 - **Articulated Body Algorithm** ([ArticulatedBodyAlgorithm.md](ArticulatedBodyAlgorithm.md)): the $O(n)$ forward-dynamics dual; composing the two is the identity, which makes it a strong cross-check.
 
 ## References & Further Reading

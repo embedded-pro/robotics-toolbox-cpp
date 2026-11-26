@@ -2,9 +2,9 @@
 
 ## Overview & Motivation
 
-Most industrial six-axis arms (KUKA, ABB, Fanuc, Stäubli, Yaskawa) share one layout: axes 2 and 3 are parallel to each other and orthogonal to axis 1, and the last three axes intersect in a **spherical wrist**. For this ortho-parallel layout the inverse kinematics has a closed form: every solution is found in constant time, with no iteration, no seed and no convergence failure.
+Most industrial six-axis arms (KUKA, ABB, Fanuc, Stäubli, Yaskawa) share one layout. Axes 2 and 3 are parallel to each other and orthogonal to axis 1. The last three axes intersect in a **spherical wrist**. For this ortho-parallel layout the inverse kinematics has a closed form. It finds every solution in constant time, with no iteration, no seed and no convergence failure.
 
-The **OPW** formulation (Brandstötter, Angerer and Hofbaur, 2014) describes the arm with seven lengths plus a sign and an offset per joint, read straight from the datasheet. No Denavit–Hartenberg table or frame convention is involved.
+The **OPW** formulation (Brandstötter, Angerer and Hofbaur, 2014) describes the arm with seven lengths plus a sign and an offset per joint. The user reads these straight from the datasheet. No Denavit–Hartenberg table or frame convention is involved.
 It returns up to **eight** configurations: two shoulder poses, two elbow poses and two wrist poses. The caller picks one, typically the closest to the current joint values.
 
 ## Mathematical Theory

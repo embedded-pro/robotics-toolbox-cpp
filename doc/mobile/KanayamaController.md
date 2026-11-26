@@ -2,7 +2,7 @@
 
 ## Overview & Motivation
 
-Path trackers such as pure pursuit follow a geometric path at whatever speed the robot happens to drive. Many tasks also fix **when** the robot should be where: a delivery robot keeping to a schedule, several robots moving in formation, or a base that must arrive in sync with an arm. These need **trajectory tracking**, where a reference pose and its velocity are given at every instant.
+Path trackers such as pure pursuit follow a geometric path at whatever speed the robot happens to drive. Many tasks also fix **when** the robot should be where. Examples are a delivery robot keeping to a schedule, several robots moving in formation, or a base that must arrive in sync with an arm. These need **trajectory tracking**, where a reference pose and its velocity are given at every instant.
 
 The Kanayama controller (Kanayama et al., 1990) is the classical solution for unicycle-type bases such as differential-drive and skid-steer robots. It expresses the tracking error in the robot's own frame and adds a feedback correction to the reference velocity. A Lyapunov function proves that the error converges to zero from any initial error while the reference keeps moving forward.
 
@@ -58,7 +58,7 @@ Gains $k_x = 1$ s⁻¹, $k_y = 4$ m⁻² and $k_\theta = 4$ m⁻¹ (critically d
 2. **Along-track error**: a reference $0.2$ m ahead raises the speed to $0.5 + 0.2 = 0.7$ m/s.
 3. **Cross-track error**: a reference $0.1$ m to the left gives $\omega = 0.5 \cdot 4 \cdot 0.1 = 0.2$ rad/s, turning towards it.
 4. **Heading error**: a reference rotated $0.3$ rad gives $v = 0.5\cos 0.3 = 0.478$ m/s and $\omega = 0.5 \cdot 4 \sin 0.3 = 0.591$ rad/s.
-5. **Robot frame**: a robot at $(1, 1)$ facing north with the reference at $(1, 2)$ sees an along-track error of $1$ m, not a lateral one, and speeds up to $1.5$ m/s.
+5. **Robot frame**: a robot at $(1, 1)$ faces north with the reference at $(1, 2)$. It sees an along-track error of $1$ m, not a lateral one, and speeds up to $1.5$ m/s.
 6. **Closed loop**: starting at $(-0.3, 0.5, -0.4)$ with $V = 0.379$, the error falls below $10^{-4}$ within $20$ s, and $V$ decreases at every $10$ ms step.
 
 ## Pitfalls & Edge Cases
