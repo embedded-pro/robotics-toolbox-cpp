@@ -17,4 +17,5 @@ target_sources(robotics.mobile_test PRIVATE
     TestPurePursuit.cpp
     TestSkidSteerKinematics.cpp
     TestStanleyController.cpp
+    TestWheeledInvertedPendulum.cpp
 )
