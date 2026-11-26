@@ -53,7 +53,7 @@ $\Delta = (M + 2J_w/r^2) J_t + mJ$, which is positive for every physical robot. 
 
 ### Yaw Model
 
-Each wheel turns at $\dot{\psi}\,b/(2r)$ relative to the other, so the wheel spin adds $J_w b^2/(2r^2)$ to the yaw inertia. The ground forces $\tau_L/r$ and $\tau_R/r$ act at $\pm b/2$. With the state $(\psi, \dot{\psi})$ and the input $\tau_d$:
+Each wheel turns at $\pm\dot{\psi}\,b/(2r)$ relative to the axle centre, so the wheel spin adds $J_w b^2/(2r^2)$ to the yaw inertia. The wheel torques give the forces $\tau_L/r$ and $\tau_R/r$ at $\pm b/2$. With the state $(\psi, \dot{\psi})$ and the input $\tau_d$:
 
 $$\left(J_\psi + \frac{J_w b^2}{2r^2}\right)\ddot{\psi} = \frac{b}{2r}\,\tau_d$$
 
@@ -69,7 +69,7 @@ The free pitch model has a faster unstable root, $\sqrt{M_t m g\ell/\Delta}$, be
 
 | Operation      | Time   | Space  | Notes                                   |
 |----------------|--------|--------|-----------------------------------------|
-| Pitch model    | $O(1)$ | $O(1)$ | One division by $\Delta$, eight entries |
+| Pitch model    | $O(1)$ | $O(1)$ | Six non-zero entries, four over $\Delta$ |
 | Yaw model      | $O(1)$ | $O(1)$ | Two entries                             |
 | Time constants | $O(1)$ | $O(1)$ | One square root each                    |
 
@@ -82,6 +82,7 @@ A small robot: $m = 0.8$ kg, $M = 0.1$ kg, $\ell = 0.1$ m, $J = 0.004$ kg·m², 
 3. $A_{21} = 0.98651 \times 0.7848 / 0.0054381 = 142.37$ s⁻² and $A_{41} = -0.0064 \times 9.81 / 0.0054381 = -11.545$ m/s².
 4. $B_2 = -(0.98651 + 2.3529)/0.0054381 = -614.09$ and $B_4 = (0.35294 + 0.08)/0.0054381 = 79.613$.
 5. $\tau = \sqrt{0.012/0.7848} = 0.12366$ s. The free root is $\sqrt{142.37} = 11.932$ s⁻¹.
+6. Yaw, with $J_\psi = 0.01$ kg·m² and $b = 0.145$ m: the effective inertia is $0.01 + 0.00045469 = 0.010455$ kg·m², and $B_2 = 0.145/(2 \times 0.034 \times 0.010455) = 203.96$.
 
 ## Pitfalls & Edge Cases
 
@@ -89,7 +90,7 @@ A small robot: $m = 0.8$ kg, $M = 0.1$ kg, $\ell = 0.1$ m, $J = 0.004$ kg·m², 
 - **Wheel inertia**: include the motor rotor and the gearbox, reflected through the square of the gear ratio. For a small robot it is a large part of $M_t$.
 - **Sign conventions**: positive $\tau_c$ drives the robot forward and pitches the body back. A wrong sign in the motor or the IMU mapping makes every gain destabilise the robot.
 - **Range**: the linear model holds to about 15°. At 35° the small-angle error in $\sin\theta$ is above 6 %.
-- **Degenerate input**: a zero or negative mass, length, radius or inertia has no physical meaning and is rejected.
+- **Degenerate input**: the model rejects a body mass, height, wheel radius, track width or gravity that is not positive. It also rejects a negative inertia or wheel mass, and $\Delta = 0$.
 - **Not modelled**: slip, slopes, motor saturation, backlash, friction, flexible structure and yaw-pitch coupling at high turn rates.
 
 ## Variants & Generalizations
