@@ -12,22 +12,22 @@ Controller design for this robot starts from a linear model about the upright po
 
 The model has two rigid bodies. The body pivots freely about the axle. The wheels roll without slip on flat, level ground. Pitch and travel decouple from yaw, so the model splits into a planar pitch model and a yaw model.
 
-| Symbol      | Meaning                                                  | Unit    |
-|-------------|----------------------------------------------------------|---------|
-| $m$         | Body mass: everything that pivots about the axle         | kg      |
-| $M$         | Mass of both wheels                                      | kg      |
-| $\ell$      | Distance from the axle to the body centre of mass        | m       |
-| $J$         | Body pitch inertia about its centre of mass              | kg·m²   |
-| $J_w$       | Inertia of one wheel about its axle, rotor included      | kg·m²   |
-| $J_\psi$    | Yaw inertia of body and wheels about the vertical axis   | kg·m²   |
-| $r$         | Wheel radius                                             | m       |
-| $b$         | Track width between the contact points                   | m       |
-| $g$         | Gravitational acceleration                               | m/s²    |
-| $\theta$    | Body pitch from vertical, positive with the top forward  | rad     |
-| $x$         | Axle travel, positive forward                            | m       |
-| $\psi$      | Yaw, positive counter-clockwise seen from above          | rad     |
-| $\tau_c$    | Common torque on the wheels, $\tau_L + \tau_R$           | N·m     |
-| $\tau_d$    | Differential torque on the wheels, $\tau_R - \tau_L$     | N·m     |
+| Symbol   | Meaning                                                 | Unit  |
+|----------|---------------------------------------------------------|-------|
+| $m$      | Body mass: everything that pivots about the axle        | kg    |
+| $M$      | Mass of both wheels                                     | kg    |
+| $\ell$   | Distance from the axle to the body centre of mass       | m     |
+| $J$      | Body pitch inertia about its centre of mass             | kg·m² |
+| $J_w$    | Inertia of one wheel about its axle, rotor included     | kg·m² |
+| $J_\psi$ | Yaw inertia of body and wheels about the vertical axis  | kg·m² |
+| $r$      | Wheel radius                                            | m     |
+| $b$      | Track width between the contact points                  | m     |
+| $g$      | Gravitational acceleration                              | m/s²  |
+| $\theta$ | Body pitch from vertical, positive with the top forward | rad   |
+| $x$      | Axle travel, positive forward                           | m     |
+| $\psi$   | Yaw, positive counter-clockwise seen from above         | rad   |
+| $\tau_c$ | Common torque on the wheels, $\tau_L + \tau_R$          | N·m   |
+| $\tau_d$ | Differential torque on the wheels, $\tau_R - \tau_L$    | N·m   |
 
 The motors act between body and wheels. A wheel torque therefore puts an equal and opposite torque on the body.
 
@@ -67,11 +67,11 @@ The free pitch model has a faster unstable root, $\sqrt{M_t m g\ell/\Delta}$, be
 
 ## Complexity Analysis
 
-| Operation      | Time   | Space  | Notes                                   |
-|----------------|--------|--------|-----------------------------------------|
+| Operation      | Time   | Space  | Notes                                    |
+|----------------|--------|--------|------------------------------------------|
 | Pitch model    | $O(1)$ | $O(1)$ | Six non-zero entries, four over $\Delta$ |
-| Yaw model      | $O(1)$ | $O(1)$ | Two entries                             |
-| Time constants | $O(1)$ | $O(1)$ | One square root each                    |
+| Yaw model      | $O(1)$ | $O(1)$ | Two entries                              |
+| Time constants | $O(1)$ | $O(1)$ | One square root each                     |
 
 ## Step-by-Step Walkthrough
 
