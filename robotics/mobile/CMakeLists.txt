@@ -20,6 +20,7 @@ target_sources(robotics.mobile PRIVATE
     PurePursuit.hpp
     SkidSteerKinematics.hpp
     StanleyController.hpp
+    WheeledInvertedPendulum.hpp
 )
 
 robotics_add_coverage_sources(robotics.mobile
@@ -32,6 +33,7 @@ robotics_add_coverage_sources(robotics.mobile
     PurePursuit.cpp
     SkidSteerKinematics.cpp
     StanleyController.cpp
+    WheeledInvertedPendulum.cpp
 )
 
 add_subdirectory(test)
