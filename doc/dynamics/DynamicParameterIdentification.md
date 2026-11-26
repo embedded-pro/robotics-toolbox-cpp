@@ -22,7 +22,7 @@ $$\underbrace{\begin{bmatrix} Y_1 \\ \vdots \\ Y_N \end{bmatrix}}_{W} \pi = \und
 
 ### Rank Deficiency and Base Parameters
 
-$W$ never has full column rank. Some columns are identically zero, for example inertia components about axes perpendicular to a planar arm's joints. Others are linear combinations of the rest: the mass of link 2 enters link 1's dynamics only through $m_2 l_1$ and $m_2 l_1^2$, which merge with link 1's first moment and inertia.
+$W$ never has full column rank. Some columns are identically zero, for example inertia components about axes perpendicular to a planar arm's joints. Others are linear combinations of the rest. The mass of link 2 enters link 1's dynamics only through $m_2 l_1$ and $m_2 l_1^2$. These terms merge with link 1's first moment and inertia.
 The identifiable subspace is the row space of $W$. Its dimension, the number of base parameters, is far below $10n$.
 
 ### Streaming Rank-Revealing Least Squares
@@ -52,7 +52,7 @@ The estimate is validated by predicting torques $\hat{\tau} = Y\hat{\pi}$ on hel
 
 ## Step-by-Step Walkthrough
 
-A planar two-link arm of uniform rods (masses $2$ and $1.5$ kg, lengths $1$ and $0.8$ m) follows a three-harmonic Fourier trajectory, sampled 200 times over one period. Torques come from the recursive Newton–Euler algorithm on the true parameters.
+A planar two-link arm of uniform rods (masses $2$ and $1.5$ kg, lengths $1$ and $0.8$ m) follows a three-harmonic Fourier trajectory. The test samples it 200 times over one period. Torques come from the recursive Newton–Euler algorithm on the true parameters.
 
 1. **Joint axes horizontal.** Gravity acts in the plane of motion. The stacked regressor has rank 6, matching the classical base set $ZZ_1^R = ZZ_1 + m_2 l_1^2$, $ZZ_2$, $MX_1^R = MX_1 + m_2 l_1$, $MY_1$, $MX_2$ and $MY_2$, with $Z$ along the joint axes.
 2. **Joint axes vertical.** Gravity is parallel to the axes, so link 1's first moments no longer act: rank 4 ($ZZ_1^R$, $ZZ_2$, $MX_2$, $MY_2$).

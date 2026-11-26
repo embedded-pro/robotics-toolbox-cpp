@@ -2,10 +2,10 @@
 
 ## Overview & Motivation
 
-Many tasks are naturally specified at the tool: follow a weld seam, hold a camera on a target, press with a given stiffness. Joint-space controllers must first convert such a task into joint trajectories through inverse kinematics, and they still do not shape how the tool **responds** to errors and disturbances.
+Many tasks are naturally specified at the tool: follow a weld seam, hold a camera on a target, press with a given stiffness. Joint-space controllers must first convert such a task into joint trajectories through inverse kinematics. Even then, they do not shape how the tool **responds** to errors and disturbances.
 
 **Operational-space control** (Khatib, 1987) writes the manipulator dynamics directly in task coordinates. It commands a task acceleration through the **task-space inertia** $\Lambda(q)$, so the tool behaves like a decoupled, unit-mass second-order system along every task axis.
-On redundant arms, a **dynamically consistent null-space projector** lets a secondary objective (posture, joint-limit avoidance) act through the remaining freedom without disturbing the task at all.
+On redundant arms, a **dynamically consistent null-space projector** lets a secondary objective (posture, joint-limit avoidance) act through the remaining freedom. It does not disturb the task at all.
 
 ## Mathematical Theory
 

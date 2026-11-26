@@ -4,7 +4,7 @@
 
 Cars, tractors, forklifts and many outdoor robots steer with their front wheels. They cannot turn in place or move sideways. Their motion is limited by the steering angle, and the steering angle itself is limited in range and rate.
 
-The **kinematic bicycle** model merges the two front wheels into one virtual wheel at steering angle $\delta$ and the two rear wheels into one, with no tyre slip. It is accurate at low lateral acceleration (below roughly $0.4\,g$), and it is the model behind classical path trackers such as pure pursuit and Stanley.
+The **kinematic bicycle** model merges the two front wheels into one virtual wheel at steering angle $\delta$. It merges the two rear wheels into one, with no tyre slip. It is accurate at low lateral acceleration (below roughly $0.4\,g$), and it is the model behind classical path trackers such as pure pursuit and Stanley.
 The **Ackermann** geometry maps the virtual steering angle back to the two real front wheels so that all four wheels turn about one common centre.
 
 ## Mathematical Theory

@@ -12,9 +12,9 @@ Different controllers need different pieces of it:
 - Operational-space control needs $M(q)$.
 - Computed-torque control needs the whole right-hand side for a commanded acceleration, ideally in a single pass.
 
-The recursive algorithms compute these pieces efficiently from a physical link description, but they speak in links, frames and spatial vectors rather than in matrices of the joint space.
+The recursive algorithms compute these pieces efficiently from a physical link description. But they speak in links, frames and spatial vectors rather than in matrices of the joint space.
 
-The chain dynamics model is the adapter between the two worlds. Given a link chain and the gravity vector, it answers every term of the manipulator equation through two small abstract interfaces. Controllers stay independent of how the dynamics are computed, can be tested against mock models, and can be bound to the concrete model on a hard real-time path.
+The chain dynamics model is the adapter between the two worlds. Given a link chain and the gravity vector, it answers every term of the manipulator equation through two small abstract interfaces. Controllers stay independent of how the dynamics are computed. They can be tested against mock models and bound to the concrete model on a hard real-time path.
 
 ## Mathematical Theory
 

@@ -5,7 +5,7 @@
 A robot often needs a velocity command **right now**, using only what its sensors see, rather than a complete collision-free path. Examples are a mobile base nudging around a person, or a manipulator's elbow dodging a moving obstacle.
 **Artificial potential fields** (Khatib, 1986) answer with a single gradient step. The goal is an attractive well, each nearby obstacle an expanding hill, and the robot follows the negative gradient of their sum.
 
-The method is constant-time per obstacle, needs no map and no search, and reacts instantly to new proximity readings, which makes it a classic reactive layer below a global planner. Its well-known weakness is **local minima**, where attraction and repulsion cancel short of the goal. Here they are detected and reported, so the caller can switch strategy.
+The method is constant-time per obstacle, needs no map and no search, and reacts instantly to new proximity readings. This makes it a classic reactive layer below a global planner. Its well-known weakness is **local minima**, where attraction and repulsion cancel short of the goal. Here they are detected and reported, so the caller can switch strategy.
 
 ## Mathematical Theory
 
@@ -66,7 +66,7 @@ Gains $k_a = 1$, $d^* = 1$, $k_r = 0.1$, $\rho_0 = 1$, speed limit $0.5$, robot 
 - **Navigation functions** (Rimon and Koditschek): potentials with a unique minimum on sphere worlds, at the cost of global knowledge.
 - **Harmonic potentials**: solutions of Laplace's equation have no interior local minima, but require a grid solve.
 - **Vortex and circulation fields**: tangential components steer around obstacles instead of pushing directly away.
-- **Manipulator control points**: evaluate the field at several points on the arm and map each force through the transposed point Jacobian into joint torques or rates.
+- **Manipulator control points**: evaluate the field at several points on the arm. Map each force through the transposed point Jacobian into joint torques or rates.
 - **Elastic bands**: deform a global path with repulsive forces instead of commanding velocity directly.
 
 ## Applications

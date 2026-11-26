@@ -5,7 +5,7 @@
 Collision checking on a robot rarely uses the real link meshes. Arm links are wrapped in **capsules** (a sphere swept along a segment), grippers and heads in **spheres**, and tables, walls and fixtures in **oriented boxes**.
 These checks run every control cycle in self-collision avoidance, human–robot speed and separation monitoring, and reactive obstacle avoidance. They must be exact, constant-time, branch-light and allocation-free.
 
-The queries return the **closest points** on both shapes and a **signed distance**: positive when the shapes are apart, negative when they overlap, where the magnitude is the penetration depth. The signed value lets one smooth function serve both clearance monitoring and contact response.
+The queries return the **closest points** on both shapes and a **signed distance**. It is positive when the shapes are apart and negative when they overlap; then the magnitude is the penetration depth. The signed value lets one smooth function serve both clearance monitoring and contact response.
 
 ## Mathematical Theory
 
@@ -84,7 +84,7 @@ There are no loops beyond the fixed three box axes, so timing is fully determini
 
 - **Swept volumes**: continuous collision checking sweeps a capsule over a time step, so it becomes a segment–segment query in space-time.
 - **Axis-aligned boxes**: the rotation step disappears, which is useful for broad-phase culling.
-- **Distance derivatives**: the gradient of the signed distance with respect to a point is the unit normal $n$, which repulsive potential fields and collision-avoidance constraints use.
+- **Distance derivatives**: the gradient of the signed distance with respect to a point is the unit normal $n$. Repulsive potential fields and collision-avoidance constraints use it.
 - **Spheres as degenerate capsules**: a zero-length capsule axis reproduces the sphere queries, so one capsule–capsule kernel can serve both.
 
 ## Applications

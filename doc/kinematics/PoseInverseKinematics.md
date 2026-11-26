@@ -61,7 +61,7 @@ A PUMA-560 (standard DH) with target pose $T^* = T(q^\ast)$, $q^\ast = (0.3, -0.
 2. **Heavier damping $\lambda_0 = 0.2$**: 14 iterations to $10^{-5}$ instead of 4, but the same joint angles to within $10^{-3}$. Damping costs speed, not accuracy.
 3. **One weighted step**: with $J = I$, $\rho = 0.1$ and $\lambda = 0.1$, the error $(0.1, 0, 0, 0, 0, 0.1)$ gives $\Delta q_i = w_i^2 e_i / (w_i^2 + \lambda^2)$, i.e. $0.0990$ on the position row and $0.05$ on the rotation row.
 4. **Wrist singularity**: starting at $\theta_5 = 0$, where the wrist axes align, adaptive damping with $w_0 = 10^{-3}$ and $\Delta_{\max} = 0.2$ converges in 8 iterations.
-5. **Unreachable target**: moving the target to $(3, 0, 0)$ m, beyond the arm's reach, stops at the iteration limit with a finite configuration and a residual of about $3.8$.
+5. **Unreachable target**: the target moves to $(3, 0, 0)$ m, beyond the arm's reach. The solver stops at the iteration limit with a finite configuration and a residual of about $3.8$.
 
 ## Pitfalls & Edge Cases
 

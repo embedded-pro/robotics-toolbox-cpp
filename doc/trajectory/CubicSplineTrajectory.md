@@ -59,8 +59,8 @@ One joint, knots $t = (0, 1, 2.5, 3, 4.5)$ s, positions $q = (0, 1, -0.5, 0.3, 2
 
 ## Pitfalls & Edge Cases
 
-- **Acceleration steps at the ends**: clamped zero velocities start and stop at rest, but the end accelerations are generally non-zero, so the acceleration jumps at start and stop. Natural ends remove the jump but leave the end velocities free. Pick per application, or blend into the spline with a higher-order segment.
-- **Overshoot between knots**: the spline minimizes curvature, not excursion. Joint and velocity limits can be violated between knots, so check sampled states or stretch all knot times by $\lambda \ge 1$ (velocities scale by $1/\lambda$, accelerations by $1/\lambda^2$).
+- **Acceleration steps at the ends**: clamped zero velocities start and stop at rest. But the end accelerations are generally non-zero, so the acceleration jumps at start and stop. Natural ends remove the jump but leave the end velocities free. Pick per application, or blend into the spline with a higher-order segment.
+- **Overshoot between knots**: the spline minimizes curvature, not excursion. Joint and velocity limits can be violated between knots. Check sampled states or stretch all knot times by $\lambda \ge 1$ (velocities scale by $1/\lambda$, accelerations by $1/\lambda^2$).
 - **Knot timing**: badly chosen times (a long hop scheduled in a short interval) produce large accelerations. A good default spaces knot times in proportion to the largest joint displacement per segment, or to the chord length.
 - **Nearly coincident knots**: spans close to zero make the system ill-conditioned and the slopes huge. Times must be strictly increasing with a margin above floating-point resolution, and plans that violate this are rejected.
 - **Capacity**: plans with fewer than two knots or more than the compile-time capacity are rejected rather than truncated.

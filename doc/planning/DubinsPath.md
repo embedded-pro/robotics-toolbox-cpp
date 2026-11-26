@@ -2,11 +2,11 @@
 
 ## Overview & Motivation
 
-A car cannot turn on the spot. Its turning radius is bounded below, and without reversing it can only drive forward. Planning for such a vehicle needs the shortest path between two poses that respects this **curvature bound**, both as a local steering function inside sampling planners and as a distance metric between poses.
+A car cannot turn on the spot. Its turning radius is bounded below, and without reversing it can only drive forward. Planning for such a vehicle needs the shortest path between two poses that respects this **curvature bound**. This path serves as a local steering function inside sampling planners and as a distance metric between poses.
 
-Dubins (1957) proved a remarkable result: the shortest forward-only path between any two planar poses is one of just **six words** of at most three segments. Each segment is either an arc at the minimum turning radius ($C$, turning left $L$ or right $R$) or a straight line ($S$). Every word has a closed-form solution, so the planner evaluates all six and keeps the shortest.
+Dubins (1957) proved a remarkable result. The shortest forward-only path between any two planar poses is one of just **six words** of at most three segments. Each segment is either an arc at the minimum turning radius ($C$, turning left $L$ or right $R$) or a straight line ($S$). Every word has a closed-form solution, so the planner evaluates all six and keeps the shortest.
 
-The same header defines a general **car path** type, a short list of steering segments with signed lengths, which the Reeds–Shepp planner reuses for paths that also reverse.
+The same header defines a general **car path** type, a short list of steering segments with signed lengths. The Reeds–Shepp planner reuses it for paths that also reverse.
 
 ## Mathematical Theory
 
@@ -39,7 +39,7 @@ The total length is $\rho\,(t + p + q)$, and the shortest valid word wins. On a 
 ### Single-Precision Boundary Cases
 
 Goals reachable by a single arc, such as a quarter turn to $(\rho, \rho, \pi/2)$, place the crossing discriminants exactly on zero. In single precision they come out slightly negative. A strict test would then reject the correct word and return a path five times too long.
-The existence tests therefore accept a tolerance of $10^{-5}$ (in units of $\rho$), and angles within $10^{-5}$ of $2\pi$ snap to zero rather than adding a spurious full loop.
+The existence tests therefore accept a tolerance of $10^{-5}$ (in units of $\rho$). Angles within $10^{-5}$ of $2\pi$ snap to zero rather than adding a spurious full loop.
 
 ### Sampling a Car Path
 

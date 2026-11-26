@@ -4,10 +4,10 @@
 
 How heavy does a joint feel? The answer depends on what the other joints do.
 
-- With every other joint **locked**, joint $i$ moves its own subtree as one rigid body, and the inertia it feels is the diagonal entry $M_{ii}$ of the mass matrix.
-- With every other joint **free** (unactuated or back-drivable), part of a torque on joint $i$ is spent accelerating the neighbours through the coupling terms, and the joint feels a smaller inertia.
+- With every other joint **locked**, joint $i$ moves its own subtree as one rigid body. The inertia it feels is the diagonal entry $M_{ii}$ of the mass matrix.
+- With every other joint **free** (unactuated or back-drivable), part of a torque on joint $i$ is spent accelerating the neighbours through the coupling terms. The joint then feels a smaller inertia.
 
-The second value is the one that sizes a joint's controller when the other joints are not holding it: a gain chosen from $M_{ii}$ is too stiff for a joint that, in practice, drags light neighbours along. It is also what a single-joint step test measures on a real arm, and what a simulated plant should report as each joint's load.
+The second value sizes a joint's controller when the other joints are not holding it. A gain chosen from $M_{ii}$ is too stiff for a joint that, in practice, drags light neighbours along. It is also what a single-joint step test measures on a real arm, and what a simulated plant should report as each joint's load.
 
 ## Mathematical Theory
 

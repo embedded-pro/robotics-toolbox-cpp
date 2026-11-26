@@ -34,7 +34,7 @@ k_1 &= f(x_k), & k_2 &= f\!\left(x_k + \tfrac{h}{2}k_1\right), & k_3 &= f\!\left
 x_{k+1} &= x_k + \tfrac{h}{6}\left(k_1 + 2k_2 + 2k_3 + k_4\right)
 \end{aligned}$$
 
-The local error is $O(h^5)$ and the global error $O(h^4)$, at four dynamics evaluations per step. RK4 is not symplectic, so energy slowly drifts (usually dissipates) over long horizons, but at fine steps the drift is far below the float resolution of a typical run.
+The local error is $O(h^5)$ and the global error $O(h^4)$, at four dynamics evaluations per step. RK4 is not symplectic, so energy slowly drifts (usually dissipates) over long horizons. But at fine steps the drift is far below the float resolution of a typical run.
 
 ### Logged Acceleration
 
@@ -58,12 +58,12 @@ $$\omega_0 = \sqrt{\frac{m g L/2}{m L^2/3}} = \sqrt{\frac{3g}{2L}} = 3.836\ \tex
 1. Release it from rest at $0.05$ rad off vertical with $h = 1$ ms.
 2. RK4 evaluates the articulated-body dynamics four times per step. The measured period matches $1.638$ s to within $0.02\,\%$, which is the finite-amplitude correction $\theta_0^2/16$. After 10 s (about six periods) the relative energy error is near $10^{-7}$.
 3. The same experiment with semi-implicit Euler has an energy error that oscillates around zero at the oscillation frequency and never grows.
-4. For a rod spinning about a vertical axis under constant torque $\tau$ (gravity is parallel to the axis and does no work), the angle follows $q(t) = \tfrac12(\tau/I)t^2$ exactly, since RK4 integrates polynomials up to degree four without error.
+4. A rod spins about a vertical axis under constant torque $\tau$ (gravity is parallel to the axis and does no work). The angle follows $q(t) = \tfrac12(\tau/I)t^2$ exactly, since RK4 integrates polynomials up to degree four without error.
 
 ## Pitfalls & Edge Cases
 
-- **Step size versus stiffness**: explicit methods are stable only while $h\,\omega_{\max}$ stays small, where $\omega_{\max}$ is the highest natural frequency, including stiff contact springs and high-gain controllers in the loop. Semi-implicit Euler needs $h\,\omega_{\max} < 2$; RK4 tolerates about $2.8$.
-- **Damping belongs in the torque**: joint friction and viscous damping should enter as torques ($\tau - b\dot{q}$), not as ad-hoc velocity scaling after the step, which breaks the integrator's structure.
+- **Step size versus stiffness**: explicit methods are stable only while $h\,\omega_{\max}$ stays small. Here $\omega_{\max}$ is the highest natural frequency, including stiff contact springs and high-gain controllers in the loop. Semi-implicit Euler needs $h\,\omega_{\max} < 2$; RK4 tolerates about $2.8$.
+- **Damping belongs in the torque**: joint friction and viscous damping should enter as torques ($\tau - b\dot{q}$). Ad-hoc velocity scaling after the step breaks the integrator's structure.
 - **Controller sample rate**: when the plant step is finer than the controller period, hold $\tau$ across several plant steps. Mixing the two rates silently changes the closed-loop dynamics.
 - **Long horizons in float**: angles grow without bound under continuous rotation, and float spacing grows with magnitude. Wrap revolute angles for long simulations.
 - **Singular configurations**: the articulated-body recursion needs a positive joint-space inertia at every joint. Massless distal links make it ill-conditioned; add armature.

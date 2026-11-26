@@ -31,10 +31,10 @@ where the **allowed set** $\mathcal{A}$ excludes pairs that need no check.
 
 ### Allowed Pairs
 
-Adjacent links share a joint, so their capsules always touch, and they are allowed by default. Further pairs belong in $\mathcal{A}$ when joint limits keep them permanently apart, or when the coarse model makes them permanently overlap (a housing over its neighbour).
+Adjacent links share a joint, so their capsules always touch, and they are allowed by default. Further pairs belong in $\mathcal{A}$ when joint limits keep them permanently apart. Pairs also belong there when the coarse model makes them permanently overlap (a housing over its neighbour).
 A permanent false positive would otherwise hide every real collision behind it. The allowed set is a symmetric bit matrix, so membership is a single test.
 
-The pairs that overlap by construction can be found from the model itself: evaluate every pair not yet allowed at a reference configuration where the arm is known to be clear, such as its home pose, and allow those closer than the margin there. Whatever touches in a pose that is safe by definition touches because of the coarse geometry, not because of a collision.
+The model itself shows the pairs that overlap by construction. Pick a reference configuration where the arm is known to be clear, such as its home pose. Evaluate every pair not yet allowed at that configuration. Allow those closer than the margin there. Whatever touches in a pose that is safe by definition touches because of the coarse geometry, not because of a collision.
 
 ### Margin
 

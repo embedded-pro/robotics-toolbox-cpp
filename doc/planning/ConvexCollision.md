@@ -2,10 +2,10 @@
 
 ## Overview & Motivation
 
-Closed-form distances exist for spheres, capsules and a point against a box, but not for most pairs a planner meets: capsule against box, box against box, or an arbitrary convex hull against anything. Writing a dedicated routine for every pair does not scale.
+Closed-form distances exist for spheres, capsules and a point against a box. They do not exist for most pairs a planner meets: capsule against box, box against box, or an arbitrary convex hull against anything. Writing a dedicated routine for every pair does not scale.
 
-The **Gilbert–Johnson–Keerthi (GJK)** algorithm computes the distance between any two convex shapes using only their **support functions**, the farthest point of the shape in a given direction. When the shapes overlap, the **expanding polytope algorithm (EPA)** continues from GJK's final simplex to find the penetration depth and contact normal.
-Together they give one routine for distance, closest points, penetration depth and contact normal across spheres, capsules, oriented boxes and bounded convex hulls, with bounded memory and iteration counts.
+The **Gilbert–Johnson–Keerthi (GJK)** algorithm computes the distance between any two convex shapes using only their **support functions**. A support function gives the farthest point of the shape in a given direction. When the shapes overlap, the **expanding polytope algorithm (EPA)** continues from GJK's final simplex to find the penetration depth and contact normal.
+Together they give one routine for distance, closest points, penetration depth and contact normal. It covers spheres, capsules, oriented boxes and bounded convex hulls, with bounded memory and iteration counts.
 
 ## Mathematical Theory
 
@@ -27,13 +27,13 @@ This is exact, and a negative value is an exact penetration depth as long as the
 
 ### GJK
 
-Starting from any point of $A \ominus B$, GJK keeps a simplex of up to four support points and the point $v$ of that simplex closest to the origin. Each iteration:
+Starting from any point of $A \ominus B$, GJK keeps a simplex of up to four support points. It also keeps the point $v$ of that simplex closest to the origin. Each iteration:
 
 1. Takes a new support point $w = s_{A \ominus B}(-v)$.
 2. Stops if $\|v\|^2 - v \cdot w \le \varepsilon\|v\|^2$ (no further progress) or if $w$ repeats.
 3. Otherwise adds $w$, computes the closest point of the new simplex with Johnson's sub-algorithm, and keeps only the supporting face.
 
-Johnson's sub-algorithm enumerates the up to 15 faces of the simplex, solves each face's small affine system, and keeps the closest point with non-negative barycentric weights. A full tetrahedron, or a closest point at the origin, means the shapes intersect. Otherwise the witness points follow from the barycentric weights.
+Johnson's sub-algorithm enumerates the up to 15 faces of the simplex and solves each face's small affine system. It keeps the closest point with non-negative barycentric weights. A full tetrahedron, or a closest point at the origin, means the shapes intersect. Otherwise the witness points follow from the barycentric weights.
 
 ### EPA
 
@@ -44,7 +44,7 @@ When the cores intersect, EPA expands a polytope inside $A \ominus B$ that conta
 3. If $w \cdot n$ barely exceeds the face distance, that face lies on the boundary: the depth is its distance and its normal is the contact normal.
 4. Otherwise remove every face that sees $w$, including coplanar ones, and connect $w$ to the horizon edges.
 
-Faces are oriented away from the initial tetrahedron's centroid rather than from the origin, because the origin can lie exactly on a face for touching or axis-aligned shapes.
+Faces are oriented away from the initial tetrahedron's centroid rather than from the origin. The reason is that the origin can lie exactly on a face for touching or axis-aligned shapes.
 
 ## Complexity Analysis
 

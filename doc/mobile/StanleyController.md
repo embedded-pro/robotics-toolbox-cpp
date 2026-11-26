@@ -3,7 +3,7 @@
 ## Overview & Motivation
 
 The **Stanley** steering law steered Stanford's autonomous car to victory in the 2005 DARPA Grand Challenge. It is a path tracker for front-steered vehicles that measures its error at the **front axle**, the point the steered wheels act on directly.
-It then combines two intuitive corrections: turn the wheels parallel to the path, and turn them further towards the path by an amount that depends on the cross-track distance and the speed.
+It then combines two intuitive corrections. The first turns the wheels parallel to the path. The second turns them further towards the path by an amount that depends on the cross-track distance and the speed.
 
 Pure pursuit chases a look-ahead point and tends to cut corners. Stanley instead uses the path heading at the closest point, so it tracks tightly at moderate speed. For small errors the cross-track distance decays exponentially, at a rate set by one gain and independent of speed.
 
@@ -49,7 +49,7 @@ The closest point is searched over a short window of path segments starting at t
 
 ## Step-by-Step Walkthrough
 
-A car with wheel base $2.5$ m and $\delta_{\max} = 0.6$ rad follows a straight road along the $x$ axis, with $k = 2.5$ s⁻¹, $k_s = 1$ m/s and $v = 5$ m/s:
+A car with wheel base $2.5$ m and $\delta_{\max} = 0.6$ rad follows a straight road along the $x$ axis. The gains and speed are $k = 2.5$ s⁻¹, $k_s = 1$ m/s and $v = 5$ m/s:
 
 1. **Lateral offset**: $0.5$ m left of the road with zero heading error, $\delta = -\arctan(1.25/6) = -0.205$ rad.
 2. **Heading error**: on the road but heading $0.2$ rad to the left, the front axle sits at $(2.450, 0.497)$. Both terms steer right, $\delta = -0.2 - \arctan(1.242/6) = -0.404$ rad.

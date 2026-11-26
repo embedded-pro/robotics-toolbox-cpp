@@ -4,7 +4,7 @@
 
 A closed-form inverse-kinematics solver returns every joint configuration that reaches a pose: up to eight for an ortho-parallel arm with a spherical wrist. A controller can use only one. Two facts decide which:
 
-- **Joint limits.** A solution the joints cannot reach is no solution at all. Revolute solvers return angles wrapped to $(-\pi, \pi]$, but a joint that turns further than half a revolution reaches the same pose at $\theta \pm 2\pi$, and that equivalent angle may be the one inside the limits.
+- **Joint limits.** A solution the joints cannot reach is no solution at all. Revolute solvers return angles wrapped to $(-\pi, \pi]$. A joint that turns further than half a revolution reaches the same pose at $\theta \pm 2\pi$. That equivalent angle may be the one inside the limits.
 - **Continuity.** Streaming poses along a line or a jog calls the solver every control period. Picking the solution nearest the current joints keeps the arm on its present branch, so it never flips elbow or wrist between two samples.
 
 The selection turns the solver's candidate set into one joint vector, or a reason why there is none.
@@ -37,7 +37,7 @@ The candidate with the smallest $d$ is the result. The outcome is one of three:
 | Outside limits | The pose is reachable, but every candidate leaves some joint's limits |
 | Unreachable    | The solver returned no candidate at all                               |
 
-The distinction matters to a caller: an unreachable pose is a planning error, while a pose outside the limits may be reachable with another tool orientation or with wider limits.
+The distinction matters to a caller. An unreachable pose is a planning error. A pose outside the limits may be reachable with another tool orientation or with wider limits.
 
 ## Complexity Analysis
 

@@ -2,9 +2,9 @@
 
 ## Overview & Motivation
 
-A laser scanner sees the same walls from slightly different poses as the robot moves. Aligning two consecutive scans therefore measures the motion between them, often far more accurately than wheel odometry, and aligning a scan with a map localises the robot. The standard tool is **iterative closest point** (ICP).
+A laser scanner sees the same walls from slightly different poses as the robot moves. Aligning two consecutive scans therefore measures the motion between them, often far more accurately than wheel odometry. Aligning a scan with a map localises the robot. The standard tool is **iterative closest point** (ICP).
 
-ICP needs no features. Each iteration pairs every point of the current scan with the nearest point of the reference scan, solves for the transform that best aligns the pairs, applies it, and repeats until the correction becomes negligible. Two error metrics are common:
+ICP needs no features. Each iteration pairs every point of the current scan with the nearest point of the reference scan. It solves for the transform that best aligns the pairs and applies it. Iterations repeat until the correction becomes negligible. Two error metrics are common:
 - **Point-to-point** minimises the distances between paired points, with a closed-form solution.
 - **Point-to-line** minimises only the distance across the local reference wall. It converges in fewer iterations and has no bias when the two scans sample the walls at different spots.
 
@@ -60,7 +60,7 @@ The reference scan has 68 points on three walls of a room: $x = 2$, $y = 1.5$ an
 1. **Exact correspondences**: when the current scan samples the same wall spots, both metrics recover the motion to $10^{-4}$. Point-to-point needs 3 iterations, point-to-line 2.
 2. **Sampling bias**: when the current scan samples the walls halfway between the reference points, point-to-point settles about $3$ cm off, pulled towards the reference samples. Point-to-line still recovers the motion exactly.
 3. **Offset guess**: starting from $(-0.05, 0.05, -0.05)$ instead of the identity, point-to-line still converges to the true motion.
-4. **Outlier**: an extra point $1.2$ m from every wall, such as a person in the room, is rejected by the $0.5$ m gate. 65 of the 66 points are paired, and the result is unchanged.
+4. **Outlier**: an extra point $1.2$ m from every wall, such as a person in the room, is rejected by the $0.5$ m gate. Of the 66 points, 65 are paired, and the result is unchanged.
 5. **Tight gate**: with a $1$ cm gate, no pair survives, and the match fails.
 6. **Corridor**: two parallel walls leave the motion along them unobservable, and the match is refused.
 

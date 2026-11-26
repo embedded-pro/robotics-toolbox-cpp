@@ -2,7 +2,7 @@
 
 ## Overview & Motivation
 
-A collaborative robot must notice a collision within milliseconds, from the signals it already has: the commanded joint torques and the measured joint positions and velocities. Joint-torque sensors are expensive, and differentiating velocities to estimate accelerations amplifies noise until the estimate is useless.
+A collaborative robot must notice a collision within milliseconds, from the signals it already has. These are the commanded joint torques and the measured joint positions and velocities. Joint-torque sensors are expensive, and differentiating velocities to estimate accelerations amplifies noise until the estimate is useless.
 
 The **generalized-momentum observer** sidesteps both. It tracks the momentum $p = M(q)\dot{q}$, which changes only because of known torques and the unknown external torque. The mismatch between the measured momentum and the integral of everything the model explains converges to the external torque with a first-order lag.
 The result is a **residual** per joint, an estimate of the contact torque that serves for detection, isolation of the touched link, and reaction strategies.
@@ -57,7 +57,7 @@ A collision is declared when any joint exceeds its threshold, $|r_i| > \bar{r}_i
 
 ## Step-by-Step Walkthrough
 
-A planar two-link arm of uniform rods (masses $2$ and $1.5$ kg, lengths $1$ and $0.8$ m) is simulated at $\Delta t = 1$ ms with gain $K_O = 50\ \text{s}^{-1}$, so $K_O\Delta t = 0.05$.
+The test simulates a planar two-link arm of uniform rods (masses $2$ and $1.5$ kg, lengths $1$ and $0.8$ m). The simulation runs at $\Delta t = 1$ ms with gain $K_O = 50\ \text{s}^{-1}$, so $K_O\Delta t = 0.05$.
 
 1. **Free motion.** Gravity-compensated sinusoidal torques drive the arm for one second. The residual stays below $10^{-2}$ N·m on both joints.
 2. **Step contact.** At $t = 0.2$ s a torque of $0.8$ N·m is applied to joint 2. After one time constant ($20$ ms), $r_2 \approx 0.8(1 - e^{-1}) = 0.506$ N·m. After $0.3$ s it has settled at $0.8$ N·m, and $r_1$ stays near zero.

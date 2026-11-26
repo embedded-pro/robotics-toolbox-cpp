@@ -4,7 +4,7 @@
 
 A **mobile manipulator** mounts a robot arm on a wheeled base. The base extends the arm's reach from a fixed workcell to a whole building. The combination is the standard platform for logistics picking, laboratory automation and service robots.
 
-Controlling the tool needs one Jacobian that maps **all** the robot's inputs, base and arm together, to the tool twist in the world frame. A differential-drive base adds a complication: it has three planar coordinates but only two controls, forward speed and yaw rate, because its wheels cannot slide sideways.
+Controlling the tool needs one Jacobian that maps **all** the robot's inputs, base and arm together, to the tool twist in the world frame. A differential-drive base adds a complication. It has three planar coordinates but only two controls, forward speed and yaw rate, because its wheels cannot slide sideways.
 The combined Jacobian therefore uses the base's two controls directly, so every column is a velocity the robot can actually command.
 
 ## Mathematical Theory
@@ -51,7 +51,7 @@ Every base velocity of this form satisfies the no-slip constraint $-\sin\varphi\
 
 ## Step-by-Step Walkthrough
 
-A three-joint arm (a yaw joint, then two pitch joints with links of $0.2$ m and $0.3$ m and a $0.25$ m tool) is mounted at $(0.1, 0, 0.3)$ on the base, rotated $90°$. The base stands at $(1, 2)$ heading $\pi/6$, and the arm is at $q = (0.4, -0.6, 0.9)$:
+A three-joint arm has a yaw joint, then two pitch joints with links of $0.2$ m and $0.3$ m and a $0.25$ m tool. The arm is mounted at $(0.1, 0, 0.3)$ on the base, rotated $90°$. The base stands at $(1, 2)$ heading $\pi/6$, and the arm is at $q = (0.4, -0.6, 0.9)$:
 
 1. **Tool pose**: the tool point is at $(0.699, 2.343, 0.696)$ in the world.
 2. **Combined twist**: the input $(0.3, -0.5, 0.2, -0.1, 0.4)$ moves the tool at $(0.404, 0.200, -0.047)$ m/s and rotates it at $(-0.181, -0.239, -0.3)$ rad/s, matching a finite difference of the tool pose.

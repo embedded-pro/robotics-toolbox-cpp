@@ -2,7 +2,7 @@
 
 ## Overview & Motivation
 
-A **holonomic** base can move in any planar direction and rotate at the same time, with no need to turn before translating. It can slide sideways into a narrow aisle or dock against a workstation. Holonomic bases are built from **Swedish wheels**: wheels with free rollers around the rim, so each one drives in one direction and slides freely in another.
+A **holonomic** base can move in any planar direction and rotate at the same time, with no need to turn before translating. It can slide sideways into a narrow aisle or dock against a workstation. Holonomic bases are built from **Swedish wheels**, which have free rollers around the rim. Each wheel drives in one direction and slides freely in another.
 
 The common layouts are three omniwheels at $120°$ (the "kiwi" drive) and four mecanum wheels with $45°$ rollers. Both follow from one general model in which every wheel contributes one linear constraint between its speed and the body twist. With more than three wheels the constraints overdetermine the twist, which also allows slip to be detected.
 
@@ -10,7 +10,7 @@ The common layouts are three omniwheels at $120°$ (the "kiwi" drive) and four m
 
 ### Wheel Constraint
 
-Wheel $i$ sits at $(x_i, y_i)$ in the body frame, drives along angle $\beta_i$, has roller angle $\gamma_i$ (zero for omniwheels, $\pm 45°$ for mecanum) and radius $r_i$. With $a_i = \beta_i + \gamma_i$, its angular speed for a body twist $(v_x, v_y, \omega)$ is
+Wheel $i$ sits at $(x_i, y_i)$ in the body frame and drives along angle $\beta_i$. It has roller angle $\gamma_i$ (zero for omniwheels, $\pm 45°$ for mecanum) and radius $r_i$. With $a_i = \beta_i + \gamma_i$, its angular speed for a body twist $(v_x, v_y, \omega)$ is
 
 $$u_i = \frac{1}{r_i\cos\gamma_i}\begin{pmatrix} \cos a_i & \sin a_i & x_i\sin a_i - y_i\cos a_i \end{pmatrix}\begin{pmatrix} v_x \\ v_y \\ \omega \end{pmatrix}$$
 

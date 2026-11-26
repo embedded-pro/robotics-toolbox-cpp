@@ -41,7 +41,7 @@ The feasible region of stage $i$ is a polygon in the $(x, u)$ plane, and $K_i$ i
 
 $$(\beta_p \alpha_n - \beta_n \alpha_p)\,x \le \beta_p \gamma_n - \beta_n \gamma_p$$
 
-Together with the rows that do not involve $u$, these give the exact minimum and maximum of $x$ over the polygon, without an iterative LP solver. The path is infeasible if some $K_i$ is empty or if $0 \notin K_0$, since the robot must start from rest.
+Together with the rows that do not involve $u$, these give the exact minimum and maximum of $x$ over the polygon. No iterative LP solver is needed. The path is infeasible if some $K_i$ is empty or if $0 \notin K_0$, since the robot must start from rest.
 
 ### Greedy Forward Pass
 

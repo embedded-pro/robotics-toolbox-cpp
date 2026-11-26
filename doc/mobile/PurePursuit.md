@@ -2,7 +2,7 @@
 
 ## Overview & Motivation
 
-A mobile robot that must follow a planned path needs a steering law that turns position errors into a smooth command. **Pure pursuit** (Coulter, 1992) is the simplest robust choice and still the default in many navigation stacks: pick the point one **look-ahead distance** ahead on the path, then drive the circular arc that reaches it.
+A mobile robot that must follow a planned path needs a steering law that turns position errors into a smooth command. **Pure pursuit** (Coulter, 1992) is the simplest robust choice and still the default in many navigation stacks. It picks the point one **look-ahead distance** ahead on the path, then drives the circular arc that reaches it.
 
 The output is a **curvature**, so the same tracker serves a unicycle ($\omega = v\kappa$) and a car-like vehicle ($\delta = \arctan(L\kappa)$). Its behaviour is governed by one intuitive parameter. A short look-ahead tracks tightly but oscillates at speed, and a long one is smooth but cuts corners.
 
@@ -62,7 +62,7 @@ The path runs $(0,0) \to (2,0) \to (4,2) \to (4,5)$, with arc lengths $0$, $2$, 
 3. **Goal on the next segment**: from $(1.8, 0)$, the circle leaves the path on the diagonal at $(2.96, 0.96)$, which needs curvature $0.85$.
 4. **Far off the path**: from $(1, -3)$, the circle does not reach the path, so the goal falls back to $(2, 0)$ with curvature $0.6$.
 5. **U-turn**: on a path that runs out and back $1$ m apart, a robot at $(1, 0.6)$ stays on the outbound leg (goal $(1.8, 0)$). An unbounded search would have jumped to the closer return leg.
-6. **Closed loop**: a unicycle starting $0.5$ m off the path at $0.8$ m/s reaches within $0.1$ m of the end in under $600$ steps of $20$ ms.
+6. **Closed loop**: a unicycle starts $0.5$ m off the path at $0.8$ m/s. It reaches within $0.1$ m of the end in under $600$ steps of $20$ ms.
 
 ## Pitfalls & Edge Cases
 

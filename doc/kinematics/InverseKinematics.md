@@ -2,9 +2,9 @@
 
 ## Overview & Motivation
 
-Inverse Kinematics (IK) solves the problem dual to Forward Kinematics: given a desired 3D end-effector position $p_{\text{target}}$, find joint angles $q$ such that the end-effector reaches that position. This is the core computational problem in robot arm control, motion planning, and teleoperation.
+Inverse Kinematics (IK) solves the problem dual to Forward Kinematics. Given a desired 3D end-effector position $p_{\text{target}}$, it finds joint angles $q$ such that the end-effector reaches that position. This is the core computational problem in robot arm control, motion planning, and teleoperation.
 
-The **Damped Least Squares** (DLS) method, also known as the Levenberg-Marquardt approach, iteratively refines a joint-angle estimate by solving a small linear system at each step. Unlike the plain pseudoinverse, DLS adds a damping term $\lambda^2 I$ that keeps the system numerically stable even when the manipulator is near a singular configuration (such as a fully extended arm).
+The **Damped Least Squares** (DLS) method is also known as the Levenberg-Marquardt approach. It iteratively refines a joint-angle estimate by solving a small linear system at each step. Unlike the plain pseudoinverse, DLS adds a damping term $\lambda^2 I$. This term keeps the system numerically stable even when the manipulator is near a singular configuration (such as a fully extended arm).
 
 ## Mathematical Theory
 
@@ -57,8 +57,8 @@ $$\|\Delta q\| \leq \frac{\|e\|}{2\lambda}$$
 
 because each singular value $\sigma$ of $J$ is mapped to $\sigma / (\sigma^2 + \lambda^2) \le 1/(2\lambda)$.
 
-Damping does **not** bias the converged solution of the iteration. A fixed point requires $J^\top (J J^\top + \lambda^2 I)^{-1} e = 0$, which for a full-rank $J$ implies $e = 0$: a reachable, non-singular target is reached exactly, and larger $\lambda$ only shortens the steps and slows convergence.
-The damping trade-off is therefore speed and step size versus robustness near singularities; only at a singular configuration, or for an unreachable target, does the iteration stop at a least-squares stationary point with $e \neq 0$.
+Damping does **not** bias the converged solution of the iteration. A fixed point requires $J^\top (J J^\top + \lambda^2 I)^{-1} e = 0$, which for a full-rank $J$ implies $e = 0$. The iteration reaches a reachable, non-singular target exactly. A larger $\lambda$ only shortens the steps and slows convergence.
+The damping trade-off is therefore speed and step size versus robustness near singularities. Only at a singular configuration, or for an unreachable target, does the iteration stop at a least-squares stationary point with $e \neq 0$.
 Choosing $\lambda \in [0.01, 0.2]$ (scaled to the robot's link lengths) is a common starting point.
 
 ## Complexity Analysis
@@ -90,13 +90,13 @@ After 7 iterations the error drops below $10^{-4}$ and $p_{\text{ee}} \approx (0
 
 ## Pitfalls & Edge Cases
 
-- **Unreachable targets**: If the target lies outside the workspace, the algorithm reaches the iteration limit and reports non-convergence; the iterate approaches a least-squares stationary point (typically the closest reachable point), but this is not guaranteed for non-convex workspaces.
+- **Unreachable targets**: If the target lies outside the workspace, the algorithm reaches the iteration limit and reports non-convergence. The iterate approaches a least-squares stationary point (typically the closest reachable point). This is not guaranteed for non-convex workspaces.
 - **Singularity handling**: Near singularities (e.g., fully extended arm), the damping $\lambda$ bounds the step size and prevents numerical blow-up at the cost of slower convergence. Adaptive or selectively damped schemes raise $\lambda$ only near singularities.
 - **Local minima in redundant chains**: For $n > 3$ (redundant), DLS finds *a* solution (minimum-norm joint motion) but not necessarily the one with the best posture. Null-space techniques (projecting secondary objectives into $\ker(J)$) can improve this.
 - **Initial guess sensitivity**: Starting closer to the expected solution reduces iterations and avoids winding through joint-limit regions. For repeated calls (e.g., tracking), use the previous solution as the initial guess.
 - **Float-only**: The trigonometric and square-root evaluations make fixed-point types unsuitable.
 - **Configuration preconditions**: The damping factor, the tolerance and the iteration budget must all be strictly positive. The damping term $\lambda^2 I$ makes $A$ symmetric positive definite only when $\lambda > 0$; these preconditions are checked when the solver is constructed, in every build type.
-- **Tool and base geometry**: The target is compared against the tool point, so the tool offset and the base mounting offset must match the physical robot; a wrong tool offset makes the solver converge exactly to the wrong joint angles.
+- **Tool and base geometry**: The solver compares the target against the tool point. Thus the tool offset and the base mounting offset must match the physical robot. A wrong tool offset makes the solver converge exactly to the wrong joint angles.
 
 ## Variants & Generalizations
 

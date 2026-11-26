@@ -6,7 +6,7 @@ The geometric Jacobian $J(q) \in \mathbb{R}^{6 \times n}$ is the linear map from
 
 $$\begin{bmatrix} v \\ \omega \end{bmatrix} = J(q)\,\dot{q}$$
 
-Here $v$ is the linear velocity of the **tool point** and $\omega$ the angular velocity of the tool frame, both in the base frame, linear part first. Nearly every task-space algorithm runs on it:
+Here $v$ is the linear velocity of the **tool point** and $\omega$ the angular velocity of the tool frame. Both are in the base frame, linear part first. Nearly every task-space algorithm runs on it:
 
 - damped-least-squares inverse kinematics inverts it;
 - manipulability analysis decomposes it;
@@ -29,7 +29,7 @@ A revolute column depends on $o_i$ only through $p - o_i$ crossed with $\hat{z}_
 
 ### Statics
 
-By the principle of virtual work, a wrench $w = (f; n)$ applied at the tool point (force first, moment about the tool point) does power $w^T J \dot{q}$, which must equal $\tau^T \dot{q}$ for every $\dot{q}$:
+Apply a wrench $w = (f; n)$ at the tool point (force first, moment about the tool point). By the principle of virtual work, it does power $w^T J \dot{q}$, which must equal $\tau^T \dot{q}$ for every $\dot{q}$:
 
 $$\tau = J^T w$$
 
@@ -71,7 +71,7 @@ A planar two-link arm with unit links and joints about $\hat{z}$, stretched alon
 - **Reference point**: the linear rows are the velocity of the tool point, not of the base origin. The "space Jacobian" of the product-of-exponentials literature differs by a frame shift and is a different matrix.
 - **Wrench reference**: in $\tau = J^T w$, the moment must be taken about the tool point. A moment about another point must be shifted first.
 - **Singularities**: near a singularity the columns become dependent and any inverse blows up. Use damping or a pseudo-inverse with a rank threshold, and monitor manipulability.
-- **Frame-chain conventions**: for a standard Denavit–Hartenberg table, joint $i$ acts about the $z$ axis of the frame **before** its link; for the modified convention, about the frame **of** its link. A wrong frame shifts every column.
+- **Frame-chain conventions**: for a standard Denavit–Hartenberg table, joint $i$ acts about the $z$ axis of the frame **before** its link. For the modified convention, it acts about the frame **of** its link. A wrong frame shifts every column.
 
 ## Variants & Generalizations
 

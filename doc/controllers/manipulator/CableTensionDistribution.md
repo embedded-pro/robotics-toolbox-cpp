@@ -5,7 +5,7 @@
 **Cable-driven parallel robots** move a platform with several cables wound on winches: stadium cameras, large-scale 3D printers, rehabilitation devices and wind-tunnel model supports. They reach huge workspaces with tiny moving mass. The catch is that cables can only **pull**. A tension that would have to be negative means the cable goes slack and control is lost.
 
 With more cables than platform degrees of freedom, infinitely many tension sets produce the same platform wrench. The controller must pick one that stays within $[t_{\min}, t_{\max}]$ (taut, but below the winch limit) at every control cycle, deterministically and quickly.
-This module computes the structure matrix from the cable geometry, distributes tensions with Pott's closed-form method and its improved variant, and provides an exact quadratic-programming path for the boundary of the workspace.
+This module computes the structure matrix from the cable geometry. It distributes tensions with Pott's closed-form method and its improved variant. For the boundary of the workspace, it provides an exact quadratic-programming path.
 
 ## Mathematical Theory
 
@@ -31,7 +31,7 @@ It keeps every cable as far from slack and from overload as the wrench allows (P
 
 ### Improved Closed Form
 
-When some tension leaves its bounds, the worst-violating cable is clamped to its bound, its contribution moves to the wrench side, and the reduced system is solved again (Pott, 2014). This repeats at most $m - n + 1$ times. If fewer than $n$ free cables remain, the wrench is declared infeasible for this method.
+When some tension leaves its bounds, the worst-violating cable is clamped to its bound. Its contribution moves to the wrench side, and the reduced system is solved again (Pott, 2014). This repeats at most $m - n + 1$ times. If fewer than $n$ free cables remain, the wrench is declared infeasible for this method.
 
 ### Exact Distribution
 

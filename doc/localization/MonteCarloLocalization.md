@@ -48,7 +48,8 @@ $$\bar\theta = \operatorname{atan2}\Big(\sum_i w_i \sin\theta_i,\; \sum_i w_i \c
 | Update           | $O(N B / s)$ | $O(N)$   | One lookup, exponential and logarithm per used beam |
 | Particle store   | —            | $O(N)$   | Two particle buffers, weights and scratch           |
 
-For $N$ particles, $B$ beams per scan, stride $s$ and a $W \times H$ grid. 500 particles with 60 beams cost about 30 000 field lookups per scan.
+For $N$ particles, $B$ beams per scan, stride $s$ and a $W \times H$ grid.
+As an example, 500 particles with 60 beams cost about 30 000 field lookups per scan.
 
 ## Step-by-Step Walkthrough
 

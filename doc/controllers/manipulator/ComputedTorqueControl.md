@@ -48,7 +48,7 @@ With an imperfect model $\hat{M}, \hat{h}$, the closed loop becomes $\ddot{e} + 
 A two-joint arm with $K_p = \mathrm{diag}(100, 100)$ and $K_d = \mathrm{diag}(20, 20)$, so each joint is critically damped at $\omega_n = 10$ rad/s:
 
 1. Errors $e = (0.1, -0.2)$ rad, $\dot{e} = 0$, $\ddot{q}_d = 0$ give the commanded acceleration $a_q = K_p e = (10, -20)$ rad/s².
-2. Inverse dynamics at the measured $(q, \dot{q})$ with $\ddot{q} = a_q$ returns the torque that makes the arm accelerate exactly at $a_q$, including the coupling, velocity and gravity terms.
+2. Inverse dynamics at the measured $(q, \dot{q})$ with $\ddot{q} = a_q$ returns the torque that makes the arm accelerate exactly at $a_q$. This torque includes the coupling, velocity and gravity terms.
 3. With an exact model, each joint's error then follows $e(t) = (e_0 + (\dot{e}_0 + 10 e_0)t)\,e^{-10t}$. Starting at rest with $e_0 = 0.3$ rad, the error is about $1.5 \times 10^{-4}$ rad after one second, with no overshoot.
 4. Adding velocity and acceleration feedforward makes the same law track a moving trajectory with the same error dynamics.
 

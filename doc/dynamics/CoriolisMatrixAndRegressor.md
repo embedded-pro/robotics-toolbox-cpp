@@ -50,7 +50,8 @@ Each link contributes ten parameters about its joint origin: mass $m$, first mom
 $$I\,(\omega; u) = A(\omega, u)\,\pi_i, \qquad A = \begin{bmatrix} 0 & -[u]_\times & L(\omega) \\ u & [\omega]_\times & 0 \end{bmatrix}$$
 
 where $L(\omega)$ arranges $\omega$ so that $L(\omega)\,(I_{xx}, I_{xy}, I_{xz}, I_{yy}, I_{yz}, I_{zz})^T = I_O\,\omega$. Substituting $A$ into the body wrench gives a $6 \times 10$ block per link.
-Carrying it towards the base and projecting on each ancestor joint fills the regressor $Y$, with $Y\pi = M\ddot{q}_r + C\dot{q}_r + g$. $Y$ depends only on geometry and motion, never on the inertial parameters. The armature is not one of the ten link parameters.
+Carrying it towards the base and projecting on each ancestor joint fills the regressor $Y$, with $Y\pi = M\ddot{q}_r + C\dot{q}_r + g$.
+The regressor $Y$ depends only on geometry and motion, never on the inertial parameters. The armature is not one of the ten link parameters.
 
 ## Complexity Analysis
 
@@ -72,7 +73,7 @@ A planar two-link arm of uniform rods, with $h = m_2 l_1 \tfrac{l_2}{2} \sin q_2
 
 ## Pitfalls & Edge Cases
 
-- **Wrong factorization**: reconstructing $C$ from the vector $C\dot{q}$, or using a convenient factorization from symbolic tools, generally breaks the skew-symmetry, and with it the stability proofs of passivity-based controllers and observers.
+- **Wrong factorization**: reconstructing $C$ from the vector $C\dot{q}$, or using a convenient factorization from symbolic tools, generally breaks the skew-symmetry. This also breaks the stability proofs of passivity-based controllers and observers.
 - **Parameter frame**: the regressor's rotational inertia is about the **joint origin**, not the centre of mass. Mixing the two silently corrupts identification.
 - **Identifiability**: the full $10n$-parameter vector is not identifiable from joint torques. Some parameters never appear and others only in combinations. Reduce to base parameters before estimation.
 - **Armature and friction**: neither is among the ten link parameters. Extend the parameter vector with per-joint armature and friction terms when identifying real arms.
