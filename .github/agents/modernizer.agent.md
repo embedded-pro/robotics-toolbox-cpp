@@ -17,22 +17,21 @@ change unless required to remove duplication.
 
 1. Read the target `.hpp`, its `test/Test*.cpp`, and `doc/<domain>/<Name>.md`.
 2. Find duplication: logic that already exists in `numerical/math/`
-   (`CompilerOptimizations.hpp`, `Tolerance.hpp`, `ComplexNumber.hpp`,
-   `RecursiveBuffer.hpp`, `Statistics.hpp`, …) or scaffolding repeated across `test/` files
-   (e.g. `CalculateMagnitude`, twiddle-factor mocks — emulate `PowerDensitySpectrumTestSupport.hpp`).
+   (`CompilerOptimizations.hpp`, `Tolerance.hpp`, `Matrix.hpp`, `Math.hpp`, `AngleUtilities.hpp`, …)
+   or scaffolding repeated across `test/` files (e.g. mock setups — reuse the mocks in
+   `robotics/<domain>/test_doubles/`).
 3. Replace the duplicated logic with the shared utility; delete the local copy.
 4. Add coverage-build infra if missing (per `roadmap/DEPLOYMENT.md`): guarded `extern template`
    at header bottom + matching `.cpp` (`template class <Name><float, ...>;`) wired via
    `robotics_add_coverage_sources()`.
-5. Refactor the `test/Test*.cpp` — **mandatory, never skip**. It is a required deliverable, not
-   optional cleanup: apply the **Tests checklist** below on every run, even when the production
-   code needs no change and even when the test already builds green.
+5. Apply the *Tests checklist* below to `test/Test*.cpp` on every run, even when the production
+   code needs no change and the test already passes.
 6. Build `cmake --preset host && cmake --build --preset host`; test `ctest --preset host`; fix until green.
 7. Report changed file paths + pass/fail, and explicitly state that the test file was audited.
 
 ## Tests checklist — apply every run
 
-The `test/Test*.cpp` is a first-class deliverable of every modernization. Audit and fix:
+Audit and fix:
 - [ ] `StrictMock<...>` only — never a bare mock or `NiceMock`.
 - [ ] Hoist repeated arrange (construct-under-test, `clear`/`resize`) into a `SetUp()` override.
 - [ ] Extract repeated mock-return / `WillOnce(Invoke(...))` tails into fixture helper methods.
